@@ -3,3 +3,4 @@ Makefile*
 *.pro.user
 *.Debug
 *.Release
+Thumbs.db
