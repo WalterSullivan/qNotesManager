@@ -1,0 +1,5 @@
+build
+Makefile*
+*.pro.user
+*.Debug
+*.Release
