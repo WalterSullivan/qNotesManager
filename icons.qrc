@@ -1,0 +1,66 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="main">icons/book-brown.png</file>
+    </qresource>
+    <qresource prefix="/gui">
+        <file alias="underline-color">icons/gui/border-color.png</file>
+        <file alias="broom">icons/gui/broom.png</file>
+        <file alias="date">icons/gui/date.png</file>
+        <file alias="edit-alignment">icons/gui/edit-alignment.png</file>
+        <file alias="edit-alignment-center">icons/gui/edit-alignment-center.png</file>
+        <file alias="edit-alignment-justify">icons/gui/edit-alignment-justify.png</file>
+        <file alias="edit-alignment-right">icons/gui/edit-alignment-right.png</file>
+        <file alias="edit-bold">icons/gui/edit-bold.png</file>
+        <file alias="text-color">icons/gui/edit-color.png</file>
+        <file alias="edit-italic">icons/gui/edit-italic.png</file>
+        <file alias="edit-list">icons/gui/edit-list.png</file>
+        <file alias="edit-strike">icons/gui/edit-strike.png</file>
+        <file alias="edit-underline">icons/gui/edit-underline.png</file>
+        <file alias="eraser">icons/gui/eraser.png</file>
+        <file alias="folder">icons/gui/folder.png</file>
+        <file alias="folder-horizontal-open">icons/gui/folder-horizontal-open.png</file>
+        <file alias="magnifier">icons/gui/magnifier.png</file>
+        <file alias="background-color">icons/gui/paint-can-color.png</file>
+        <file alias="table">icons/gui/table.png</file>
+        <file alias="table-delete-column">icons/gui/table-delete-column.png</file>
+        <file alias="table-delete-row">icons/gui/table-delete-row.png</file>
+        <file alias="table-insert-column">icons/gui/table-insert-column.png</file>
+        <file alias="table-insert-row">icons/gui/table-insert-row.png</file>
+        <file alias="table-join">icons/gui/table-join.png</file>
+        <file alias="tag">icons/gui/tag.png</file>
+        <file alias="wrench-screwdriver">icons/gui/wrench-screwdriver.png</file>
+        <file alias="disk-black">icons/gui/disk-black.png</file>
+        <file alias="cross">icons/gui/cross.png</file>
+        <file alias="document">icons/gui/document.png</file>
+        <file alias="pin">icons/gui/pin.png</file>
+        <file alias="arrow-down">icons/gui/control-270.png</file>
+        <file alias="arrow-up">icons/gui/control-090.png</file>
+        <file alias="property">icons/gui/property.png</file>
+        <file alias="globe-green">icons/gui/globe-green.png</file>
+        <file alias="user">icons/gui/user.png</file>
+        <file alias="balloon-box">icons/gui/balloon-box.png</file>
+        <file alias="edit">icons/gui/edit.png</file>
+        <file alias="edit-lipsum">icons/gui/edit-lipsum.png</file>
+        <file alias="globe-network">icons/gui/globe-network.png</file>
+        <file alias="bin-full">icons/gui/bin-full.png</file>
+        <file alias="bin">icons/gui/bin.png</file>
+        <file alias="folder-tree">icons/gui/folder-tree.png</file>
+        <file alias="folder-excl">icons/gui/folder--exclamation.png</file>
+        <file alias="arrow">icons/gui/arrow.png</file>
+        <file alias="arrow-180">icons/gui/arrow-180.png</file>
+        <file alias="lock-small">icons/gui/lock-small.png</file>
+        <file alias="unlock">icons/gui/lock-unlock.png</file>
+        <file alias="lock">icons/gui/lock.png</file>
+        <file alias="redo">icons/gui/arrow-curve.png</file>
+        <file alias="undo">icons/gui/arrow-curve-180-left.png</file>
+        <file alias="lightning">icons/gui/lightning.png</file>
+        <file alias="doc-add">icons/gui/document--plus.png</file>
+        <file alias="folder-add">icons/gui/folder--plus.png</file>
+        <file alias="cross-small">icons/gui/cross-small.png</file>
+    </qresource>
+    <qresource prefix="/standard">
+        <file alias="tag">icons/standard/tag.png</file>
+        <file alias="folder">icons/standard/folder.png</file>
+        <file alias="note">icons/standard/note.png</file>
+    </qresource>
+</RCC>
