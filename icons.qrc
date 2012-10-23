@@ -57,6 +57,8 @@
         <file alias="doc-add">icons/gui/document--plus.png</file>
         <file alias="folder-add">icons/gui/folder--plus.png</file>
         <file alias="cross-small">icons/gui/cross-small.png</file>
+        <file alias="clipboard-arrow">icons/gui/clipboard--arrow.png</file>
+        <file alias="power">icons/gui/control-power.png</file>
     </qresource>
     <qresource prefix="/standard">
         <file alias="tag">icons/standard/tag.png</file>
