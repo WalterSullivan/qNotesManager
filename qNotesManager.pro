@@ -105,7 +105,6 @@ HEADERS += src/tag.h \
     src/textedit.h \
     src/textdocument.h \
     src/texteditwidget.h \
-    src/documentsettingswidget.h \
     src/cipherer.h \
     src/documentpropertieswidget.h \
     src/aboutprogramwidget.h \
@@ -166,7 +165,6 @@ SOURCES += src/tagownerscollection.cpp \
     src/texteditwidget.cpp \
     src/textedit.cpp \
     src/textdocument.cpp \
-    src/documentsettingswidget.cpp \
     src/cipherer.cpp \
     src/documentpropertieswidget.cpp \
     src/aboutprogramwidget.cpp \
