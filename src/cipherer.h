@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CRYPTOR_H
-#define CRYPTOR_H
+#ifndef CIPHERER_H
+#define CIPHERER_H
 
 #include <QtCrypto>
 #include <QByteArray>
@@ -71,4 +71,4 @@ namespace qNotesManager {
 	};
 }
 
-#endif // CRYPTOR_H
+#endif // CIPHERER_H
