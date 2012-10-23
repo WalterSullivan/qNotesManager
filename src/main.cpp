@@ -21,22 +21,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "mainwindow.h"
 
-#include <QDate>
-#include <QDebug>
-#include <QList>
-#include <QColor>
-#include <QString>
-#include <QBuffer>
-#include <QFile>
 #include <QTextCodec>
-#include "tracelogger.h"
-#include "folder.h"
-#include "note.h"
-#include "document.h"
 #include "application.h"
-#include "tag.h"
-
-#include "cipherer.h"
 
 
 using namespace qNotesManager;
@@ -65,8 +51,6 @@ int main(int argc, char** argv) {
 
 	bool showMainWindow = true;
 
-
-
 	if (arguments.count() > 1) {
 		arguments.removeAt(0);
 
@@ -86,77 +70,16 @@ int main(int argc, char** argv) {
 				showMainWindow = false;
 			}
 		}
-
-
 	}
 
 	qInstallMsgHandler(myMessageOutput);
-
-	{
-		Note* n = new Note("");
-		Tag* t = new Tag("1");
-		n->Tags.Add(t);
-		t = new Tag("2");
-		n->Tags.Add(t);
-		n->Tags.Clear();
-
-		delete n;
-	}
-
-	Document* doc = new Document();
-
-	{
-		Folder* f = new Folder("Programming");
-		Note* n1 = new Note("C++");
-		f->Items.Add(n1);
-		Note* n2 = new Note("Tips & tricks");
-		f->Items.Add(n2);
-		Note* n3 = new Note("C#");
-		f->Items.Add(n3);
-
-		doc->GetRoot()->Items.Add(f);
-
-		f = new Folder("Movies");
-		Note* n4 = new Note("To Watch");
-		f->Items.Add(n4);
-		Folder* f2 = new Folder("Revies");
-		Note* n5 = new Note("Review1");
-		f2->Items.Add(n5);
-		f->Items.Add(f2);
-
-		doc->GetRoot()->Items.Add(f);
-
-		Tag* t1 = new Tag("C");
-		Tag* t2 = new Tag("Cool");
-		Tag* t3 = new Tag("Read later");
-		Tag* t4 = new Tag("Important");
-
-		n1->Tags.Add(t1);
-		n2->Tags.Add(t1);
-		n2->Tags.Add(t4);
-		n4->Tags.Add(t2);
-		n5->Tags.Add(t3);
-		n3->Tags.Add(t2);
-
-
-	}
-
-
-
-
 
 	MainWindow w;
 	if (showMainWindow) {
 		w.show();
 	}
 
-
-Application::I()->SetCurrentDocument(doc);
-
 	return app.exec();
-
-
-	return 0;
 }
 
 
