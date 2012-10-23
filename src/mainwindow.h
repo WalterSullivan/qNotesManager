@@ -93,13 +93,14 @@ namespace qNotesManager {
 		SearchResultsWidget* searchResultsWidget;
 
 		QWidget* rightPanelWidget;
-		//QLayout* rightPanelLayout;
 		QSplitter* rightPanelSplitter;
 
 		DocumentPropertiesWidget* docProperties;
 
 		void saveDocumentVisualSettings() const;
 		void restoreDocumentVisualSettings();
+		void createActions();
+		void createControls();
 
 	public:
 		explicit MainWindow();
@@ -118,8 +119,6 @@ namespace qNotesManager {
 
 		void sl_CurrentNoteChanged(Note*);
 
-
-		void sl_testSlot(QObject*);
 
 		void sl_ShowSearchResult(NoteFragment);
 		void sl_SearchResults_CloseRequest();

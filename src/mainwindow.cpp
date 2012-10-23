@@ -45,65 +45,24 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 MainWindow::MainWindow() : QMainWindow(0) {
-	docProperties = 0;
+	createControls();
 
-	navigationPanel = new NavigationPanelWidget();
-	QObject::connect(navigationPanel, SIGNAL(sg_NoteDoubleClicked(Note*)),
-					 this, SLOT(sl_NoteDoubleClicked(Note*)));
-	QObject::connect(navigationPanel, SIGNAL(sg_SelectedItemsActionsListChanged()),
-					 this, SLOT(sl_EditMenuContentChanged()));
+	// Clipboard
+	QClipboard* clipboard = QApplication::clipboard();
+	QObject::connect(clipboard, SIGNAL(dataChanged()),
+					 this, SLOT(sl_Clipboard_DataChanged()));
+	sl_Clipboard_DataChanged();
 
-	notesTabWidget = new NotesTabWidget();
-	QObject::connect(notesTabWidget, SIGNAL(sg_CurrentNoteChanged(Note*)),
-					 this, SLOT(sl_CurrentNoteChanged(Note*)));
 
-	rightPanelWidget = new QWidget();
-	//rightPanelLayout = new QVBoxLayout();
-	rightPanelSplitter = new QSplitter(Qt::Vertical, this);
-#if QT_VERSION < 0x040300
-	//rightPanelLayout->setMargin(2);
-#else
-	//rightPanelLayout->setContentsMargins(2, 2, 2, 2);
-#endif
-	rightPanelSplitter->addWidget(notesTabWidget);
-	rightPanelSplitter->setCollapsible(0, false);
-	//rightPanelLayout->addWidget(notesTabWidget);
-	//rightPanelWidget->setLayout(rightPanelLayout);
-
-	mainSplitter = new QSplitter(Qt::Horizontal, this);
-	mainSplitter->addWidget(navigationPanel);
-	mainSplitter->addWidget(rightPanelSplitter);
-	mainSplitter->setCollapsible(1, false);
-	mainSplitter->setStretchFactor(0, 0);
-	mainSplitter->setStretchFactor(1, 5);
-
-	setCentralWidget(mainSplitter);
-
-	engine = new DocumentSearchEngine(this);
-	searchWidget = 0;
-	searchResultsWidget = 0;
-
-	// Create toolbar
-	toolbar = new QToolBar(this);
+	QObject::connect(Application::I(), SIGNAL(sg_CurrentDocumentChanged(Document*)),
+					 this, SLOT(sl_Application_CurrentDocumentChanged(Document*)));
 
 
 
-	addToolBar(toolbar);
+	setWindowTitle(APPNAME);
+}
 
-
-	// Create statusbar
-	statusBar = new QStatusBar();
-	setStatusBar(statusBar);
-
-
-	// Create menubar
-	menuBar = new QMenuBar();
-	setMenuBar(menuBar);
-
-	// Create main menu
-	documentMenu = new QMenu("Document");
-	menuBar->addMenu(documentMenu);
-
+void MainWindow::createActions() {
 	newDocumentAction = new QAction(QPixmap(":/gui/document"), "New document", this);
 	QObject::connect(newDocumentAction, SIGNAL(triggered()),
 					 this, SLOT(sl_NewDocumentAction_Triggered()));
@@ -137,9 +96,110 @@ MainWindow::MainWindow() : QMainWindow(0) {
 					 this, SLOT(sl_GlobalSearchAction_Triggered()));
 	globalSearchAction->setShortcut(QKeySequence(Qt::ControlModifier |Qt::ShiftModifier | Qt::Key_F));
 
-	exitAction = new QAction(QPixmap(), "Exit", this);
+	exitAction = new QAction(QPixmap(":/gui/power"), "Exit", this);
 	QObject::connect(exitAction, SIGNAL(triggered()),
 					 this, SLOT(sl_ExitAction_Triggered()));
+
+	showToolbarAction = new QAction("Show toolbar", this);
+	showToolbarAction->setCheckable(true);
+	showToolbarAction->setChecked(true);
+	QObject::connect(showToolbarAction, SIGNAL(triggered()),
+					 this, SLOT(sl_ShowToolbarAction_Triggered()));
+
+	showStatusBarAction = new QAction("Show statusbar", this);
+	showStatusBarAction->setCheckable(true);
+	showStatusBarAction->setChecked(true);
+	QObject::connect(showStatusBarAction, SIGNAL(triggered()),
+					 this, SLOT(sl_ShowStatusbarAction_Triggered()));
+
+	applicationSettingAction = new QAction(QPixmap(":/gui/wrench-screwdriver"), "Settings", this);
+	QObject::connect(applicationSettingAction, SIGNAL(triggered()),
+					 this, SLOT(sl_ApplicationSettingsAction_Triggered()));
+
+	aboutProgramAction = new QAction("About program", this);
+	QObject::connect(aboutProgramAction, SIGNAL(triggered()),
+					 this, SLOT(sl_AboutProgramAction_Triggered()));
+
+	aboutQtAction = new QAction("About Qt", this);
+	QObject::connect(aboutQtAction, SIGNAL(triggered()),
+					 this, SLOT(sl_AboutQtAction_Triggered()));
+
+	showHideMainWindowAction = new QAction("Show / hide main window", this);
+	QObject::connect(showHideMainWindowAction, SIGNAL(triggered()),
+					 this, SLOT(sl_ShowHideMainWindowAction_Triggered()));
+
+	quickNoteAction = new QAction(QIcon(":/gui/lightning"), "Quick note", this);
+	quickNoteAction->setToolTip("Create note with text from clipboard");
+	quickNoteAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_N));
+	QObject::connect(quickNoteAction, SIGNAL(triggered()),
+					 this, SLOT(sl_QuickNoteAction_Triggered()));
+	quickNoteAction->setEnabled(false);
+}
+
+void MainWindow::createControls() {
+	createActions();
+
+	docProperties = 0;
+
+	navigationPanel = new NavigationPanelWidget();
+	QObject::connect(navigationPanel, SIGNAL(sg_NoteDoubleClicked(Note*)),
+					 this, SLOT(sl_NoteDoubleClicked(Note*)));
+	QObject::connect(navigationPanel, SIGNAL(sg_SelectedItemsActionsListChanged()),
+					 this, SLOT(sl_EditMenuContentChanged()));
+
+	notesTabWidget = new NotesTabWidget();
+	QObject::connect(notesTabWidget, SIGNAL(sg_CurrentNoteChanged(Note*)),
+					 this, SLOT(sl_CurrentNoteChanged(Note*)));
+
+	rightPanelWidget = new QWidget();
+	rightPanelSplitter = new QSplitter(Qt::Vertical, this);
+	rightPanelSplitter->addWidget(notesTabWidget);
+	rightPanelSplitter->setCollapsible(0, false);
+
+
+	mainSplitter = new QSplitter(Qt::Horizontal, this);
+	mainSplitter->addWidget(navigationPanel);
+	mainSplitter->addWidget(rightPanelSplitter);
+	mainSplitter->setCollapsible(1, false);
+	mainSplitter->setStretchFactor(0, 0);
+	mainSplitter->setStretchFactor(1, 5);
+
+	setCentralWidget(mainSplitter);
+
+	engine = new DocumentSearchEngine(this);
+	searchWidget = 0;
+	searchResultsWidget = 0;
+
+	// Create toolbar
+	toolbar = new QToolBar(this);
+	toolbar->addAction(newDocumentAction);
+	toolbar->addAction(openDocumentAction);
+	toolbar->addAction(saveDocumentAction);
+	toolbar->addAction(closeDocumentAction);
+	toolbar->addSeparator();
+	toolbar->addAction(documentPropertiesAction);
+	toolbar->addAction(globalSearchAction);
+	toolbar->addSeparator();
+	toolbar->addAction(applicationSettingAction);
+	toolbar->addAction(quickNoteAction);
+	toolbar->addAction(exitAction);
+
+
+	addToolBar(toolbar);
+
+
+	// Create statusbar
+	statusBar = new QStatusBar();
+	setStatusBar(statusBar);
+
+
+	// Create menubar
+	menuBar = new QMenuBar();
+	setMenuBar(menuBar);
+
+	// Create main menu
+	documentMenu = new QMenu("Document");
+	menuBar->addMenu(documentMenu);
 
 	documentMenu->addAction(newDocumentAction);
 	documentMenu->addAction(openDocumentAction);
@@ -160,21 +220,7 @@ MainWindow::MainWindow() : QMainWindow(0) {
 
 	optionsMenu = new QMenu("Options", this);
 	menuBar->addMenu(optionsMenu);
-	showToolbarAction = new QAction("Show toolbar", this);
-	showToolbarAction->setCheckable(true);
-	showToolbarAction->setChecked(true);
-	QObject::connect(showToolbarAction, SIGNAL(triggered()),
-					 this, SLOT(sl_ShowToolbarAction_Triggered()));
 
-	showStatusBarAction = new QAction("Show statusbar", this);
-	showStatusBarAction->setCheckable(true);
-	showStatusBarAction->setChecked(true);
-	QObject::connect(showStatusBarAction, SIGNAL(triggered()),
-					 this, SLOT(sl_ShowStatusbarAction_Triggered()));
-
-	applicationSettingAction = new QAction("Settings", this);
-	QObject::connect(applicationSettingAction, SIGNAL(triggered()),
-					 this, SLOT(sl_ApplicationSettingsAction_Triggered()));
 
 	optionsMenu->addAction(showToolbarAction);
 	optionsMenu->addAction(showStatusBarAction);
@@ -183,26 +229,14 @@ MainWindow::MainWindow() : QMainWindow(0) {
 
 	aboutMenu = new QMenu("About", this);
 	menuBar->addMenu(aboutMenu);
-	aboutProgramAction = new QAction("About program", this);
-	QObject::connect(aboutProgramAction, SIGNAL(triggered()),
-					 this, SLOT(sl_AboutProgramAction_Triggered()));
-	aboutQtAction = new QAction("About Qt", this);
-	QObject::connect(aboutQtAction, SIGNAL(triggered()),
-					 this, SLOT(sl_AboutQtAction_Triggered()));
+
+
+
 	aboutMenu->addAction(aboutProgramAction);
 	aboutMenu->addAction(aboutQtAction);
 
 	// Create tray icon
-	showHideMainWindowAction = new QAction("Show / hide main window", this);
-	QObject::connect(showHideMainWindowAction, SIGNAL(triggered()),
-					 this, SLOT(sl_ShowHideMainWindowAction_Triggered()));
 
-	quickNoteAction = new QAction(QIcon(":/gui/lightning"), "Quick note", this);
-	quickNoteAction->setToolTip("Create note with text from clipboard");
-	quickNoteAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_N));
-	QObject::connect(quickNoteAction, SIGNAL(triggered()),
-					 this, SLOT(sl_QuickNoteAction_Triggered()));
-	quickNoteAction->setEnabled(false);
 	addAction(quickNoteAction);
 
 	trayIconMenu = new QMenu();
@@ -217,22 +251,6 @@ MainWindow::MainWindow() : QMainWindow(0) {
 	trayIcon->setContextMenu(trayIconMenu);
 	trayIcon->show();
 
-	// Clipboard
-	QClipboard* clipboard = QApplication::clipboard();
-	QObject::connect(clipboard, SIGNAL(dataChanged()),
-					 this, SLOT(sl_Clipboard_DataChanged()));
-	sl_Clipboard_DataChanged();
-
-
-	QObject::connect(Application::I(), SIGNAL(sg_CurrentDocumentChanged(Document*)),
-					 this, SLOT(sl_Application_CurrentDocumentChanged(Document*)));
-
-
-
-	setWindowTitle(APPNAME);
-}
-
-void MainWindow::sl_testSlot(QObject*) {
 }
 
 /*virtual*/
