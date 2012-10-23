@@ -121,7 +121,7 @@ quint32 crc32buf(const char *buf, size_t len) {
 	oldcrc32 = 0xFFFFFFFF;
 
 	for ( ; len; --len, ++buf) {
-		oldcrc32 = UPDC32(*buf, oldcrc32);
+		oldcrc32 = updateCRC32(*buf, oldcrc32);
 	}
 
 	return ~oldcrc32;
