@@ -65,7 +65,6 @@ HEADERS += src/tag.h \
     src/mainwindow.h \
     src/folderitemcollection.h \
     src/document.h \
-    src/applicationpreferences.h \
     src/application.h \
     src/abstractfolderitem.h \
     src/tagownerscollection.h \
@@ -117,7 +116,8 @@ HEADERS += src/tag.h \
     src/documentsearchengine.h \
     src/global.h \
     src/boibuffer.h \
-    src/crc32.h
+    src/crc32.h \
+    src/applicationsettings.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -126,7 +126,6 @@ SOURCES += src/tagownerscollection.cpp \
     src/main.cpp \
     src/folderitemcollection.cpp \
     src/document.cpp \
-    src/applicationpreferences.cpp \
     src/application.cpp \
     src/abstractfolderitem.cpp \
     src/folder.cpp \
@@ -172,5 +171,6 @@ SOURCES += src/tagownerscollection.cpp \
     src/documentvisualsettings.cpp \
     src/documentsearchengine.cpp \
     src/boibuffer.cpp \
-    src/crc32.cpp
+    src/crc32.cpp \
+    src/applicationsettings.cpp
 RESOURCES += icons.qrc

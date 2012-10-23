@@ -22,7 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QHash>
 #include <QPixmap>
 
-#include "applicationpreferences.h"
+#include "applicationsettings.h"
 
 namespace qNotesManager {
 	class Document;
@@ -43,7 +43,7 @@ namespace qNotesManager {
 		void SetCurrentDocument(Document*);
 		Document* CurrentDocument() const;
 
-		ApplicationPreferences Preferences;
+		ApplicationSettings Settings;
 
 		QHash<QString, QPixmap> GetStandardIcons() const;
 

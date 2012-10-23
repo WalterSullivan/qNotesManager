@@ -15,16 +15,16 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef APPLICATIONPREFERENCES_H
-#define APPLICATIONPREFERENCES_H
+#ifndef APPLICATIONSETTINGS_H
+#define APPLICATIONSETTINGS_H
 
 #include <QPoint>
 #include <QSize>
 
 namespace qNotesManager {
-	class ApplicationPreferences {
+	class ApplicationSettings {
 	public:
-		ApplicationPreferences();
+		ApplicationSettings();
 
 		QPoint windowPosition;
 		QSize windowSize;
@@ -39,7 +39,9 @@ namespace qNotesManager {
 		bool moveItemsToBin;
 		bool showAsterixInChangedItemTitle;
 		bool createBackups;
+		bool showToolbar;
+		bool showStausBar;
 	};
 }
 
-#endif // APPLICATIONPREFERENCES_H
+#endif // APPLICATIONSETTINGS_H

@@ -15,10 +15,10 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "applicationpreferences.h"
+#include "applicationsettings.h"
 
 using namespace qNotesManager;
 
-ApplicationPreferences::ApplicationPreferences()
+ApplicationSettings::ApplicationSettings()
 {
 }
