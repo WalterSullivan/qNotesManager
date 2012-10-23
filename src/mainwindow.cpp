@@ -76,25 +76,30 @@ void MainWindow::createActions() {
 	QObject::connect(saveDocumentAction, SIGNAL(triggered()),
 					 this, SLOT(sl_SaveDocumentAction_Triggered()));
 	saveDocumentAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
+	saveDocumentAction->setEnabled(false);
 
 
 	saveDocumentAsAction = new QAction(QPixmap("/gui/disk-black"), "Save As...", this);
 	QObject::connect(saveDocumentAsAction, SIGNAL(triggered()),
 					 this, SLOT(sl_SaveDocumentAsAction_Triggered()));
+	saveDocumentAsAction->setEnabled(false);
 
 	closeDocumentAction = new QAction(QPixmap(":/gui/cross"), "Close document", this);
 	QObject::connect(closeDocumentAction, SIGNAL(triggered()),
 					 this, SLOT(sl_CloseDocumentAction_Triggered()));
 	closeDocumentAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Q));
+	closeDocumentAction->setEnabled(false);
 
 	documentPropertiesAction = new QAction(QPixmap(":/gui/property"), "Document properties", this);
 	QObject::connect(documentPropertiesAction, SIGNAL(triggered()),
 					 this, SLOT(sl_DocumentPropertiesAction_Triggered()));
+	documentPropertiesAction->setEnabled(false);
 
 	globalSearchAction = new QAction(QPixmap(":/gui/magnifier"), "Search", this);
 	QObject::connect(globalSearchAction, SIGNAL(triggered()),
 					 this, SLOT(sl_GlobalSearchAction_Triggered()));
 	globalSearchAction->setShortcut(QKeySequence(Qt::ControlModifier |Qt::ShiftModifier | Qt::Key_F));
+	globalSearchAction->setEnabled(false);
 
 	exitAction = new QAction(QPixmap(":/gui/power"), "Exit", this);
 	QObject::connect(exitAction, SIGNAL(triggered()),
@@ -526,6 +531,19 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 		restoreDocumentVisualSettings();
 		sl_Clipboard_DataChanged();
 	}
+
+	// Actions
+	bool enable = (doc != 0);
+	saveDocumentAction->setEnabled(enable);
+	saveDocumentAsAction->setEnabled(enable);
+	closeDocumentAction->setEnabled(enable);
+	documentPropertiesAction->setEnabled(enable);
+	globalSearchAction->setEnabled(enable);
+
+
+
+
+
 }
 
 void MainWindow::sl_Application_NoteDeleted(Note* n) {
