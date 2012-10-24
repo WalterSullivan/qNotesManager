@@ -19,16 +19,35 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #define APPLICATIONSETTINGSWIDGET_H
 
 #include <QDialog>
+#include <QCheckBox>
+#include <QPushButton>
 
 namespace qNotesManager {
 	class ApplicationSettingsWidget : public QDialog {
 	Q_OBJECT
+	private:
+		QCheckBox* preserveDocVisSettingsCheckbox;
+		QCheckBox* showNumberOfItemsCheckbox;
+		QCheckBox* showTagsTreeViewCheckbox;
+		QCheckBox* showDatesTreeViewCheckbox;
+		QCheckBox* showSystemTrayCheckbox;
+		QCheckBox* closeToTrayCheckbox;
+		QCheckBox* minimizeToTrayCheckbox;
+		QCheckBox* moveItemsToBinCheckbox;
+		QCheckBox* showAsterixInTitleCheckbox;
+		QCheckBox* createBackupsCheckbox;
+		QCheckBox* showWindowOnStartCheckbox;
+
+		QPushButton* okButton;
+		QPushButton* cancelButton;
+
 	public:
 		explicit ApplicationSettingsWidget(QWidget *parent = 0);
 
-	signals:
-
-	public slots:
+	private slots:
+		void sl_ShowSystemTrayCheckbox_StateChanged(int);
+		void sl_OKButton_Clicked();
+		void sl_CancelButton_Clicked();
 
 	};
 }
