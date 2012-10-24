@@ -19,6 +19,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-ApplicationSettings::ApplicationSettings()
-{
+ApplicationSettings::ApplicationSettings() {
+}
+
+void ApplicationSettings::Load() {
+
+}
+
+void ApplicationSettings::Save() {
+
 }

@@ -25,6 +25,8 @@ namespace qNotesManager {
 	class ApplicationSettings {
 	public:
 		ApplicationSettings();
+		void Load();
+		void Save();
 
 		QPoint windowPosition;
 		QSize windowSize;
@@ -36,6 +38,7 @@ namespace qNotesManager {
 		bool showDatesTreeView;
 		bool showSystemTray;
 		bool closeToTray;
+		bool minimizeToTray;
 		bool moveItemsToBin;
 		bool showAsterixInChangedItemTitle;
 		bool createBackups;
