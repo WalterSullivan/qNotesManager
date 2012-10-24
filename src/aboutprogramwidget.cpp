@@ -28,15 +28,16 @@ AboutProgramWidget::AboutProgramWidget(QWidget *parent) : QDialog(parent) {
 	descriptionLabel = new QLabel();
 	descriptionLabel->setText(
 	"qNotesManager is note taking software. Keep all your notes, important data."
-	"\n\nCode by: Yury Hamenkov (mailto:waltersullivan.11121@gmail.com)"
-	"\nIcons:\nFugue Icons pack. Copyright (C) 2010 Yusuke Kamiyamane (p@yusukekamiyamane.com). "
+	"\n\nCode by: Yury Hamenkov"
+	"\nIcons:"
+	"\nFugue Icons pack. Copyright (C) 2010 Yusuke Kamiyamane (p@yusukekamiyamane.com). "
 	"All rights reserved."
 	"\nThe icons are licensed under a Creative Commons Attribution  3.0 license. "
 	"<http://creativecommons.org/licenses/by/3.0/>"
 	);
 
 	versionLabel = new QLabel();
-	versionLabel->setText(QString("Current version: %1").arg("0.9.0")); // FIXME: add actual version
+	versionLabel->setText(QString("Current version: %1").arg(VERSION));
 
 	okButton = new QPushButton("OK");
 	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(close()));
