@@ -69,6 +69,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	mainLayout->addLayout(buttonsLayout);
 
 	setLayout(mainLayout);
+	setWindowTitle("Settings");
 
 	// Load settings
 	preserveDocVisSettingsCheckbox->setChecked(Application::I()->Settings.preserveDocumentVisualSettings);
