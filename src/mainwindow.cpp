@@ -41,11 +41,19 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
+#include <QTimer>
 
 using namespace qNotesManager;
 
 MainWindow::MainWindow() : QMainWindow(0) {
 	createControls();
+
+	showToolbarAction->setChecked(Application::I()->Settings.showToolbar);
+	toolbar->setVisible(Application::I()->Settings.showToolbar);
+
+	showStatusBarAction->setChecked(Application::I()->Settings.showStausBar);
+	statusBar->setVisible(Application::I()->Settings.showStausBar);
+
 
 	// Clipboard
 	QClipboard* clipboard = QApplication::clipboard();
@@ -258,7 +266,9 @@ void MainWindow::createControls() {
 	QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
 					 this, SLOT(sl_Tray_Activated(QSystemTrayIcon::ActivationReason)));
 	trayIcon->setContextMenu(trayIconMenu);
-	trayIcon->show();
+	if (Application::I()->Settings.showSystemTray) {
+		trayIcon->show();
+	}
 
 }
 
@@ -269,10 +279,22 @@ bool MainWindow::eventFilter (QObject* watched, QEvent* event) {
 
 /*virtal*/
 void MainWindow::closeEvent (QCloseEvent* event) {
-#ifdef DEBUG
-	QCoreApplication::quit();
-#endif
+	if (Application::I()->Settings.closeToTray) {
+		hide();
+	} else {
+		QCoreApplication::quit();
+	}
 	event->accept();
+}
+
+/*virtual*/
+void MainWindow::changeEvent (QEvent* event) {
+	QMainWindow::changeEvent(event);
+	if ( (event->type() == QEvent::WindowStateChange) &&
+			isMinimized() &&
+			(Application::I()->Settings.minimizeToTray)) {
+		QTimer::singleShot(0, this, SLOT(hide()));
+	}
 }
 
 void MainWindow::sl_NoteDoubleClicked(Note* note) {
@@ -485,16 +507,20 @@ void MainWindow::sl_ExitAction_Triggered() {
 }
 
 void MainWindow::sl_ShowToolbarAction_Triggered() {
+	Application::I()->Settings.showToolbar = showToolbarAction->isChecked();
 	toolbar->setVisible(showToolbarAction->isChecked());
 }
 
 void MainWindow::sl_ShowStatusbarAction_Triggered() {
+	Application::I()->Settings.showToolbar = showToolbarAction->isChecked();
 	statusBar->setVisible(showStatusBarAction->isChecked());
 }
 
 void MainWindow::sl_ApplicationSettingsAction_Triggered() {
 	ApplicationSettingsWidget w;
-	w.exec();
+	if (w.exec() == QDialog::Accepted) {
+		trayIcon->setVisible(Application::I()->Settings.showSystemTray);
+	}
 }
 
 void MainWindow::sl_AboutProgramAction_Triggered() {
@@ -610,6 +636,7 @@ void MainWindow::sl_ShowHideMainWindowAction_Triggered() {
 		this->hide();
 	} else {
 		this->show();
+		setWindowState(windowState() & ~Qt::WindowMinimized); // if window was hidden by minimizing
 		this->activateWindow();
 	}
 }
