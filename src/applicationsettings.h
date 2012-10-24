@@ -44,6 +44,7 @@ namespace qNotesManager {
 		bool createBackups;
 		bool showToolbar;
 		bool showStausBar;
+		bool ShowWindowOnStart;
 	};
 }
 
