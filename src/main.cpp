@@ -37,7 +37,6 @@ int main(int argc, char** argv) {
 			"-v, --version				Print version and exit.\n"
 			"-h, --help				Print this screen\n"
 			"Options:\n"
-			"-d, --hidden				Start program hidden\n"
 			"-s, --silent			Do not send data to stderr\n"
 			"-fo FILE, --file-output FILE		Send debug output to file FILE\n\n"
 			"file					File to open\n");
@@ -48,8 +47,6 @@ int main(int argc, char** argv) {
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
 	QStringList arguments = QCoreApplication::arguments();
-
-	bool showMainWindow = true;
 
 	if (arguments.count() > 1) {
 		arguments.removeAt(0);
@@ -66,17 +63,18 @@ int main(int argc, char** argv) {
 			if (arguments.contains("-no") || arguments.contains("--no-output")) {
 				errorOutput = false;
 			}
-			if (arguments.contains("-d") || arguments.contains("--hidden")) {
-				showMainWindow = false;
-			}
 		}
 	}
 
 	qInstallMsgHandler(myMessageOutput);
 
+	Application::I()->Settings.Load();
 	MainWindow w;
-	if (showMainWindow) {
+	QObject::connect(&app, SIGNAL(aboutToQuit()), &w, SLOT(sl_QApplication_AboutToQuit()));
+	if (Application::I()->Settings.ShowWindowOnStart) {
 		w.show();
+	} else {
+		w.hide();
 	}
 
 	return app.exec();

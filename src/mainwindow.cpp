@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of qNotesManager.
 
 qNotesManager is free software: you can redistribute it and/or modify
@@ -60,6 +60,10 @@ MainWindow::MainWindow() : QMainWindow(0) {
 
 
 	setWindowTitle(APPNAME);
+
+	resize(Application::I()->Settings.windowSize);
+	move(Application::I()->Settings.windowPosition);
+	setWindowState(Application::I()->Settings.windowState);
 }
 
 void MainWindow::createActions() {
@@ -672,4 +676,10 @@ void MainWindow::sl_EditMenuContentChanged() {
 			editMenu->addAction(action);
 		}
 	}
+}
+
+void MainWindow::sl_QApplication_AboutToQuit() {
+	Application::I()->Settings.windowPosition = pos();
+	Application::I()->Settings.windowSize = size();
+	Application::I()->Settings.windowState = windowState();
 }

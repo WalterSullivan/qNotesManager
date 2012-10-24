@@ -106,10 +106,8 @@ namespace qNotesManager {
 		explicit MainWindow();
 
 	protected:
-		/*virtual*/
-		bool eventFilter (QObject* watched, QEvent* event);
-		/*virtual*/
-		void closeEvent (QCloseEvent* event);
+		/*virtual*/ bool eventFilter (QObject* watched, QEvent* event);
+		/*virtual*/ void closeEvent (QCloseEvent* event);
 
 	signals:
 
@@ -151,6 +149,8 @@ namespace qNotesManager {
 		void sl_CurrentDocument_Changed();
 		void sl_Application_CurrentDocumentChanged(Document*);
 		void sl_Application_NoteDeleted(Note*);
+
+		void sl_QApplication_AboutToQuit();
 
 	};
 }
