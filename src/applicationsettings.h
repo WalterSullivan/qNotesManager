@@ -45,6 +45,8 @@ namespace qNotesManager {
 		bool showToolbar;
 		bool showStausBar;
 		bool ShowWindowOnStart;
+	private:
+		void loadDefaultValues();
 	};
 }
 
