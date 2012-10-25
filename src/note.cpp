@@ -284,7 +284,7 @@ TextDocument* Note::GetTextDocument() const {
 }
 
 // NOT thread-safe
-void Note::Serialize(const int version, BOIBuffer& stream, const QHash<QString, quint32>& hash) const {
+void Note::Serialize(const int version, BOIBuffer& stream) const {
 	(void)version;
 
 	const QByteArray w_captionArray = name.toUtf8();
@@ -294,7 +294,7 @@ void Note::Serialize(const int version, BOIBuffer& stream, const QHash<QString, 
 	const quint32 w_creationDate = creationDate.toTime_t();
 	const quint32 w_modificationDate = modificationDate.toTime_t();
 	const quint32 w_textDate = textDate.isValid() ? textDate.toTime_t() : 0;
-	const quint32 w_iconID = hash.value(iconID);
+	const quint32 w_iconID = IconIndex;
 	const QByteArray w_authorArray = author.toUtf8();
 	const quint32 w_authorSize = w_authorArray.size();
 	const QByteArray w_sourceArray = source.toUtf8();
@@ -354,7 +354,7 @@ void Note::Serialize(const int version, BOIBuffer& stream, const QHash<QString, 
 
 /* static */
 // NOT thread-safe
-Note* Note::Deserialize(const int version, BOIBuffer& stream, const QHash<quint32, QString>& hash) {
+Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 	(void)version;
 
 	qint64 bytesRead = 0;
@@ -459,7 +459,7 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream, const QHash<quint3
 	note->author = r_authorArray;
 	note->source = r_sourceArray;
 	note->comment = r_commentArray;
-	note->iconID = hash.value(r_iconID);
+	note->IconIndex = r_iconID;
 	note->nameBackColor.setRgba(r_backColor);
 	note->nameForeColor.setRgba(r_foreColor);
 	note->locked = (bool)r_locked;

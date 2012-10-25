@@ -214,13 +214,13 @@ QString Folder::GetPath() const {
 	return path;
 }
 
-void Folder::Serialize(const int version, BOIBuffer& stream, const QHash<QString, quint32>& hash) const {
+void Folder::Serialize(const int version, BOIBuffer& stream) const {
 	(void)version;
 	const QByteArray s_caption = name.toUtf8();
 	const quint32 s_captionSize = s_caption.size();
 	const quint32 s_creationDate = creationDate.toTime_t();
 	const quint32 s_modificationDate = modificationDate.toTime_t();
-	const quint32 s_iconID = hash.value(iconID);
+	const quint32 s_iconID = IconIndex;
 	const quint32 s_backColor = nameBackColor.rgba();
 	const quint32 s_foreColor = nameForeColor.rgba();
 	const quint8 s_locked = (quint8)locked;
@@ -245,7 +245,7 @@ void Folder::Serialize(const int version, BOIBuffer& stream, const QHash<QString
 }
 
 /* static */
-Folder* Folder::Deserialize(const int version, BOIBuffer& stream, const QHash<quint32, QString>& hash) {
+Folder* Folder::Deserialize(const int version, BOIBuffer& stream) {
 	(void)version;
 	qint64 bytesRead = 0;
 
@@ -282,7 +282,7 @@ Folder* Folder::Deserialize(const int version, BOIBuffer& stream, const QHash<qu
 	f->nameForeColor.setRgba(r_foreColor);
 	f->nameBackColor.setRgba(r_backColor);
 	f->locked = (bool)r_locked;
-	f->iconID = hash.value(r_iconID);
+	f->IconIndex = r_iconID;
 	f->creationDate = QDateTime::fromTime_t(r_creationDate);
 	f->modificationDate = QDateTime::fromTime_t(r_modificationDate);
 

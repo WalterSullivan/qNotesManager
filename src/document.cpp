@@ -418,7 +418,8 @@ Document* Document::Open(QString fileName) {
 		while (dataBuffer.pos() < blockEndByte) {
 			quint32 folderItemID = 0;
 			readResult = dataBuffer.read(folderItemID);
-			Note* note = Note::Deserialize(r_fileVersion, dataBuffer, iconIndexes);
+			Note* note = Note::Deserialize(r_fileVersion, dataBuffer);
+			note->SetIcon(iconIndexes.value(note->IconIndex));
 
 			folderItems.insert(folderItemID, note);
 		}
@@ -440,7 +441,8 @@ Document* Document::Open(QString fileName) {
 		// Read user folders
 		while(dataBuffer.pos() < blockLastByte) {
 			readResult = dataBuffer.read(folderID);
-			Folder* folder = Folder::Deserialize(r_fileVersion, dataBuffer, iconIndexes);
+			Folder* folder = Folder::Deserialize(r_fileVersion, dataBuffer);
+			folder->SetIconID(iconIndexes.value(folder->IconIndex));
 			folderItems.insert(folderID, folder);
 		}
 	}
@@ -739,11 +741,12 @@ void Document::Save(QString name, quint16 version) {
 		dataBuffer.write(blockSize);
 		const qint64 blockStartPosition = dataBuffer.pos();
 		for (int i = 0; i < allNotes.size(); ++i) {
-			const Note* note = allNotes.value(i);
+			Note* note = allNotes.value(i);
 			dataBuffer.write(folderOrNoteID);
 			folderItemsIDs.insert(note, folderOrNoteID);
 			folderOrNoteID++;
-			note->Serialize(version, dataBuffer, iconIndexes);
+			note->IconIndex = iconIndexes.value(note->GetIconID());
+			note->Serialize(version, dataBuffer);
 		}
 		const qint64 blockEndPosition = dataBuffer.pos();
 		blockSize = blockEndPosition - blockStartPosition;
@@ -766,11 +769,12 @@ void Document::Save(QString name, quint16 version) {
 
 		// Write user folders
 		for (int i = 0; i < allFolders.size(); ++i) {
-			const Folder* f = allFolders.value(i);
+			Folder* f = allFolders.value(i);
 			dataBuffer.write(folderOrNoteID);
 			folderItemsIDs.insert(f, folderOrNoteID);
 			folderOrNoteID++;
-			f->Serialize(version, dataBuffer, iconIndexes);
+			f->IconIndex = iconIndexes.value(f->GetIconID());
+			f->Serialize(version, dataBuffer);
 		}
 
 		const qint64 blockEndPosition = dataBuffer.pos();
