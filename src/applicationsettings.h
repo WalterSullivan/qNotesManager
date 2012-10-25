@@ -22,6 +22,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QSize>
 
 namespace qNotesManager {
+	class BOIBuffer;
+
 	class ApplicationSettings {
 	public:
 		ApplicationSettings();
@@ -47,6 +49,8 @@ namespace qNotesManager {
 		bool ShowWindowOnStart;
 	private:
 		void loadDefaultValues();
+		void loadVersion_0(BOIBuffer*);
+		const quint8 currentVersion;
 	};
 }
 

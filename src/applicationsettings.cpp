@@ -17,18 +17,137 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "applicationsettings.h"
 
+#include "boibuffer.h"
+
+#include <QFile>
+
 using namespace qNotesManager;
 
-ApplicationSettings::ApplicationSettings() {
+ApplicationSettings::ApplicationSettings() : currentVersion(0) {
 	loadDefaultValues();
 }
 
 void ApplicationSettings::Load() {
+	QFile f("settings");
+	if (!f.exists()) {
+		loadDefaultValues();
+		return;
+	}
 
+	if (!f.open(QIODevice::ReadOnly)) {
+		loadDefaultValues();
+		qWarning("Could not open settings file for reading");
+		return;
+	}
+
+	QByteArray fileDataArray(f.size(), 0x0);
+	f.read(fileDataArray.data(), f.size());
+	f.close();
+
+	BOIBuffer buffer(&fileDataArray);
+	buffer.open(QIODevice::ReadOnly);
+
+	quint8 version = -1;
+	buffer.read(version);
+
+	if (version > 0) {
+		qWarning("Wrong settings file version");
+		loadDefaultValues();
+		return;
+	}
+
+	switch (version) {
+	case 0:
+		loadVersion_0(&buffer);
+		break;
+	default:
+		qWarning("Wrong settings file version");
+		loadDefaultValues();
+		return;
+	}
+
+	buffer.close();
+}
+
+void ApplicationSettings::loadVersion_0(BOIBuffer* buffer) {
+	qint32 x = 0;
+	qint32 y = 0;
+	qint32 w = 0;
+	qint32 h = 0;
+	qint32 s = 0;
+
+
+	buffer->read(x);
+	buffer->read(y);
+
+	windowPosition.setX(x);
+	windowPosition.setY(y);
+
+	buffer->read(w);
+	buffer->read(h);
+
+	windowSize.setWidth(w);
+	windowSize.setHeight(h);
+
+	buffer->read(s);
+	windowState = (Qt::WindowStates)s;
+
+	buffer->read(preserveDocumentVisualSettings);
+	buffer->read(showNumberOfItemsInParentItemTitle);
+	buffer->read(showTagsTreeView);
+	buffer->read(showDatesTreeView);
+	buffer->read(showSystemTray);
+	buffer->read(closeToTray);
+	buffer->read(minimizeToTray);
+	buffer->read(moveItemsToBin);
+	buffer->read(showAsterixInChangedItemTitle);
+	buffer->read(createBackups);
+	buffer->read(showToolbar);
+	buffer->read(showStausBar);
+	buffer->read(ShowWindowOnStart);
 }
 
 void ApplicationSettings::Save() {
+	QByteArray fileDataArray;
 
+	BOIBuffer buffer(&fileDataArray);
+	buffer.open(QIODevice::WriteOnly);
+
+	buffer.write(currentVersion);
+
+	buffer.write((qint32)windowPosition.x());
+	buffer.write((qint32)windowPosition.y());
+
+	buffer.write((qint32)windowSize.width());
+	buffer.write((qint32)windowSize.height());
+
+	buffer.write((qint32)windowState);
+
+	buffer.write(preserveDocumentVisualSettings);
+	buffer.write(showNumberOfItemsInParentItemTitle);
+	buffer.write(showTagsTreeView);
+	buffer.write(showDatesTreeView);
+	buffer.write(showSystemTray);
+	buffer.write(closeToTray);
+	buffer.write(minimizeToTray);
+	buffer.write(moveItemsToBin);
+	buffer.write(showAsterixInChangedItemTitle);
+	buffer.write(createBackups);
+	buffer.write(showToolbar);
+	buffer.write(showStausBar);
+	buffer.write(ShowWindowOnStart);
+
+	buffer.close();
+
+	QFile f("settings");
+
+	if (!f.open(QIODevice::WriteOnly)) {
+		qWarning("Could not write settings file. Check your permissions");
+		return;
+	}
+
+	f.write(fileDataArray.constData(), fileDataArray.size());
+	f.close();
 }
 
 void ApplicationSettings::loadDefaultValues() {

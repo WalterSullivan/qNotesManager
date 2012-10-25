@@ -710,4 +710,6 @@ void MainWindow::sl_QApplication_AboutToQuit() {
 	Application::I()->Settings.windowPosition = pos();
 	Application::I()->Settings.windowSize = size();
 	Application::I()->Settings.windowState = windowState();
+
+	Application::I()->Settings.Save();
 }
