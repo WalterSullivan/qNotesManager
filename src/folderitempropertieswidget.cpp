@@ -99,6 +99,8 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 	setWindowTitle("Edit properties");
 	setWindowIcon(QIcon(":/gui/property"));
 	selectedIconKey = "";
+
+
 }
 
 void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
@@ -132,6 +134,9 @@ void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
 		chooseIconButton->setEnabled(!n->IsLocked());
 		resetIconToDefaultButton->setEnabled(!n->IsLocked());
 	}
+
+	nameLineEdit->setFocus();
+	nameLineEdit->selectAll();
 }
 
 void FolderItemPropertiesWidget::sl_OKButton_Clicked() {
