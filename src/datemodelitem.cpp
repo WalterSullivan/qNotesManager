@@ -17,6 +17,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "datemodelitem.h"
 
+#include "application.h"
+
 #include <QDate>
 #include <QIcon>
 
@@ -35,20 +37,29 @@ QVariant DateModelItem::data(int role) const {
 	if (role == Qt::DecorationRole) {
 		return QIcon(":/gui/date");
 	} else if (role == Qt::DisplayRole) {
+		QString childrenCount = QString(" (%1)").arg(QString::number(ChildrenCount()));
+		QString returnValue = "";
 		switch (component) {
 			case Year:
-				return QString("%1 (%2)").arg(QString::number(value)).arg(QString::number(ChildrenCount()));
+				returnValue =  QString::number(value);
+				if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+					returnValue.append(childrenCount);
+				}
 				break;
 			case Month:
 				{
 					QDate month(2000, value, 1);
-					return QString("%1 (%2)").arg(month.toString("MMMM")).arg(
-							QString::number(ChildrenCount()));
+					returnValue = month.toString("MMMM");
+					if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+						returnValue.append(childrenCount);
+					}
 				}
 				break;
 			case Day:
-				return QString("%1").arg(QString::number(value), 2, '0') +
-						QString(" (%1)").arg(QString::number(ChildrenCount()));
+				returnValue = QString::number(value).rightJustified(2, '0');
+				if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+					returnValue.append(childrenCount);
+				}
 				break;
 			case MonthAndDay:
 				Q_ASSERT(false);
@@ -57,6 +68,7 @@ QVariant DateModelItem::data(int role) const {
 				Q_ASSERT(false);
 				break;
 		}
+		return returnValue;
 	} else {
 		return QVariant();
 	}

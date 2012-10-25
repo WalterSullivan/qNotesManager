@@ -16,7 +16,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "foldermodelitem.h"
+
 #include "folder.h"
+#include "application.h"
 
 #include <QBrush>
 #include <QApplication>
@@ -38,14 +40,19 @@ QVariant FolderModelItem::data(int role) const {
 		if (folder->IsLocked()) {
 			QPixmap shadedIcon = QIcon(folder->GetIcon()).pixmap(folder->GetIcon().size(),
 													   QIcon::Disabled, QIcon::On);
-			drawLockedIcon(shadedIcon); // TODO: cache locked icon
+			drawLockedIcon(shadedIcon); // TODO: cache 'locked' icon
 			return shadedIcon;
 
 		} else {
 			return folder->GetIcon();
 		}
 	} else if (role == Qt::DisplayRole) {
-		return folder->GetName() + " (" + QString::number(folder->Items.Count()) + ")";
+		QString childrenCount = QString(" (%1)").arg(QString::number(folder->Items.Count()));
+		QString returnValue = folder->GetName();
+		if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+			returnValue.append(childrenCount);
+		}
+		return returnValue;
 	} else if (role == Qt::BackgroundRole) {
 		if (folder->IsLocked()) {
 			return QBrush();

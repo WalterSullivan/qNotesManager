@@ -16,7 +16,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "tagmodelitem.h"
+
 #include "tag.h"
+#include "application.h"
 
 #include <QPixmap>
 
@@ -30,7 +32,12 @@ QVariant TagModelItem::data(int role) const {
 	if (role == Qt::DecorationRole) {
 		return QPixmap(":/standard/tag");
 	} else if (role == Qt::DisplayRole) {
-		return _tag->GetName() + " [" + QString::number(_tag->Owners.Count()) + "]";
+		QString childrenCount = QString(" (%1)").arg(QString::number(_tag->Owners.Count()));
+		QString returnValue = _tag->GetName();
+		if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+			returnValue.append(childrenCount);
+		}
+		return returnValue;
 	} else {
 		return QVariant();
 	}
