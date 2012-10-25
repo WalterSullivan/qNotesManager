@@ -195,55 +195,6 @@ void FolderNavigationWidget::SetCurrentItem(Note* note) {
 }
 
 void FolderNavigationWidget::sl_TreeView_ContextMenuRequested(const QPoint& p) {
-	/*
-	QModelIndex index = treeView->indexAt(p);
-	QMenu* contextMenu = 0;
-	bool locked = false;
-
-	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-	qDebug() << indexesList.size();
-
-	if (!index.isValid()) {
-		contextMenu = defaultContextMenu;
-	} else {
-		BaseModelItem* modelitem = static_cast<BaseModelItem*>(index.internalPointer());
-
-		if (modelitem->DataType() == BaseModelItem::folder) {
-			FolderModelItem* folderModelItem = dynamic_cast<FolderModelItem*>(modelitem);
-			AbstractFolderItem* folderItem = folderModelItem->GetStoredData();
-			if (folderItem == Application::I()->CurrentDocument()->GetTrashFolder()) {
-				contextMenu = trashFolderMenu;
-				if (Application::I()->CurrentDocument()->GetTrashFolder()->Items.Count() == 0) {
-					clearTrashAction->setEnabled(false);
-				} else {
-					clearTrashAction->setEnabled(true);
-				}
-			} else if (folderItem == Application::I()->CurrentDocument()->GetTempFolder()) {
-
-			} else {
-				contextMenu = folderContextMenu;
-			}
-
-			locked = folderModelItem->GetStoredData()->IsLocked();
-
-		} else if (modelitem->DataType() == BaseModelItem::note) {
-			contextMenu = noteContextMenu;
-			locked = dynamic_cast<NoteModelItem*>(modelitem)->GetStoredData()->IsLocked();
-		} else {
-			contextMenu = defaultContextMenu;
-		}
-	}
-
-	lockItemAction->blockSignals(true);
-	lockItemAction->setChecked(locked);
-	lockItemAction->blockSignals(false);
-
-	addNoteAction->setEnabled(!locked);
-	addFolderAction->setEnabled(!locked);
-	deleteItemAction->setEnabled(!locked);
-	itemForeColorMenu->setEnabled(!locked);
-	itemBackColorMenu->setEnabled(!locked);*/
-
 	QList<QAction*> actions = GetSelectedItemsActions();
 
 	foreach (QAction* act, actions) {
@@ -461,7 +412,7 @@ void FolderNavigationWidget::sl_AddFolderAction_Triggered() {
 
 void FolderNavigationWidget::sl_DeleteItemAction_Triggered() {
 	QModelIndexList list = treeView->selectionModel()->selectedIndexes();
-	deleteItems(list, false);
+	deleteItems(list, !Application::I()->Settings.moveItemsToBin);
 }
 
 void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
@@ -664,7 +615,9 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 	if (keyEvent->key() == Qt::Key_Delete) {
 		if (treeView->selectionModel()->selectedIndexes().size() == 0) {return false;}
 		bool permanently = false;
-		if ((keyEvent->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier) {
+		if (((keyEvent->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)
+			||
+			!Application::I()->Settings.moveItemsToBin) {
 			permanently = true;
 		}
 		QModelIndexList list = treeView->selectionModel()->selectedIndexes();
