@@ -44,6 +44,7 @@ namespace qNotesManager {
 		void SetCurrentTab(int index);
 		void SetTargetDocument(Document*);
 		QList<QAction*> GetSelectedItemsActions() const;
+		void UpdateViewsVisibility();
 
 
 	signals:

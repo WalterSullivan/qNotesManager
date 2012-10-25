@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "tagsnavigationwidget.h"
 #include "datenavigationwidget.h"
 #include "document.h"
+#include "application.h"
 
 #include <QVBoxLayout>
 
@@ -45,7 +46,7 @@ NavigationPanelWidget::NavigationPanelWidget(QWidget *parent) : QWidget(parent) 
 					 this, SIGNAL(sg_NoteClicked(Note*)));
 	QObject::connect(tagsWidget, SIGNAL(sg_NoteDoubleClicked(Note*)),
 					 this, SIGNAL(sg_NoteDoubleClicked(Note*)));
-	tabWidget->addTab(tagsWidget, QIcon(":/gui/tag"), "Tags");
+	tabWidget->addTab(tagsWidget, QIcon(":/gui/tag"), "Tags"); // TODO: make icon and title widget's properties
 
 	datesWidget = new DateNavigationWidget();
 	QObject::connect(datesWidget, SIGNAL(sg_NoteClicked(Note*)),
@@ -62,6 +63,8 @@ NavigationPanelWidget::NavigationPanelWidget(QWidget *parent) : QWidget(parent) 
 #endif
 	layout->addWidget(tabWidget);
 	setLayout(layout);
+
+	UpdateViewsVisibility();
 }
 
 int NavigationPanelWidget::CurrentTabIndex() const {
@@ -108,3 +111,18 @@ QList<QAction*> NavigationPanelWidget::GetSelectedItemsActions() const {
 	return QList<QAction*>();
 }
 
+void NavigationPanelWidget::UpdateViewsVisibility() {
+	int tagsWidgetIndex = tabWidget->indexOf(tagsWidget);
+	if (tagsWidgetIndex >= 0 && !Application::I()->Settings.showTagsTreeView) {
+		tabWidget->removeTab(tagsWidgetIndex);
+	} else if (tagsWidgetIndex == -1 && Application::I()->Settings.showTagsTreeView) {
+		tabWidget->insertTab(1, tagsWidget, QIcon(":/gui/tag"), "Tags");
+	}
+
+	int datesWidgetIndex = tabWidget->indexOf(datesWidget);
+	if (datesWidgetIndex >=0 && !Application::I()->Settings.showDatesTreeView) {
+		tabWidget->removeTab(datesWidgetIndex);
+	} else if (datesWidgetIndex == -1 && Application::I()->Settings.showDatesTreeView) {
+		tabWidget->insertTab(2, datesWidget, QIcon(":/gui/date"), "Dates");
+	}
+}

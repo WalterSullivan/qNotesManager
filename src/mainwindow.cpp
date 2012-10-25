@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of qNotesManager.
 
 qNotesManager is free software: you can redistribute it and/or modify
@@ -520,6 +520,7 @@ void MainWindow::sl_ApplicationSettingsAction_Triggered() {
 	ApplicationSettingsWidget w;
 	if (w.exec() == QDialog::Accepted) {
 		trayIcon->setVisible(Application::I()->Settings.showSystemTray);
+		navigationPanel->UpdateViewsVisibility();
 	}
 }
 
