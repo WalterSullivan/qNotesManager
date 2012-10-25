@@ -99,7 +99,11 @@ int BaseModelItem::ChildrenCount() const {
 
 // Returns child item at position 'index'. It is supposed that 'index' is valid index
 BaseModelItem* BaseModelItem::ChildAt(int index) const {
-	Q_ASSERT(index >= 0 && index < childrenList.count());
+	if (!(index >= 0 && index < childrenList.count())) {
+		qWarning("Item at non-existent index requested");
+		return 0;
+	}
+
 
 	return childrenList.at(index);
 }
@@ -184,6 +188,10 @@ int BaseModelItem::findInsertIndex_Sorted(const BaseModelItem* item) const {
 
 	while (true) {
 		index = (left + right) / 2;
+
+		if (index == 0 || index == size) {
+			break;
+		}
 
 		BaseModelItem* leftItem = ChildAt(index - 1);
 		BaseModelItem* rightItem = ChildAt(index);
