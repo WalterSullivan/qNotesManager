@@ -20,6 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "document.h"
 #include "note.h"
 #include "boibuffer.h"
+#include "global.h"
 
 #include <QDebug>
 
@@ -115,7 +116,10 @@ QPixmap Folder::GetIcon() const {
 void Folder::SetIconID(const QString id) {
 	if (type != UserFolder) {return;}
 	if (iconID == id) {return;}
-	Q_ASSERT(!id.isEmpty());
+	if (id.isEmpty()) {
+		WARNING("New icon id is empty");
+		return;
+	}
 
 	iconID = id;
 	modificationDate = QDateTime::currentDateTime();
