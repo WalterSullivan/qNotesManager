@@ -196,6 +196,7 @@ void FolderNavigationWidget::SetCurrentItem(Note* note) {
 
 void FolderNavigationWidget::sl_TreeView_ContextMenuRequested(const QPoint& p) {
 	QList<QAction*> actions = GetSelectedItemsActions();
+	contextMenu->clear();
 
 	foreach (QAction* act, actions) {
 		contextMenu->addAction(act);
