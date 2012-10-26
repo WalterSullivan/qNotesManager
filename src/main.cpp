@@ -77,6 +77,11 @@ int main(int argc, char** argv) {
 		w.hide();
 	}
 
+	if (Application::I()->Settings.OpenLastDocumentOnStart &&
+		!Application::I()->Settings.LastDocumentName.isEmpty()) {
+		w.OpenDocument(Application::I()->Settings.LastDocumentName);
+	}
+
 	return app.exec();
 }
 

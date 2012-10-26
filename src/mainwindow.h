@@ -104,6 +104,7 @@ namespace qNotesManager {
 
 	public:
 		explicit MainWindow();
+		void OpenDocument(QString fileName);
 
 	protected:
 		/*virtual*/ bool eventFilter (QObject* watched, QEvent* event);

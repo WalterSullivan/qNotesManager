@@ -105,6 +105,12 @@ void ApplicationSettings::loadVersion_0(BOIBuffer* buffer) {
 	buffer->read(showToolbar);
 	buffer->read(showStausBar);
 	buffer->read(ShowWindowOnStart);
+	buffer->read(OpenLastDocumentOnStart);
+	quint32 lastDocNameSize = 0;
+	buffer->read(lastDocNameSize);
+	QByteArray lastDocName(lastDocNameSize, 0x0);
+	buffer->read(lastDocName.data(), lastDocNameSize);
+	LastDocumentName = lastDocName;
 }
 
 void ApplicationSettings::Save() {
@@ -136,6 +142,10 @@ void ApplicationSettings::Save() {
 	buffer.write(showToolbar);
 	buffer.write(showStausBar);
 	buffer.write(ShowWindowOnStart);
+	buffer.write(OpenLastDocumentOnStart);
+	QByteArray lastDocArray = LastDocumentName.toUtf8();
+	buffer.write((quint32)lastDocArray.size());
+	buffer.write(lastDocArray);
 
 	buffer.close();
 
@@ -168,4 +178,6 @@ void ApplicationSettings::loadDefaultValues() {
 	showToolbar = true;
 	showStausBar = true;
 	ShowWindowOnStart = true;
+	OpenLastDocumentOnStart = false;
+	LastDocumentName = "";
 }

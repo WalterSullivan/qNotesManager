@@ -43,6 +43,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	createBackupsCheckbox->setEnabled(false);
 
 	showWindowOnStartCheckbox = new QCheckBox("Show main window on start", this);
+	openLastDocumentOnStartCheckbox = new QCheckBox("Open last document on start", this);
 
 	okButton = new QPushButton("OK", this);
 	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(sl_OKButton_Clicked()));
@@ -66,7 +67,9 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	mainLayout->addWidget(showAsterixInTitleCheckbox);
 	mainLayout->addWidget(createBackupsCheckbox);
 	mainLayout->addWidget(showWindowOnStartCheckbox);
+	mainLayout->addWidget(openLastDocumentOnStartCheckbox);
 	mainLayout->addLayout(buttonsLayout);
+
 
 	setLayout(mainLayout);
 	setWindowTitle("Settings");
@@ -83,6 +86,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	showAsterixInTitleCheckbox->setChecked(Application::I()->Settings.showAsterixInChangedItemTitle);
 	createBackupsCheckbox->setChecked(Application::I()->Settings.createBackups);
 	showWindowOnStartCheckbox->setChecked(Application::I()->Settings.ShowWindowOnStart);
+	openLastDocumentOnStartCheckbox->setChecked(Application::I()->Settings.OpenLastDocumentOnStart);
 }
 
 void ApplicationSettingsWidget::sl_OKButton_Clicked() {
@@ -97,6 +101,7 @@ void ApplicationSettingsWidget::sl_OKButton_Clicked() {
 	Application::I()->Settings.showAsterixInChangedItemTitle = showAsterixInTitleCheckbox->isChecked();
 	Application::I()->Settings.createBackups = createBackupsCheckbox->isChecked();
 	Application::I()->Settings.ShowWindowOnStart = showWindowOnStartCheckbox->isChecked();
+	Application::I()->Settings.OpenLastDocumentOnStart = openLastDocumentOnStartCheckbox->isChecked();
 
 	accept();
 }

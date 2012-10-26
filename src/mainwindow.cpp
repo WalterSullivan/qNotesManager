@@ -327,7 +327,6 @@ void MainWindow::sl_NewDocumentAction_Triggered() {
 }
 
 void MainWindow::sl_OpenDocumentAction_Triggered() {
-
 	QString fileName = QString();
 
 	while(fileName.isEmpty()) {
@@ -349,6 +348,10 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 		if (cancelled) {return;}
 	}
 
+	OpenDocument(fileName);
+}
+
+void MainWindow::OpenDocument(QString fileName) {
 	Document* newDoc = 0;
 	try {
 		newDoc = Document::Open(fileName);
@@ -371,12 +374,11 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 		return;
 	}
 
-	Q_ASSERT(newDoc != 0);
-
 	if (newDoc == 0) {
 		QMessageBox::critical(this, "", "Error loading document");
 		return;
 	}
+
 	Application::I()->SetCurrentDocument(newDoc);
 }
 
@@ -565,6 +567,8 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 		title.append("[*] - ").append(APPNAME);
 		setWindowModified(doc->IsChanged());
 		setWindowTitle(title);
+
+		Application::I()->Settings.LastDocumentName = doc->GetFilename();
 
 		restoreDocumentVisualSettings();
 		sl_Clipboard_DataChanged();

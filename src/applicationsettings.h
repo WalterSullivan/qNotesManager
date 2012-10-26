@@ -20,6 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QPoint>
 #include <QSize>
+#include <QString>
 
 namespace qNotesManager {
 	class BOIBuffer;
@@ -47,6 +48,9 @@ namespace qNotesManager {
 		bool showToolbar;
 		bool showStausBar;
 		bool ShowWindowOnStart;
+		bool OpenLastDocumentOnStart;
+		QString LastDocumentName;
+
 	private:
 		void loadDefaultValues();
 		void loadVersion_0(BOIBuffer*);

@@ -37,6 +37,7 @@ namespace qNotesManager {
 		QCheckBox* showAsterixInTitleCheckbox;
 		QCheckBox* createBackupsCheckbox;
 		QCheckBox* showWindowOnStartCheckbox;
+		QCheckBox* openLastDocumentOnStartCheckbox;
 
 		QPushButton* okButton;
 		QPushButton* cancelButton;
