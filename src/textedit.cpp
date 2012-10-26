@@ -181,7 +181,7 @@ void TextEdit::insertFromMimeData(const QMimeData* source) {
 
 	if (source->hasImage()) { // paste image
 		QImage image = source->imageData().value<QImage>();
-		image.setText("FORMAT", "jpg"); // use jpg format to store unknown images
+		image.setText("FORMAT", "PNG"); // use PNG format to store unknown images
 		TextDocument* doc = dynamic_cast<TextDocument*>(document());
 		doc->InsertImage(image, textCursor());
 
