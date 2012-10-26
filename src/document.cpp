@@ -247,12 +247,12 @@ Document* Document::Open(QString fileName) {
 	if (r_cipherID > 0) {
 		Cipherer c;
 
-		buffer.read(r_hashID); // FIXME: Check data
+		buffer.read(r_hashID);
 		if (!c.IsHashSupported(r_hashID)) {
 			throw WrongFileVersionException("", "Hash algorithm is not supported", WHERE);
 		}
 
-		buffer.read(r_secureHashID); // FIXME: Check data
+		buffer.read(r_secureHashID);
 		if (!c.IsSecureHashSupported(r_secureHashID)) {
 			throw WrongFileVersionException("", "Hash algorithm is not supported", WHERE);
 		}
@@ -574,10 +574,10 @@ void Document::Save(QString name, quint16 version) {
 		Cipherer c;
 
 		quint8 r_hashID = c.DefaultHashID;
-		fileDataBuffer.write(r_hashID); // FIXME: Write actual data
+		fileDataBuffer.write(r_hashID);
 
 		quint8 r_secureHashID = c.DefaultSecureHashID;
-		fileDataBuffer.write(r_secureHashID); // FIXME: Write actual data
+		fileDataBuffer.write(r_secureHashID);
 
 
 		encryptionKey = c.GetHash(password, r_hashID);
