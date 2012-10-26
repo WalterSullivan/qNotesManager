@@ -327,7 +327,7 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 		const quint32 formatArraySize = formatArray.size();
 
 		if (formatArraySize == 0) {
-			WARNING(qPrintable(QString("Unknown image file format for image: %s").arg(imageName)));
+			WARNING(qPrintable(QString("Unknown image file format for image: %1").arg(imageName)));
 			continue;
 		}
 
@@ -341,7 +341,7 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 		tempArrayBuffer.close();
 
 		if (tempArray.size() == 0) {
-			WARNING(qPrintable(QString("Error saving image: %s").arg(imageName)));
+			WARNING(qPrintable(QString("Error saving image: %1").arg(imageName)));
 			continue;
 		}
 
