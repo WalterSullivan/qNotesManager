@@ -189,13 +189,14 @@ void ImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
 
 				if (s1.isNull() || s1.isEmpty() || s1 != "image/") {
 					downloadFailed(originalRequestUrl, "Downloaded data is not an image. Header:" + v.toString());
-
+#ifdef DEBUG
 					// To check what was returned
 					QFile file("lastFile");
 					file.open(QIODevice::WriteOnly | QIODevice::Truncate);
 					file.write(reply->readAll());
 					file.close();
 					qDebug() << "Data saved in file 'lastFile' for inspection";
+#endif
 
 					disconnectAndDeleteReply(reply);
 					return;
@@ -236,34 +237,41 @@ void ImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
 		 ((!fileSuffix.isEmpty()) && (!QImageReader::supportedImageFormats().contains(fileSuffix)))) {
 		// If suffix is empty or suffix is not empty, but Qt doesn't support this file type
 		qDebug() << "ERROR: Unknown or unsupported file type";
-		{
+#ifdef DEBUG
 			// To check what was returned
 			QFile file("lastFile");
 			file.open(QIODevice::WriteOnly | QIODevice::Truncate);
 			file.write(reply->readAll());
 			file.close();
 			qDebug() << "Data saved in file 'lastFile' for inspection";
-		}
+#endif
 		downloadFailed(originalRequestUrl, "Unknown or unsupported file type");
 		disconnectAndDeleteReply(reply);
 		return;
 	}
 
 	QByteArray replyData = reply->readAll();
-	QImage image = QImage::fromData(replyData, fileSuffix.data());
+	QImage image;
+	image = QImage::fromData(replyData, fileSuffix.data());
 	if (image.isNull()) {
+		// If image was not loaded, let QImage class to determine image's format
+		image = QImage::fromData(replyData);
+		if (image.isNull()) {
+#ifdef DEBUG
+				// To check what was returned
+				QFile file("lastFile");
+				file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+				file.write(replyData);
+				file.close();
+				qDebug() << "Data saved in file 'lastFile' for inspection";
+#endif
 
-		{	// To check what was returned
-			QFile file("lastFile");
-			file.open(QIODevice::WriteOnly | QIODevice::Truncate);
-			file.write(replyData);
-			file.close();
+			qDebug() << "ERROR: Unable to load image";
+			downloadFailed(originalRequestUrl, "Unable to load image");
+			disconnectAndDeleteReply(reply);
+			return;
 		}
-
-		qDebug() << "ERROR: Unable to load image";
-		downloadFailed(originalRequestUrl, "Unable to load image");
-		disconnectAndDeleteReply(reply);
-		return;
+		fileSuffix = "PNG"; // use PNG format to store unknown images
 	}
 
 	image.setText("FORMAT", fileSuffix.data());
