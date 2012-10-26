@@ -413,6 +413,7 @@ void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 
 
 	setWindowModified(false);
+	updateWindowTitle();
 }
 
 void MainWindow::sl_SaveDocumentAsAction_Triggered() {
@@ -437,6 +438,7 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 	}
 
 	setWindowModified(false);
+	updateWindowTitle();
 }
 
 void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled) {
@@ -555,8 +557,6 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	engine->SetTargetDocument(doc);
 	navigationPanel->SetTargetDocument(doc);
 	if (doc == 0) {
-		setWindowTitle(APPNAME);
-		setWindowModified(false);
 		if (menuBar->actions().contains(editMenu->menuAction())) {
 			menuBar->removeAction(editMenu->menuAction());
 		}
@@ -565,11 +565,6 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 						 this, SLOT(sl_CurrentDocument_Changed()));
 		QObject::connect(doc, SIGNAL(sg_ItemUnregistered(Note*)),
 						 this, SLOT(sl_Application_NoteDeleted(Note*)));
-		QString title;
-		title = doc->GetFilename().isEmpty() ? "<unsaved>" : doc->GetFilename();
-		title.append("[*] - ").append(APPNAME);
-		setWindowModified(doc->IsChanged());
-		setWindowTitle(title);
 
 		Application::I()->Settings.LastDocumentName = doc->GetFilename();
 
@@ -585,6 +580,21 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	closeDocumentAction->setEnabled(enable);
 	documentPropertiesAction->setEnabled(enable);
 	globalSearchAction->setEnabled(enable);
+	updateWindowTitle();
+}
+
+void MainWindow::updateWindowTitle() {
+	Document* doc = Application::I()->CurrentDocument();
+	if (doc == 0) {
+		setWindowTitle(APPNAME);
+		setWindowModified(false);
+	} else {
+		QString title;
+		title = doc->GetFilename().isEmpty() ? "<unsaved>" : doc->GetFilename();
+		title.append("[*] - ").append(APPNAME);
+		setWindowModified(doc->IsChanged());
+		setWindowTitle(title);
+	}
 }
 
 void MainWindow::sl_Application_NoteDeleted(Note* n) {
