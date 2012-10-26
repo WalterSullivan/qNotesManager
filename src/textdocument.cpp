@@ -193,11 +193,8 @@ void TextDocument::replaceImageUrl(QString oldName, QString newName) {
 	}
 }
 
-QByteArray TextDocument::SerializeImageResources() const {
-	QSet<QString> savedImages;
-	QByteArray array;
-	QBuffer imagesBuffer(&array);
-	imagesBuffer.open(QIODevice::WriteOnly);
+QSet<QString> TextDocument::GetImagesList() const {
+	QSet<QString> returnSet;
 
 	QTextBlock block = begin();
 	while(block.isValid()) {
@@ -209,7 +206,7 @@ QByteArray TextDocument::SerializeImageResources() const {
 
 			QTextImageFormat format = currentFragment.charFormat().toImageFormat();
 			const QByteArray imageName = format.name().toUtf8();
-			if (savedImages.contains(QString(imageName))) {continue;}
+			if (returnSet.contains(QString(imageName))) {continue;}
 
 			QVariant imageData = resource(QTextDocument::ImageResource, QUrl(imageName));
 			QImage image = imageData.value<QImage>();
@@ -219,48 +216,13 @@ QByteArray TextDocument::SerializeImageResources() const {
 				continue;
 			}
 
-			// TODO: move rest of this block to Note::Save
+			returnSet.insert(QString(imageName));
 
-			const quint32 imageNameSize = imageName.size();
-
-
-			qDebug()<< "Saving image: " << imageName;
-			qDebug() << "Format: " << image.text("FORMAT");
-
-			imagesBuffer.write((char*)&imageNameSize, sizeof(imageNameSize));
-			imagesBuffer.write(imageName.constData(), imageNameSize);
-
-			// TODO: check if image.save returns true
-
-			const QByteArray formatArray = image.text("FORMAT").toAscii();
-			const quint32 formatArraySize = formatArray.size();
-			imagesBuffer.write((char*)&formatArraySize, sizeof(formatArraySize));
-			imagesBuffer.write(formatArray.constData(), formatArraySize);
-
-			if (formatArraySize == 0) {
-				qDebug() << "Unknown image file format for image: " << imageName;
-			}
-
-			quint32 imageArraySize = 0;
-			qint64 sizePos = imagesBuffer.pos();
-			imagesBuffer.write((char*)&imageArraySize, sizeof(imageArraySize));
-			qint64 imageStartPos = imagesBuffer.pos();
-			image.save(&imagesBuffer, image.text("FORMAT").toStdString().c_str(), 100);
-			qint64 imageEndPos = imagesBuffer.pos();
-			imageArraySize = (quint32)(imageEndPos - imageStartPos);
-			imagesBuffer.seek(sizePos);
-			imagesBuffer.write((char*)&imageArraySize, sizeof(imageArraySize));
-			imagesBuffer.seek(imageEndPos);
-
-			savedImages.insert(QString(imageName));
-
-			qDebug() << "Image bytes written: " << imageArraySize;
 		}
 		block = block.next();
 	}
 
-	imagesBuffer.close();
-	return array;
+	return returnSet;
 }
 
 quint32 TextDocument::CalculateImageCRC(const QImage& image) const {

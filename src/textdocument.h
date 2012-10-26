@@ -46,7 +46,7 @@ namespace qNotesManager {
 
 	public:
 		explicit TextDocument(QObject *parent = 0);
-		QByteArray SerializeImageResources() const;
+		QSet<QString> GetImagesList() const;
 		void InsertImage(QImage image, QTextCursor cursor);
 		void InsertImage(QUrl url, QTextCursor cursor);
 

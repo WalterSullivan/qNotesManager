@@ -20,6 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "document.h"
 #include "textdocument.h"
 #include "boibuffer.h"
+#include "global.h"
 
 #include <QBuffer>
 #include <QFileInfo>
@@ -306,10 +307,59 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 	const quint8 w_locked = (quint8)locked;
 
 	// Write images to temporary buffer
-	const QByteArray imagesByteArray = document->SerializeImageResources();
+	QSet<QString> imagesNamesList = document->GetImagesList();
+	QByteArray imagesArray;
+	BOIBuffer imagesArrayBuffer(&imagesArray);
+	imagesArrayBuffer.open(QIODevice::WriteOnly);
+
+	QByteArray tempArray;
+	QBuffer tempArrayBuffer;
+
+	foreach (QString imageName, imagesNamesList) {
+		// preparing to write
+		QVariant imageData = document->resource(QTextDocument::ImageResource, QUrl(imageName));
+		QImage image = imageData.value<QImage>();
+
+		QByteArray imageNameArray = imageName.toUtf8();
+		const quint32 imageNameSize = imageNameArray.size();
+
+		const QByteArray formatArray = image.text("FORMAT").toAscii();
+		const quint32 formatArraySize = formatArray.size();
+
+		if (formatArraySize == 0) {
+			WARNING(qPrintable(QString("Unknown image file format for image: %s").arg(imageName)));
+			continue;
+		}
+
+		qDebug()<< "Saving image: " << imageNameArray;
+		qDebug() << "Format: " << image.text("FORMAT");
+
+		tempArray.clear();
+		tempArrayBuffer.setBuffer(&tempArray);
+		tempArrayBuffer.open(QIODevice::WriteOnly);
+		image.save(&tempArrayBuffer, image.text("FORMAT").toStdString().c_str(), 100);
+		tempArrayBuffer.close();
+
+		if (tempArray.size() == 0) {
+			WARNING(qPrintable(QString("Error saving image: %s").arg(imageName)));
+			continue;
+		}
+
+		// writing data
+		imagesArrayBuffer.write(imageNameSize);
+		imagesArrayBuffer.write(imageNameArray.constData(), imageNameSize);
+
+		imagesArrayBuffer.write(formatArraySize);
+		imagesArrayBuffer.write(formatArray.constData(), formatArraySize);
+
+		const quint32 imageArraySize = tempArray.size();
+		imagesArrayBuffer.write(imageArraySize);
+		imagesArrayBuffer.write(tempArray);
+	}
+	imagesArrayBuffer.close();
 
 
-	const quint32 w_imagesArraySize = imagesByteArray.size();
+	const quint32 w_imagesArraySize = imagesArray.size();
 	const quint32 w_itemSize =	sizeof(w_captionSize) +
 								w_captionSize +
 								sizeof(w_textSize) +
@@ -349,7 +399,7 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 	result = stream.write(w_foreColor);
 	result = stream.write(w_locked);
 	result = stream.write(w_imagesArraySize);
-	result = stream.write(imagesByteArray);
+	result = stream.write(imagesArray);
 }
 
 /* static */
@@ -423,14 +473,12 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 
 			QImage image = QImage::fromData(r_imageArray, QString(imageFormat).toStdString().c_str());
 			if (!image.isNull()) {
-#ifdef DEBUG
 				qDebug() << "Image " << r_imageName << ".Suffix: " << imageFormat << " .loaded";
-#endif
 				image.setText("FORMAT", QString(imageFormat));
 				images.insert(r_imageName, image);
 			} else {
-				qWarning("Image %s. Suffix: %s not loaded", qPrintable(QString(r_imageName)),
-						 qPrintable(QString(imageFormat)) );
+				WARNING(qPrintable(QString("Image %s. Suffix: %s not loaded")
+								   .arg(QString(r_imageName)).arg(QString(imageFormat))));
 			}
 
 
