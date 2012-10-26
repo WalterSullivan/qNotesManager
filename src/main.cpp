@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 		if (arguments.count() == 1) {
 			QString arg = arguments.at(0);
 			if (arg == "-v" || arg == "--version") {
-				fprintf(stdout, "%s version: 0.9.0\n", APPNAME); // FIXME: add actual version
+				fprintf(stdout, "%s version: %s\n", APPNAME, VERSION); // FIXME: add actual version
 				return 0;
 			} else if (arg == "-h" || arg == "--help") {
 				fprintf(stdout, qPrintable(helpScreenText));
