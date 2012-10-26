@@ -37,6 +37,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTextTable>
 #include <QClipboard>
 #include <QDateTime>
+#include <QDesktopServices>
 
 
 using namespace qNotesManager;
@@ -450,15 +451,13 @@ void TextEdit::mousePressEvent (QMouseEvent* event) {
 
 		QString href = anchorAt(event->pos());
 		if (!href.isEmpty()) {
-			qDebug() << "MousePressEvent. Href is not empty";
-			qDebug() << "MousePressEvent. Left button clicked";
 			QUrl url(href);
 			QString scheme = url.scheme();
 
 			if (scheme == "note") {
-				QMessageBox::information(this, "Note Link", href);
+				// Not supported yet
 			} else {
-				QMessageBox::information(this, "Internet link", href);
+				QDesktopServices::openUrl(href);
 			}
 			emit this->sg_LinkClicked(url);
 		}
