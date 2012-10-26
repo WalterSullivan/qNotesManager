@@ -557,6 +557,9 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	if (doc == 0) {
 		setWindowTitle(APPNAME);
 		setWindowModified(false);
+		if (menuBar->actions().contains(editMenu->menuAction())) {
+			menuBar->removeAction(editMenu->menuAction());
+		}
 	} else {
 		QObject::connect(doc, SIGNAL(sg_Changed()),
 						 this, SLOT(sl_CurrentDocument_Changed()));
@@ -572,6 +575,7 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 
 		restoreDocumentVisualSettings();
 		sl_Clipboard_DataChanged();
+		sl_EditMenuContentChanged();
 	}
 
 	// Actions
@@ -581,11 +585,6 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	closeDocumentAction->setEnabled(enable);
 	documentPropertiesAction->setEnabled(enable);
 	globalSearchAction->setEnabled(enable);
-
-
-
-
-
 }
 
 void MainWindow::sl_Application_NoteDeleted(Note* n) {
@@ -691,6 +690,12 @@ void MainWindow::sl_QuickNoteAction_Triggered() {
 }
 
 void MainWindow::sl_EditMenuContentChanged() {
+	if (!Application::I()->CurrentDocument()) {
+		if (menuBar->actions().contains(editMenu->menuAction())) {
+			menuBar->removeAction(editMenu->menuAction());
+		}
+		return;
+	}
 	if (editMenu->actions().size() > 0) {
 		editMenu->clear();
 	}
