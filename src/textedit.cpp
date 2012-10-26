@@ -41,8 +41,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-int TextEdit::imageIndex = 1;
-
 TextEdit::TextEdit(QWidget *parent) :
 	QTextEdit(parent),
 	InsertHyperlinkAction(new QAction("Insert hyperlink", this)),
@@ -195,54 +193,6 @@ void TextEdit::insertFromMimeData(const QMimeData* source) {
 	} else {
 		QTextEdit::insertFromMimeData(source);
 	}
-/*
-	qDebug() << "HTML:" << source->html();
-	if (source->hasImage()) {
-		QImage image = qvariant_cast<QImage>(source->imageData());
-		QTextCursor cursor = this->textCursor();
-		QTextDocument *document = this->document();
-		document->addResource(QTextDocument::ImageResource, QUrl("image"), image);
-		cursor.insertImage("image");
-	} else {
-		QString html = "";
-		if (source->hasHtml()) {
-			html = source->html();
-		}
-		int pos = 0;
-
-
-		while (true) {
-			pos = html.indexOf("<img", pos, Qt::CaseInsensitive);
-			if (pos == -1) {break;}
-			int closeBracket = html.indexOf(">", pos);
-			if (closeBracket == -1) { break; }
-			int srcPos = html.indexOf("src=\"", pos); // тут нужно использовать QRegExp, так как кавычки могут
-			// быть двойными или одинарными и между символами могут быть пробелы
-			int srcStart = srcPos + 5;
-			int srcEnd = html.indexOf("\"", srcStart) - 1;
-			QString imgSrc = html.mid(srcStart, srcEnd - srcStart + 1);
-			//qDebug() << "Image SRC found: " << imgSrc;
-			QUrl url (imgSrc);
-			if (url.isValid()) {
-				QString scheme = url.scheme();
-				QFileInfo fileInfo(url.path());
-				if (this->savedImages.contains(url.toString())) {
-					// Этот файл уже загружен в ресурсы, то ничего не делаем
-				} else {
-					// Если файла нет в ресурсах, то загружаем его
-					//QImage image = 0; // В этой строке нужно загрузить изображение в объект image
-					//QTextDocument *document = this->document();
-					// Имя ресурса - полная ссылка на файл
-					//document->addResource(QTextDocument::ImageResource, url, image);
-
-
-				}
-			}
-			pos++;
-		}
-		QTextEdit::insertFromMimeData(source);
-	}
-	*/
 }
 
 void TextEdit::insertImageFromFile(QString fileName) {
@@ -421,33 +371,11 @@ void TextEdit::AnalyzeText(){
 			if(currentFragment.isValid()) {
 				qDebug() << "Text fragment #" << currentFragment.position() << ". Text:" << currentFragment.text() << "\n";
 				if(currentFragment.charFormat().isImageFormat()) {
-					// Найден блок с картинкой
-					// Выясняется формат картинки
 					QTextImageFormat imgFmt = currentFragment.charFormat().toImageFormat();
-					// Из формата выясняется имя картинки
+
 					QString image_name=imgFmt.name();
-					qDebug() << "Image " << image_name << "\n"; // имя файла
+					qDebug() << "Image " << image_name << "\n";
 				}
-
-
-				/*if(currentFragment.charFormat().isImageFormat()) {
-					// Найден блок с картинкой
-					// Выясняется формат картинки
-					QTextImageFormat imgFmt = currentFragment.charFormat().toImageFormat();
-					// Из формата выясняется имя картинки
-					QString image_name=imgFmt.name();
-					qDebug() << "Image " << image_name << "\n"; // имя файла
-					QString image_file_name=dirname+"/"+image_name;
-					qDebug() << "Save image data to file " << image_file_name;
-					// Из ресурсов вытягивается картинка
-					QVariant image_data=textarea->document()->resource(QTextDocument::ImageResource, image_name);
-					qDebug() << "Data length " << image_data.toByteArray().length();
-					qDebug() << "Image data as string" << image_data.toString();
-					// Картинка записывается в файл
-					QFile imgfile(image_file_name);
-					QTextStream out(&imgfile);
-					out << image_data.toByteArray();
-				}*/
 			}
 		}
 		bl = bl.next();
@@ -496,12 +424,6 @@ void TextEdit::contextMenuEvent (QContextMenuEvent* event) {
 void TextEdit::mouseMoveEvent (QMouseEvent* event) {
 	QTextEdit::mouseMoveEvent(event);
 
-	//QTextCursor cursor = cursorForPosition(event->pos());
-	//QTextCharFormat format = cursor.charFormat();
-	//if (format.isAnchor()) {
-		//QString href = format.anchorHref();
-
-
 	QString href = anchorAt(event->pos());
 	if (!href.isEmpty()) {
 		anchorTooltipTimer.start(1000);
@@ -525,10 +447,6 @@ void TextEdit::mousePressEvent (QMouseEvent* event) {
 	QTextEdit::mousePressEvent(event);
 
 	if (event->modifiers() == Qt::ControlModifier && event->button() == Qt::LeftButton) {
-		//QTextCursor cursor = cursorForPosition(event->pos());
-		//QTextCharFormat format = cursor.charFormat();
-		//if (format.isAnchor()) {
-		//QString href = format.anchorHref();
 
 		QString href = anchorAt(event->pos());
 		if (!href.isEmpty()) {
@@ -568,7 +486,6 @@ void TextEdit::sl_Document_contentsChange (int position, int charsRemoved, int c
 	(void)position;
 	(void)charsRemoved;
 	(void)charsAdded;
-	//qDebug() << QString("ContentsChange. Pos: %0, removed: %1, added: %2").arg(position).arg(charsRemoved).arg(charsAdded);
 }
 
 void TextEdit::sl_Document_NeedRelayout() {
@@ -684,19 +601,16 @@ QTextFragment TextEdit::findFragmentAtPos(QPoint pos) {
 	qDebug() << "Cursor data: start: " << cursor.position() << ", end: " << cursor.selectionEnd() - cursor.position();
 	QTextBlock block = cursor.block();
 
-	//while (true) {
-		if (!block.isValid()) {return QTextFragment();}
-		QTextBlock::iterator it;
-		//qDebug() << "Text block #" << block.blockNumber() << ". Text:\n" << block.text();
-		for(it = block.begin(); !(it.atEnd()); ++it) {
-			QTextFragment currentFragment = it.fragment();
-			if (!currentFragment.isValid()) {continue;}
-			if (cursor.position() >= currentFragment.position() &&
-					cursor.position() <= currentFragment.position() + currentFragment.length()) {
-				return currentFragment;
-			}
+	if (!block.isValid()) {return QTextFragment();}
+	QTextBlock::iterator it;
+	for(it = block.begin(); !(it.atEnd()); ++it) {
+		QTextFragment currentFragment = it.fragment();
+		if (!currentFragment.isValid()) {continue;}
+		if (cursor.position() >= currentFragment.position() &&
+			cursor.position() <= currentFragment.position() + currentFragment.length()) {
+			return currentFragment;
 		}
-	//}
+	}
 	return QTextFragment();
 }
 
@@ -831,8 +745,6 @@ void TextEdit::applyCharFormatting(QTextCharFormat& format, bool skipLinks,
 	while (true) {
 		if (!block.isValid()) {break;}
 		if (block.blockNumber() == -1) {
-			//qDebug() << "Block blockNumber is -1. Pos: " << block.position();
-			//qDebug() << "Eixting";
 			break;
 		}
 		if (block.position() > end) {break;}
@@ -847,7 +759,6 @@ void TextEdit::applyCharFormatting(QTextCharFormat& format, bool skipLinks,
 			if (currentFragment.charFormat().isAnchor() && skipLinks) {continue;}
 			if (end < fs || start > fe) {continue;} // skip not affected fragments
 
-			//qDebug() << "Fragment found: " << currentFragment.text() << ", fragment start: " << fs << ", fragment end: " << fe;
 
 			QTextCursor temp(document());
 

@@ -81,8 +81,6 @@ namespace qNotesManager {
 
 	private:
 
-		static int imageIndex;
-
 		enum CharFormatApplyMode {
 			Merge,
 			Set
