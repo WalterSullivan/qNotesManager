@@ -101,6 +101,7 @@ namespace qNotesManager {
 		void restoreDocumentVisualSettings();
 		void createActions();
 		void createControls();
+		void updateWindowTitle();
 
 	public:
 		explicit MainWindow();
