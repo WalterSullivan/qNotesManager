@@ -16,12 +16,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QApplication>
+#include <QTextCodec>
+#include <QFileInfo>
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "mainwindow.h"
-
-#include <QTextCodec>
 #include "application.h"
 
 
@@ -78,7 +79,8 @@ int main(int argc, char** argv) {
 	}
 
 	if (Application::I()->Settings.OpenLastDocumentOnStart &&
-		!Application::I()->Settings.LastDocumentName.isEmpty()) {
+		!Application::I()->Settings.LastDocumentName.isEmpty() &&
+		QFileInfo(Application::I()->Settings.LastDocumentName).exists()) {
 		w.OpenDocument(Application::I()->Settings.LastDocumentName);
 	}
 
