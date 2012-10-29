@@ -100,13 +100,11 @@ namespace qNotesManager {
 
 		TextDocument* GetTextDocument() const;
 
-		void Serialize(const int version, BOIBuffer& stream) const;
-		static Note* Deserialize(const int version, BOIBuffer& stream);
+		void Serialize(const int version, BOIBuffer& stream, const QHash<QString, quint32>&) const;
+		static Note* Deserialize(const int version, BOIBuffer& stream, const QHash<quint32, QString>&);
 
 
 		NoteTagsCollection Tags;
-
-		quint32 IconIndex; // Used for loading and saving icons
 
 	signals:
 		void sg_VisualPropertiesChanged(); // emitted when name or icon or other properties has been changed
