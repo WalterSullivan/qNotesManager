@@ -514,7 +514,9 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream, const QHash<quint3
 	foreach(QString name, images.keys()) {
 		note->document->addResource(QTextDocument::ImageResource, QUrl(name), images.value(name));
 	}
+	note->document->blockSignals(true);
 	note->document->setHtml(r_textArray);
+	note->document->blockSignals(false);
 
 	return note;
 }
