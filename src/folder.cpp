@@ -55,6 +55,14 @@ Folder::Folder(QString _name, FolderType _type) :
 					   this, SIGNAL(sg_ItemAboutToBeRemoved(AbstractFolderItem*const)));
 	QObject::connect(&Items, SIGNAL(sg_AboutToClear()),
 					   this, SIGNAL(sg_ItemsCollectionAboutToClear()));
+	QObject::connect(&Items, SIGNAL(sg_ItemAdded(AbstractFolderItem*const,int)),
+					 this, SIGNAL(sg_DataChanged()));
+	QObject::connect(&Items, SIGNAL(sg_ItemMoved(AbstractFolderItem*const,int,Folder*)),
+					 this, SIGNAL(sg_DataChanged()));
+	QObject::connect(&Items, SIGNAL(sg_ItemRemoved(AbstractFolderItem*const)),
+					 this, SIGNAL(sg_DataChanged()));
+	QObject::connect(&Items, SIGNAL(sg_Cleared()),
+					 this, SIGNAL(sg_DataChanged()));
 
 	if (type == TempFolder) {
 		name = "Temporary";

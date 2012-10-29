@@ -55,19 +55,21 @@ Document::Document() : QObject(0) {
 					 this, SLOT(sl_Folder_ItemAdded(AbstractFolderItem* const, int)));
 	QObject::connect(rootFolder, SIGNAL(sg_ItemRemoved(AbstractFolderItem*const)),
 					 this, SLOT(sl_Folder_ItemRemoved(AbstractFolderItem*const)));
-
+	QObject::connect(rootFolder, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 
 	tempFolder = new Folder("Temporary", Folder::TempFolder);
 	QObject::connect(tempFolder, SIGNAL(sg_ItemAdded(AbstractFolderItem*const, int)),
 					 this, SLOT(sl_Folder_ItemAdded(AbstractFolderItem* const, int)));
 	QObject::connect(tempFolder, SIGNAL(sg_ItemRemoved(AbstractFolderItem*const)),
 					 this, SLOT(sl_Folder_ItemRemoved(AbstractFolderItem*const)));
+	QObject::connect(tempFolder, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 
 	trashFolder = new Folder("Trash", Folder::TrashFolder);
 	QObject::connect(trashFolder, SIGNAL(sg_ItemAdded(AbstractFolderItem*const, int)),
 					 this, SLOT(sl_Folder_ItemAdded(AbstractFolderItem* const, int)));
 	QObject::connect(trashFolder, SIGNAL(sg_ItemRemoved(AbstractFolderItem*const)),
 					 this, SLOT(sl_Folder_ItemRemoved(AbstractFolderItem*const)));
+	QObject::connect(trashFolder, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 
 	tagsListModel = new QStandardItemModel(this);
 
