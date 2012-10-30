@@ -279,6 +279,8 @@ bool MainWindow::eventFilter (QObject* watched, QEvent* event) {
 
 /*virtal*/
 void MainWindow::closeEvent (QCloseEvent* event) {
+	event->ignore();
+
 	if (Application::I()->Settings.closeToTray) {
 		hide();
 	} else {
@@ -291,7 +293,6 @@ void MainWindow::closeEvent (QCloseEvent* event) {
 
 		QCoreApplication::quit();
 	}
-	event->accept();
 }
 
 /*virtual*/
