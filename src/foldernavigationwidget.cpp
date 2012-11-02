@@ -28,9 +28,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "note.h"
 #include "folderitempropertieswidget.h"
 #include "separatoritemdelegate.h"
-#ifdef DEBUG
-#include "tracelogger.h"
-#endif
 #include "global.h"
 
 #include <QVBoxLayout>
@@ -325,7 +322,10 @@ void FolderNavigationWidget::sl_PinFolderButton_Toggled(bool toggle) {
 		}
 
 		QModelIndex index = indexesList.at(0);
-		Q_ASSERT(index.isValid());
+		if (!index.isValid()) {
+			WARNING("Invalid index");
+			return;
+		}
 
 		BaseModelItem* modelItem = static_cast<BaseModelItem*>(index.internalPointer());
 		if (modelItem->DataType() != BaseModelItem::folder) {
@@ -370,7 +370,10 @@ void FolderNavigationWidget::sl_AddNoteAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
 
 	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-	Q_ASSERT(indexesList.size() <= 1);
+	if (indexesList.size() > 1) {
+		WARNING("Wrong item selection");
+		return;
+	}
 
 	Folder* parentFolder = 0;
 
@@ -379,11 +382,19 @@ void FolderNavigationWidget::sl_AddNoteAction_Triggered() {
 	} else {
 		BaseModelItem* modelitem =
 				static_cast<BaseModelItem*>(indexesList.value(0).internalPointer());
-		Q_ASSERT(modelitem->DataType() == BaseModelItem::folder);
+		if (modelitem->DataType() != BaseModelItem::folder) {
+			WARNING("Parent item is not a folder");
+			return;
+		}
 		parentFolder = dynamic_cast<FolderModelItem*>(modelitem)->GetStoredData();
-		Q_ASSERT(parentFolder != doc->GetTempFolder() &&
-				 parentFolder != doc->GetTrashFolder());
-		Q_ASSERT(!parentFolder->IsLocked());
+		if (parentFolder == doc->GetTrashFolder()) {
+			WARNING("Cannot create notes in bin");
+			return;
+		}
+		if (parentFolder->IsLocked()) {
+			WARNING("Parent folder is locked");
+			return;
+		}
 	}
 
 	Note* n = new Note();
@@ -394,7 +405,10 @@ void FolderNavigationWidget::sl_AddFolderAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
 
 	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-	Q_ASSERT(indexesList.size() <= 1);
+	if (indexesList.size() > 1) {
+		WARNING("Wrong item selection");
+		return;
+	}
 
 	Folder* parentFolder = 0;
 
@@ -404,11 +418,19 @@ void FolderNavigationWidget::sl_AddFolderAction_Triggered() {
 		BaseModelItem* modelitem =
 				static_cast<BaseModelItem*>(indexesList.value(0).internalPointer());
 
-		Q_ASSERT(modelitem->DataType() == BaseModelItem::folder);
+		if (modelitem->DataType() != BaseModelItem::folder) {
+			WARNING("Parent item is not a folder");
+			return;
+		}
 		parentFolder = dynamic_cast<FolderModelItem*>(modelitem)->GetStoredData();
-		Q_ASSERT(parentFolder != doc->GetTempFolder() &&
-				 parentFolder != doc->GetTrashFolder());
-		Q_ASSERT(!parentFolder->IsLocked());
+		if (parentFolder == doc->GetTrashFolder() || parentFolder == doc->GetTempFolder()) {
+			WARNING("Cannot create new items in system folders");
+			return;
+		}
+		if (parentFolder->IsLocked()) {
+			WARNING("Parent folder is locked");
+			return;
+		}
 	}
 
 	Folder* newFolder = new Folder();
@@ -423,13 +445,11 @@ void FolderNavigationWidget::sl_DeleteItemAction_Triggered() {
 void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
 	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
 
-	if (indexesList.size() == 0) {
-		WARNING("Too few items in list");
+	if (indexesList.size() != 1) {
+		WARNING("Wrong selection for this operation");
 		return;
 	}
-	if (indexesList.size() > 1) {
-		WARNING("Too many items in list");
-	}
+
 	QModelIndex itemIndex = indexesList.at(0);
 	if (!itemIndex.isValid()) {
 		WARNING("Got invalid index");
@@ -444,17 +464,23 @@ void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
 	AbstractFolderItem* itemToEdit = 0;
 	if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 		Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-		Q_ASSERT(f != 0);
+		if (!f) {
+			WARNING("Casting error");
+			return;
+		}
 
 		if (f->GetType() != Folder::UserFolder) {
-			WARNING("Call props on system folder");
+			WARNING("Cannot perform action on system folder");
 			return;
 		}
 
 		itemToEdit = f;
 	} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 		Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-		Q_ASSERT(n != 0);
+		if (!n) {
+			WARNING("Casting error");
+			return;
+		}
 
 		itemToEdit = n;
 	}
@@ -465,26 +491,46 @@ void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
 
 void FolderNavigationWidget::sl_DefaultForeColor_Triggered() {
 	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-	Q_ASSERT(indexesList.size() > 0);
+	if (indexesList.size() == 0) {
+		WARNING("Wrong selection for this operation");
+		return;
+	}
 	Document* doc = Application::I()->CurrentDocument();
 
 	for (int i = 0; i < indexesList.size(); ++i) {
-		Q_ASSERT(indexesList.value(i).isValid());
+		if (!indexesList.value(i).isValid()) {
+			WARNING("Invalid index");
+			continue;
+		}
 
 		BaseModelItem* modelItemToEdit =
 				static_cast<BaseModelItem*>(indexesList.value(i).internalPointer());
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			Q_ASSERT(f != 0);
-			Q_ASSERT(f != doc->GetTempFolder() &&
-					 f != doc->GetTrashFolder());
-			Q_ASSERT(!f->IsLocked());
+			if (!f) {
+				WARNING("Casting error");
+				continue;
+			}
+			if (f->GetType() != Folder::UserFolder) {
+				WARNING("Cannot perform action on system folder");
+				return;
+			}
+			if (f->IsLocked()) {
+				WARNING("Item is locked");
+				continue;
+			}
 			f->SetNameForeColor(f->GetDefaultForeColor());
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			Q_ASSERT(n != 0);
-			Q_ASSERT(!n->IsLocked());
+			if (!n) {
+				WARNING("Casting error");
+				continue;
+			}
+			if (n->IsLocked()) {
+				WARNING("Item is locked");
+				continue;
+			}
 			n->SetNameForeColor(n->GetDefaultForeColor());
 		}
 	}
@@ -492,25 +538,45 @@ void FolderNavigationWidget::sl_DefaultForeColor_Triggered() {
 
 void FolderNavigationWidget::sl_DefaultBackColor_Triggered() {
 	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-	Q_ASSERT(indexesList.size() > 0);
+	if (indexesList.size() == 0) {
+		WARNING("Wrong selection for this operation");
+		return;
+	}
 	Document* doc = Application::I()->CurrentDocument();
 
 	for (int i = 0; i < indexesList.size(); ++i) {
-		Q_ASSERT(indexesList.value(i).isValid());
+		if (!indexesList.value(i).isValid()) {
+			WARNING("Invalid index");
+			continue;
+		}
 		BaseModelItem* modelItemToEdit =
 				static_cast<BaseModelItem*>(indexesList.value(i).internalPointer());
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			Q_ASSERT(f != 0);
-			Q_ASSERT(f != doc->GetTempFolder() &&
-					 f != doc->GetTrashFolder());
-			Q_ASSERT(!f->IsLocked());
+			if (!f) {
+				WARNING("Casting error");
+				continue;
+			}
+			if (f->GetType() != Folder::UserFolder) {
+				WARNING("Cannot perform action on system folder");
+				return;
+			}
+			if (f->IsLocked()) {
+				WARNING("Item is locked");
+				continue;
+			}
 			f->SetNameBackColor(f->GetDefaultBackColor());
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			Q_ASSERT(n != 0);
-			Q_ASSERT(!n->IsLocked());
+			if (!n) {
+				WARNING("Casting error");
+				continue;
+			}
+			if (n->IsLocked()) {
+				WARNING("Item is locked");
+				continue;
+			}
 			n->SetNameBackColor(n->GetDefaultBackColor());
 		}
 	}
@@ -518,28 +584,48 @@ void FolderNavigationWidget::sl_DefaultBackColor_Triggered() {
 
 void FolderNavigationWidget::sl_CustomForeColor_Triggered() {
 	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-	Q_ASSERT(indexesList.size() > 0);
+	if (indexesList.size() == 0) {
+		WARNING("Wrong selection for this operation");
+		return;
+	}
 	Document* doc = Application::I()->CurrentDocument();
 
 	QColor newColor = QColorDialog::getColor();
 	if (!newColor.isValid()) {return;}
 
 	for (int i = 0; i < indexesList.size(); ++i) {
-		Q_ASSERT(indexesList.value(i).isValid());
+		if (!indexesList.value(i).isValid()) {
+			WARNING("Invalid index");
+			continue;
+		}
 		BaseModelItem* modelItemToEdit =
 				static_cast<BaseModelItem*>(indexesList.value(i).internalPointer());
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			Q_ASSERT(f != 0);
-			Q_ASSERT(f != doc->GetTempFolder() &&
-					 f != doc->GetTrashFolder());
-			Q_ASSERT(!f->IsLocked());
+			if (!f) {
+				WARNING("Casting error");
+				continue;
+			}
+			if (f->GetType() != Folder::UserFolder) {
+				WARNING("Cannot perform action on system folder");
+				return;
+			}
+			if (f->IsLocked()) {
+				WARNING("Item is locked");
+				continue;
+			}
 			f->SetNameForeColor(newColor);
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			Q_ASSERT(n != 0);
-			Q_ASSERT(!n->IsLocked());
+			if (!n) {
+				WARNING("Casting error");
+				continue;
+			}
+			if (n->IsLocked()) {
+				WARNING("Item is locked");
+				continue;
+			}
 			n->SetNameForeColor(newColor);
 		}
 	}
@@ -547,28 +633,48 @@ void FolderNavigationWidget::sl_CustomForeColor_Triggered() {
 
 void FolderNavigationWidget::sl_CustomBackColor_Triggered() {
 	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-	Q_ASSERT(indexesList.size() > 0);
+	if (indexesList.size() == 0) {
+		WARNING("Wrong selection for this operation");
+		return;
+	}
 	Document* doc = Application::I()->CurrentDocument();
 
 	QColor newColor = QColorDialog::getColor();
 	if (!newColor.isValid()) {return;}
 
 	for (int i = 0; i < indexesList.size(); ++i) {
-		Q_ASSERT(indexesList.value(i).isValid());
+		if (!indexesList.value(i).isValid()) {
+			WARNING("Invalid index");
+			continue;
+		}
 		BaseModelItem* modelItemToEdit =
 				static_cast<BaseModelItem*>(indexesList.value(i).internalPointer());
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			Q_ASSERT(f != 0);
-			Q_ASSERT(f != doc->GetTempFolder() &&
-					 f != doc->GetTrashFolder());
-			Q_ASSERT(!f->IsLocked());
+			if (!f) {
+				WARNING("Casting error");
+				continue;
+			}
+			if (f->GetType() != Folder::UserFolder) {
+				WARNING("Cannot perform action on system folder");
+				return;
+			}
+			if (f->IsLocked()) {
+				WARNING("Item is locked");
+				continue;
+			}
 			f->SetNameBackColor(newColor);
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			Q_ASSERT(n != 0);
-			Q_ASSERT(!n->IsLocked());
+			if (!n) {
+				WARNING("Casting error");
+				continue;
+			}
+			if (n->IsLocked()) {
+				WARNING("Item is locked");
+				continue;
+			}
 			n->SetNameBackColor(newColor);
 		}
 	}
@@ -620,7 +726,7 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 	if (keyEvent->key() == Qt::Key_Delete) {
 		if (treeView->selectionModel()->selectedIndexes().size() == 0) {return false;}
 		bool permanently = false;
-		if (((keyEvent->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier)
+		if ((keyEvent->modifiers() & Qt::ShiftModifier)
 			||
 			!Application::I()->Settings.moveItemsToBin) {
 			permanently = true;
@@ -633,7 +739,10 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 
 void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool permanently) {
 	QString details;
-	Q_ASSERT(indexesList.size() > 0);
+	if (indexesList.size() == 0) {
+		WARNING("List is empty");
+		return;
+	}
 
 	foreach (QModelIndex index, indexesList) {
 		details.append("\n").append(index.model()->data(index, Qt::DisplayRole).toString());
@@ -651,7 +760,10 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 	deleteChildIndexes(indexesList);
 
 	foreach (QModelIndex index, indexesList) {
-		Q_ASSERT(index.isValid());
+		if (!index.isValid()) {
+			WARNING("Invalid index in list");
+			continue;
+		}
 
 		BaseModelItem* modelItemToDelete = static_cast<BaseModelItem*>(index.internalPointer());
 
@@ -668,10 +780,16 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 			NoteModelItem* fmi = dynamic_cast<NoteModelItem*>(modelItemToDelete);
 			itemToDelete = fmi->GetStoredData();
 		}
-		Q_ASSERT(itemToDelete != 0);
+		if (itemToDelete == 0) {
+			WARNING("Could not find an item for deletion");
+			continue;
+		}
 
 		Folder* parentFolder = itemToDelete->GetParent();
-		Q_ASSERT(parentFolder != 0);
+		if (parentFolder == 0) {
+			WARNING("Cannot delete item without parent");
+			continue;
+		}
 
 		if (permanently) {
 			parentFolder->Items.Remove(itemToDelete);
@@ -759,14 +877,16 @@ void FolderNavigationWidget::sl_LockItemAction_Triggered(bool checked) {
 	itemBackColorMenu->setEnabled(!checked);
 }
 
-
 void FolderNavigationWidget::sl_View_clicked (const QModelIndex& index) {
 	if (!index.isValid()) {return;}
 
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
 		Note* n = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-		Q_ASSERT(n != 0);
+		if (!n) {
+			WARNING("Casting error");
+			return;
+		}
 		emit sg_NoteClicked(n);
 	}
 }
@@ -777,7 +897,10 @@ void FolderNavigationWidget::sl_View_doubleClicked (const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
 		Note* n = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-		Q_ASSERT(n != 0);
+		if (!n) {
+			WARNING("Casting error");
+			return;
+		}
 		emit sg_NoteDoubleClicked(n);
 	}
 }

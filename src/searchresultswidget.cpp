@@ -22,7 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "document.h"
 #include "documentsearchengine.h"
 #include "searchmodelitem.h"
-#include "tracelogger.h"
+#include "global.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -136,7 +136,10 @@ void SearchResultsWidget::sl_ListView_DoubleClicked(const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::SearchResult) {
 		SearchModelItem* si = dynamic_cast<SearchModelItem*>(item);
-		Q_ASSERT(si != 0);
+		if (!si) {
+			WARNING("Casting error");
+			return;
+		}
 		emit sg_ShowSearchResults(si->Fragment());
 	}
 }

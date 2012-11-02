@@ -16,6 +16,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "hierarchymodel.h"
+
 #include "folder.h"
 #include "notemodelitem.h"
 #include "foldermodelitem.h"
@@ -63,8 +64,14 @@ HierarchyModel::HierarchyModel(Document* doc) : BaseModel(doc) {
 }
 
 void HierarchyModel::RegisterItem(Folder* folder) { // Register folder and all items inside of it
-	Q_ASSERT(folder != 0);
-	Q_ASSERT(!_bridge.contains(folder));
+	if (!folder) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (_bridge.contains(folder)) {
+		WARNING("Item already registered");
+		return;
+	}
 
 	QObject::connect(folder, SIGNAL(sg_ItemAdded(AbstractFolderItem* const, int)),
 					 this, SLOT(sl_Folder_ItemAdded(AbstractFolderItem* const, int)));
@@ -96,8 +103,14 @@ void HierarchyModel::RegisterItem(Folder* folder) { // Register folder and all i
 }
 
 void HierarchyModel::RegisterItem(Note* note) {
-	Q_ASSERT(note != 0);
-	Q_ASSERT(!_bridge.contains(note));
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (_bridge.contains(note)) {
+		WARNING("Item already registered");
+		return;
+	}
 
 	Folder* folder = note->GetParent();
 	BaseModelItem* parentItem = _bridge.value(folder);
@@ -109,8 +122,14 @@ void HierarchyModel::RegisterItem(Note* note) {
 }
 
 void HierarchyModel::UnregisterItem(Folder* folder) {
-	Q_ASSERT(folder != 0);
-	Q_ASSERT(_bridge.contains(folder));
+	if (!folder) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!_bridge.contains(folder)) {
+		WARNING("Item is not registered");
+		return;
+	}
 
 	QObject::disconnect(folder, 0, this, 0);
 
@@ -129,10 +148,12 @@ void HierarchyModel::UnregisterItem(Folder* folder) {
 
 	Folder* parent = folder->GetParent();
 	if (parent != 0) {
-		Q_ASSERT(_bridge.contains(parent));
-
-		BaseModelItem* parentItem = _bridge.value(parent);
-		parentItem->RemoveChild(childItem);
+		if (!_bridge.contains(parent)) {
+			WARNING("Item parent is not registered");
+		} else {
+			BaseModelItem* parentItem = _bridge.value(parent);
+			parentItem->RemoveChild(childItem);
+		}
 	}
 
 	_bridge.remove(folder);
@@ -144,12 +165,24 @@ void HierarchyModel::UnregisterItem(Folder* folder) {
 }
 
 void HierarchyModel::UnregisterItem(Note* note) {
-	Q_ASSERT(note != 0);
-	Q_ASSERT(_bridge.contains(note));
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!_bridge.contains(note)) {
+		WARNING("Item is not registered");
+		return;
+	}
 
 	Folder* parent = note->GetParent();
-	Q_ASSERT(parent != 0);
-	Q_ASSERT(_bridge.contains(parent));
+	if (!parent) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!_bridge.contains(parent)) {
+		WARNING("Item is not registered");
+		return;
+	}
 
 	BaseModelItem* parentItem = _bridge.value(parent);
 	BaseModelItem* childItem = _bridge.value(note);
@@ -165,14 +198,20 @@ void HierarchyModel::SetPinnedFolder(Folder* f) {
 	if (f == 0) {
 		SetDisplayRootItem(GetRootItem());
 	} else {
-		Q_ASSERT(_bridge.contains(f));
+		if (!_bridge.contains(f)) {
+			WARNING("Folder is not registered");
+			return;
+		}
 		SetDisplayRootItem(_bridge.value(f));
 	}
 }
 
 void HierarchyModel::sl_Folder_ItemAdded(AbstractFolderItem* const item, int) {
 	Folder* parent = static_cast<Folder*>(QObject::sender());
-	Q_ASSERT(_bridge.contains(parent));
+	if (!_bridge.contains(parent)) {
+		WARNING("Unknown sender");
+		return;
+	}
 
 	BaseModelItem* parentItem = _bridge.value(parent);
 
@@ -212,7 +251,10 @@ void HierarchyModel::sl_Folder_ItemAdded(AbstractFolderItem* const item, int) {
 
 void HierarchyModel::sl_Folder_ItemAboutToBeRemoved(AbstractFolderItem* const item) {
 	Folder* parent = static_cast<Folder*>(QObject::sender());
-	Q_ASSERT(_bridge.contains(parent));
+	if (!_bridge.contains(parent)) {
+		WARNING("Unknown sender");
+		return;
+	}
 
 	BaseModelItem* parentItem = _bridge.value(parent);
 
@@ -248,15 +290,22 @@ void HierarchyModel::sl_Folder_ItemAboutToBeRemoved(AbstractFolderItem* const it
 void HierarchyModel::sl_Folder_ItemAboutToBeMoved(AbstractFolderItem* const item,
 												  int newPosition, Folder* newParent) {
 	Folder* parent = item->GetParent();
-	Q_ASSERT(_bridge.contains(parent));
-	Q_ASSERT(_bridge.contains(item));
-	Q_ASSERT(_bridge.contains(newParent));
+	if (!_bridge.contains(parent)) {
+		WARNING("Item is not registered");
+		return;
+	}
+	if (!_bridge.contains(item)) {
+		WARNING("Item is not registered");
+		return;
+	}
+	if (!_bridge.contains(newParent)) {
+		WARNING("Item is not registered");
+		return;
+	}
 
 	BaseModelItem* oldParentItem = _bridge.value(parent);
 	BaseModelItem* childItem = _bridge.value(item);
 	BaseModelItem* newParentItem = _bridge.value(newParent);
-
-	Q_ASSERT(parent->Items.Contains(item));
 
 	bool removeFromVisibleBranch = false;
 	if (oldParentItem == GetDisplayRootItem() ||
@@ -308,7 +357,7 @@ void HierarchyModel::sl_Folder_ItemAboutToBeMoved(AbstractFolderItem* const item
 
 void HierarchyModel::sl_Folder_ItemsCollectionCleared() {
 	// TODO: Implement this
-	Q_ASSERT(false);
+	WARNING("Not implemented");
 }
 
 void HierarchyModel::sl_Item_DataChanged(BaseModelItem* modelItem) {
@@ -384,7 +433,10 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 		row = GetRootItem()->ChildrenCount() - 3;
 	}
 
-	Q_ASSERT(newParentModelItem->DataType() == BaseModelItem::folder);
+	if (newParentModelItem->DataType() != BaseModelItem::folder) {
+		WARNING("Item has wrong type");
+		return false;
+	}
 
 	QByteArray encodedData = data->data("application/ami.pointer");
 	QDataStream stream(&encodedData, QIODevice::ReadOnly);
@@ -395,7 +447,6 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 	while (!stream.atEnd()) {
 		p = 0;
 		stream.readRawData((char*)&p, sizeof(p));
-		Q_ASSERT(p != 0);
 
 
 		qDebug() << "Dropped data pointer : " << p;
@@ -411,7 +462,11 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 		} else if (droppedModelItem->DataType() == BaseModelItem::note) {
 			droppedFolderItem = (dynamic_cast<NoteModelItem*>(droppedModelItem))->GetStoredData();
 		}
-		Q_ASSERT(droppedFolderItem != 0);
+
+		if (!droppedFolderItem) {
+			WARNING("Casting error");
+			continue;
+		}
 
 		// Do not allow to drop item to it's own offspring
 		if (droppedFolderItem->GetItemType() == AbstractFolderItem::Type_Folder

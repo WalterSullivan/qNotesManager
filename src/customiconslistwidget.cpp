@@ -17,14 +17,15 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "customiconslistwidget.h"
 
+#include "application.h"
+#include "document.h"
+#include "global.h"
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QDebug>
-
-#include "application.h"
-#include "document.h"
 
 using namespace qNotesManager;
 
@@ -71,9 +72,15 @@ void CustomIconsListWidget::sl_OKButton_Clicked() {
 	if (!index.isValid()) {reject();}
 
 	SelectedIconKey = index.data(Qt::UserRole + 1).toString();
-	Q_ASSERT(!SelectedIconKey.isNull() && !SelectedIconKey.isEmpty());
+	if (SelectedIconKey.isEmpty()) {
+		WARNING("Selected icon key is empty");
+		return;
+	}
 	SelectedIcon = Application::I()->CurrentDocument()->GetItemIcon(SelectedIconKey);
-	Q_ASSERT(!SelectedIcon.isNull());
+	if (SelectedIcon.isNull()) {
+		WARNING("Selected icon is null");
+		return;
+	}
 	accept();
 }
 
@@ -98,13 +105,19 @@ void CustomIconsListWidget::sl_AddIconButton_Clicked() {
 }
 
 void CustomIconsListWidget::SelectIcon(QString key) {
-	Q_ASSERT(!key.isEmpty());
+	if (key.isEmpty()) {
+		WARNING("Selected icon key is empty");
+		return;
+	}
 
 	for (int i = 0; i < listView->model()->rowCount(); ++i) {
 		QModelIndex index = listView->model()->index(i, 0);
 		if (!index.isValid()) {return;}
 		QString itemKey = index.data(Qt::UserRole + 1).toString();
-		Q_ASSERT(!itemKey.isEmpty());
+		if (itemKey.isEmpty()) {
+			WARNING("Model item key field is empty");
+			continue;
+		}
 		if (itemKey == key) {
 			listView->scrollTo(index, QAbstractItemView::PositionAtCenter);
 			listView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);

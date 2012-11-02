@@ -17,6 +17,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "notefragment.h"
 
+#include "global.h"
+
 #include <QtGlobal>
 #include <QMetaType>
 
@@ -50,10 +52,15 @@ NoteFragment::NoteFragment(const Note* n, FragmentType t, int s, int l,
 	if (NoteFragment::metaTypeID == 0) {
 		NoteFragment::metaTypeID = qRegisterMetaType<NoteFragment>("NoteFragment");
 	}
-	Q_ASSERT(s >= 0);
-	Q_ASSERT(l >= 0);
-	Q_ASSERT(n != 0);
-
+	if (s < 0) {
+		WARNING("Wrong 'start' value");
+	}
+	if (l < 0) {
+		WARNING("Wrong 'length' value");
+	}
+	if (!n) {
+		WARNING("Null pointer recieved");
+	}
 }
 
 NoteFragment::NoteFragment(const NoteFragment& f) :

@@ -16,11 +16,11 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "documentsearchthread.h"
-#include "note.h"
 
-#ifdef DEBUG
-	#include <QDebug>
-#endif
+#include "note.h"
+#include "global.h"
+
+#include <QDebug>
 
 using namespace qNotesManager;
 
@@ -65,11 +65,11 @@ const Note* DocumentSearchThread::CurrentNote() const {
 
 void DocumentSearchThread::run() {
 	if (!regexp.isValid()) {
-		qWarning("DocumentSearchThread::run: regexp is invalid");
+		WARNING("DocumentSearchThread::run: regexp is invalid");
 		return;
 	}
 	if (regexp == QRegExp()) {
-		qWarning("DocumentSearchThread::run: regexp is empty");
+		WARNING("DocumentSearchThread::run: regexp is empty");
 		return;
 	}
 
@@ -104,6 +104,7 @@ void DocumentSearchThread::run() {
 
 		SetCurrentNote(n);
 
+		// TODO: fix this mess
 
 		// Search in caption
 		// FIXME: fix situation when capturedText.length() > symbolsForSample
@@ -255,7 +256,6 @@ void DocumentSearchThread::run() {
 		}
 		if (progress > 100) {progress = 100;}
 		emit sg_SearchProgress(progress);
-		//QThread::msleep(500);
 	}
 
 

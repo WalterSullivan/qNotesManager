@@ -17,6 +17,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "colorpickerbutton.h"
 
+#include "global.h"
+
 #include <QDebug>
 #include <QColorDialog>
 #include <QPainter>
@@ -42,7 +44,7 @@ ColorPickerButton::ColorPickerButton(AffectedObject type, QWidget *parent) :
 			defaultColor = QColor(0, 0, 0, 0);
 			break;
 		default:
-			Q_ASSERT(true);
+			WARNING("Unhandled case branch");
 			break;
 	};
 

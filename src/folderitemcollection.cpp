@@ -16,28 +16,44 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "folderitemcollection.h"
+
 #include "abstractfolderitem.h"
 #include "folder.h"
+#include "global.h"
 
 using namespace qNotesManager;
 
 FolderItemCollection::FolderItemCollection(Folder* owner) : _owner(owner) {
-	Q_ASSERT(owner != 0);
+	if (!owner) {
+		WARNING("Null pointer recieved");
+	}
 }
 
 void FolderItemCollection::Add(AbstractFolderItem* item) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(item != _owner);
-
 	AddTo(item, _items.size());
 }
 
 void FolderItemCollection::AddTo(AbstractFolderItem* item, int index) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(item != _owner);
-	Q_ASSERT(!_items.contains(item));
-	Q_ASSERT(item->GetParent() == 0);
-	Q_ASSERT(index >= 0 && index <= _items.size());
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (item == _owner) {
+		WARNING("Well, this is awkward, but you tried to make an item it's own parent");
+		return;
+	}
+	if (_items.contains(item)) {
+		WARNING("Item is already in the list");
+		return;
+	}
+	if (item->GetParent() != 0) {
+		WARNING("Item already has a parent");
+		return;
+	}
+	if (index < 0 || index > _items.size()) {
+		WARNING("Index is out of bounds");
+		return;
+	}
 
 	emit sg_ItemAboutToBeAdded(item, index);
 
@@ -48,9 +64,18 @@ void FolderItemCollection::AddTo(AbstractFolderItem* item, int index) {
 }
 
 void FolderItemCollection::Remove(AbstractFolderItem* item) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(_items.contains(item));
-	Q_ASSERT(item->GetParent() == this->_owner);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!_items.contains(item)) {
+		WARNING("Item is not in the list");
+		return;
+	}
+	if (item->GetParent() != this->_owner) {
+		WARNING("Item is in children list, but has wrong parent");
+		return;
+	}
 
 	emit sg_ItemAboutToBeRemoved(item);
 
@@ -61,7 +86,10 @@ void FolderItemCollection::Remove(AbstractFolderItem* item) {
 }
 
 bool FolderItemCollection::Contains(AbstractFolderItem* item) const {
-	Q_ASSERT(item != 0);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return false;
+	}
 
 	return _items.contains(item);
 }
@@ -77,24 +105,32 @@ void FolderItemCollection::Clear() {
 }
 
 void FolderItemCollection::Move(int from, int to) {
-	Q_ASSERT(from >= 0 && from < _items.size());
-	Q_ASSERT(to >= 0 && to < _items.size());
+	if (from < 0 || from >= _items.size()) {
+		WARNING("'from' index is out of bounds");
+		return;
+	}
+	if (to < 0 || to >= _items.size()) {
+		WARNING("'to' index is out of bounds");
+		return;
+	}
 
 	Move(_items.at(from), to, _owner);
 }
 
 void FolderItemCollection::Move(AbstractFolderItem* item, int to) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(_items.contains(item));
-	Q_ASSERT(to >= 0 && to < _items.size());
+	if (to < 0 || to >= _items.size()) {
+		WARNING("'to' index is out of bounds");
+		return;
+	}
 
 	Move(item, to, _owner);
 }
 
 void FolderItemCollection::Move(AbstractFolderItem* item, Folder* newParent) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(_items.contains(item));
-	Q_ASSERT(newParent != 0);
+	if (!newParent) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 
 	int to = newParent->Items.Count();
 	if (_owner == newParent) {
@@ -104,21 +140,40 @@ void FolderItemCollection::Move(AbstractFolderItem* item, Folder* newParent) {
 }
 
 void FolderItemCollection::Move(AbstractFolderItem* item, int to, Folder* newParent) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(_items.contains(item));
-	Q_ASSERT(to >= 0);
-	Q_ASSERT(newParent != 0);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!_items.contains(item)) {
+		WARNING("The list doesn't contain specified item");
+		return;
+	}
+	if (to < 0) {
+		WARNING("'to' index is out of bounds");
+		return;
+	}
+	if (!newParent) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 
 	//if (from == to) {return;}
 
 	emit sg_ItemAboutToBeMoved(item, to, newParent);
 
 	if (_owner == newParent ) {
-		Q_ASSERT( ( (to == _items.count()) && (_items.count() == 0) ) ||
-				 ( (to < _items.count()) && (_items.count() > 0) ) );
+		if ((_items.count() == 0 && to != 0)
+			||
+			(_items.count() > 0 && to >= _items.count())) {
+			WARNING("'to' index is out of bounds");
+			return;
+		}
 		_items.move(_items.indexOf(item), to);
 	} else {
-		Q_ASSERT(to <= newParent->Items.Count());
+		if (to > newParent->Items.Count()) {
+			WARNING("'to' index is out of bounds");
+			return;
+		}
 		_items.removeAll(item);
 		newParent ->Items._items.insert(to, item);
 		item->SetParent(newParent );
@@ -132,14 +187,23 @@ int FolderItemCollection::Count() const {
 }
 
 AbstractFolderItem* FolderItemCollection::ItemAt(int index) const {
-	Q_ASSERT(index >= 0 && index < _items.count());
+	if (index < 0 || index >= _items.count()) {
+		WARNING("Index is out of bounds");
+		return 0;
+	}
 
 	return _items.at(index);
 }
 
 int FolderItemCollection::IndexOf(AbstractFolderItem* const item) const {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(_items.contains(item));
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return -1;
+	}
+	if (!_items.contains(item)) {
+		WARNING("The list doesn't contain specified item");
+		return -1;
+	}
 
 	return _items.indexOf(item);
 }

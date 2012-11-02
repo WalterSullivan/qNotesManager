@@ -16,23 +16,22 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "texteditwidget.h"
+
 #include "textedit.h"
 #include "textdocument.h"
+#include "colorpickerbutton.h"
+#include "global.h"
 
 #include <QVBoxLayout>
 #include <QAction>
 #include <QFontComboBox>
 #include <QComboBox>
-
-#include "colorpickerbutton.h"
 #include <QTextBlock>
 #include <QTextList>
 #include <QKeyEvent>
 #include <QRegExp>
 #include <QToolTip>
 #include <QTextTable>
-
-
 #include <QDebug>
 
 using namespace qNotesManager;
@@ -418,13 +417,19 @@ void TextEditWidget::sl_AlignJustifyAction_Triggered(bool toggle) {
 void TextEditWidget::sl_ListButton_Toggled(bool toggle) {
 	QTextCursor cursor = this->textField->textCursor();
 	if (toggle) {
-		Q_ASSERT(cursor.currentList() == 0);
+		if (cursor.currentList()) {
+			WARNING("Wrong button state");
+			return;
+		}
 		QTextListFormat format;
 		format.setStyle(QTextListFormat::ListDisc);
 		cursor.createList(format);
 	} else {
 		QTextList *textList = cursor.currentList();
-		Q_ASSERT(textList != 0);
+		if (!cursor.currentList()) {
+			WARNING("Wrong button state");
+			return;
+		}
 		QTextBlock block = cursor.block();
 		textList->remove(block);
 		QTextBlockFormat format = block.blockFormat();
@@ -434,12 +439,16 @@ void TextEditWidget::sl_ListButton_Toggled(bool toggle) {
 }
 
 void TextEditWidget::sl_ListButton_Triggered(QAction* action) {
-	Q_ASSERT(action != 0);
+	if (!action) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 	QTextListFormat::Style style = (QTextListFormat::Style)action->data().toInt();
 
 	QTextCursor cursor = this->textField->textCursor();
 	QTextList *textList = cursor.currentList();
 	if (!textList) {
+		WARNING("Wrong button state");
 		return;
 	}
 	QTextListFormat format = textList->format();
@@ -470,7 +479,10 @@ void TextEditWidget::sl_DecreaseListIndent_Triggered() {
 
 void TextEditWidget::sl_CreateTableAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (table) {return;}
+	if (table) {
+		WARNING("Wrong button state");
+		return;
+	}
 
 	table = textField->textCursor().insertTable(2, 2);
 	QTextTableFormat format = table->format();
@@ -482,7 +494,10 @@ void TextEditWidget::sl_CreateTableAction_Triggered() {
 
 void TextEditWidget::sl_InsertRowAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {return;}
+	if (!table) {
+		WARNING("Wrong button state");
+		return;
+	}
 
 	QTextTableCell currentCell = table->cellAt(textField->textCursor());
 	table->insertRows(currentCell.row() + 1, 1);
@@ -492,7 +507,10 @@ void TextEditWidget::sl_InsertRowAction_Triggered() {
 
 void TextEditWidget::sl_InsertColumnAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {return;}
+	if (!table) {
+		WARNING("Wrong button state");
+		return;
+	}
 
 	QTextTableCell currentCell = table->cellAt(textField->textCursor());
 	table->insertColumns(currentCell.column() + 1, 1);
@@ -502,7 +520,10 @@ void TextEditWidget::sl_InsertColumnAction_Triggered() {
 
 void TextEditWidget::sl_RemoveRowAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {return;}
+	if (!table) {
+		WARNING("Wrong button state");
+		return;
+	}
 
 	int rowNumber = table->cellAt(textField->textCursor()).row();
 	table->removeRows(rowNumber, 1);
@@ -510,7 +531,10 @@ void TextEditWidget::sl_RemoveRowAction_Triggered() {
 
 void TextEditWidget::sl_RemoveColumnAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {return;}
+	if (!table) {
+		WARNING("Wrong button state");
+		return;
+	}
 
 	int columnNumber = table->cellAt(textField->textCursor()).column();
 	table->removeColumns(columnNumber, 1);
@@ -518,7 +542,10 @@ void TextEditWidget::sl_RemoveColumnAction_Triggered() {
 
 void TextEditWidget::sl_MergeCellsAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {return;}
+	if (!table) {
+		WARNING("Wrong button state");
+		return;
+	}
 
 	table->mergeCells(textField->textCursor());
 }
@@ -631,7 +658,10 @@ bool TextEditWidget::eventFilter (QObject* watched, QEvent* event) {
 
 	if (event->type() == QEvent::KeyPress) {
 		QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
-		Q_ASSERT(e != 0);
+		if (!e) {
+			WARNING("Casting error");
+			return false;
+		}
 		if (watched == textField) { // intercept Ctrl+F event for search
 			if (e->key() == Qt::Key_F && e->modifiers() == Qt::ControlModifier) {
 				// open search widget

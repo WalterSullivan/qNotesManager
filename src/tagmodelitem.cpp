@@ -19,16 +19,24 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "tag.h"
 #include "application.h"
+#include "global.h"
 
 #include <QPixmap>
 
 using namespace qNotesManager;
 
 TagModelItem::TagModelItem(const Tag* tag) : BaseModelItem(BaseModelItem::tag), _tag(tag) {
-	Q_ASSERT(tag != 0);
+	if (!tag) {
+		WARNING("Null pointer recieved");
+	}
 }
 
 QVariant TagModelItem::data(int role) const {
+	if (!_tag) {
+		WARNING("Null pointer recieved");
+		return QVariant();
+	}
+
 	if (role == Qt::DecorationRole) {
 		return QPixmap(":/standard/tag");
 	} else if (role == Qt::DisplayRole) {

@@ -17,13 +17,14 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "documentpropertieswidget.h"
 
-#include <QGridLayout>
-#include <QHBoxLayout>
-#include <QToolTip>
-
 #include "document.h"
 #include "compressor.h"
 #include "cipherer.h"
+#include "global.h"
+
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QToolTip>
 
 using namespace qNotesManager;
 
@@ -111,7 +112,10 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 }
 
 void DocumentPropertiesWidget::SetDocument(Document* d) {
-	Q_ASSERT(d != 0);
+	if (!d) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 
 	QString fname = d->GetFilename().isEmpty() ? "<unsaved>" : d->GetFilename();
 	filenameLabel->setText(fname);
@@ -124,8 +128,12 @@ void DocumentPropertiesWidget::SetDocument(Document* d) {
 	} else {
 		useCompressionCheckbox->setChecked(true);
 		int index = compressionLevel->findData(compLevel, Qt::UserRole);
-		Q_ASSERT(index != -1);
-		compressionLevel->setCurrentIndex(index);
+		if (index == -1) {
+			WARNING("Situable index not found");
+			compressionLevel->setCurrentIndex(0);
+		} else {
+			compressionLevel->setCurrentIndex(index);
+		}
 	}
 
 	quint8 cipherID = d->GetCipherID();
@@ -136,9 +144,14 @@ void DocumentPropertiesWidget::SetDocument(Document* d) {
 	} else {
 		useEncryptionCheckbox->setChecked(true);
 		int index = encryptionAlg->findData(cipherID, Qt::UserRole);
-		Q_ASSERT(index != -1);
-		encryptionAlg->setCurrentIndex(index);
+		if (index == -1) {
+			WARNING("Situable index not found");
+			encryptionAlg->setCurrentIndex(0);
+		} else {
+			encryptionAlg->setCurrentIndex(index);
+		}
 		passwordLineEdit->setText(d->GetPassword());
+
 	}
 
 	currentDocument = d;
@@ -201,9 +214,9 @@ void DocumentPropertiesWidget::sl_OKButton_Clicked() {
 		currentDocument->SetCipherData(cipherID, passwordLineEdit->text());
 	}
 
-	close();
+	accept();
 }
 
 void DocumentPropertiesWidget::sl_CancelButton_Clicked() {
-	close();
+	reject();
 }

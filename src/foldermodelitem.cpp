@@ -19,6 +19,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "folder.h"
 #include "application.h"
+#include "global.h"
 
 #include <QBrush>
 #include <QApplication>
@@ -27,15 +28,22 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-FolderModelItem::FolderModelItem(Folder* folder) :
+FolderModelItem::FolderModelItem(Folder* _folder) :
 		BaseModelItem(BaseModelItem::folder),
-		folder(folder) {
-	Q_ASSERT(folder != 0);
-	QObject::connect(folder, SIGNAL(sg_VisualPropertiesChanged()),
+		folder(_folder) {
+	if (!folder) {
+		CRITICAL("Null pointer recieved");
+	} else {
+		QObject::connect(folder, SIGNAL(sg_VisualPropertiesChanged()),
 					 this, SLOT(sl_Folder_PropertiesChanged()));
+	}
+
 }
 
 QVariant FolderModelItem::data(int role) const {
+	if (!folder) {
+		return QVariant();
+	}
 	if (role == Qt::DecorationRole) {
 		if (folder->IsLocked()) {
 			QPixmap shadedIcon = QIcon(folder->GetIcon()).pixmap(folder->GetIcon().size(),

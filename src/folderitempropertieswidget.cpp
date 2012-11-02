@@ -23,6 +23,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "customiconslistwidget.h"
 #include "application.h"
 #include "document.h"
+#include "global.h"
 
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -99,12 +100,13 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 	setWindowTitle("Edit properties");
 	setWindowIcon(QIcon(":/gui/property"));
 	selectedIconKey = "";
-
-
 }
 
 void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
-	Q_ASSERT(item != 0);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 
 	itemToEdit = item;
 
@@ -140,7 +142,11 @@ void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
 }
 
 void FolderItemPropertiesWidget::sl_OKButton_Clicked() {
-	Q_ASSERT(itemToEdit != 0);
+	if (!itemToEdit) {
+		WARNING("Null pointer recieved");
+		reject();
+	}
+
 	if (nameLineEdit->text().isEmpty()) {nameLineEdit->setText("Noname");} // ?
 
 	if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Folder) {
@@ -163,7 +169,10 @@ void FolderItemPropertiesWidget::sl_CancelButton_Clicked() {
 }
 
 void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {
-	Q_ASSERT(itemToEdit != 0);
+	if (!itemToEdit) {
+		WARNING("Null pointer recieved");
+		reject();
+	}
 
 	CustomIconsListWidget* w = new CustomIconsListWidget();
 
@@ -183,7 +192,7 @@ void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {
 void FolderItemPropertiesWidget::sl_ResetIconToDefaultButton_Clicked() {
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc == 0) {
-		qWarning("Current document is 0");
+		WARNING("Current document is 0");
 		return;
 	}
 
@@ -199,7 +208,7 @@ void FolderItemPropertiesWidget::sl_ResetIconToDefaultButton_Clicked() {
 void FolderItemPropertiesWidget::sl_SetDefaultIconButton_Clicked() {
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc == 0) {
-		qWarning("Current document is 0");
+		WARNING("Current document is 0");
 		return;
 	}
 

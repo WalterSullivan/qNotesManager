@@ -18,6 +18,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "datemodelitem.h"
 
 #include "application.h"
+#include "global.h"
 
 #include <QDate>
 #include <QIcon>
@@ -62,10 +63,10 @@ QVariant DateModelItem::data(int role) const {
 				}
 				break;
 			case MonthAndDay:
-				Q_ASSERT(false);
+				WARNING("Wrong component type");
 				break;
 			default:
-				Q_ASSERT(false);
+				WARNING("Wrong component type");
 				break;
 		}
 		return returnValue;

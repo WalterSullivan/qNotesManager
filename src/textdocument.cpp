@@ -16,8 +16,10 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "textdocument.h"
+
 #include "imagedownloader.h"
 #include "crc32.h"
+#include "global.h"
 
 #include <QFileInfo>
 #include <QDebug>
@@ -29,7 +31,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QThread>
 #include <QPainter>
 #include <QBuffer>
-
 
 using namespace qNotesManager;
 
@@ -263,7 +264,7 @@ void TextDocument::InsertImage(QImage image, QTextCursor cursor) {
 }
 
 void TextDocument::InsertImage(QUrl url, QTextCursor cursor) {
-	Q_ASSERT(false);
+	WARNING("Not implemented");
 }
 
 void TextDocument::sl_RestartDownloadsTimer_Timeout() {

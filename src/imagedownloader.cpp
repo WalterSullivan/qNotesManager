@@ -17,6 +17,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "imagedownloader.h"
 
+#include "global.h"
+
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
@@ -113,7 +115,10 @@ bool ImageDownloader::HasActiveDownload(const QUrl url) const {
 
 void ImageDownloader::sl_reply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(QObject::sender());
-	Q_ASSERT(reply != 0);
+	if (!reply) {
+		WARNING("Casting error");
+		return;
+	}
 
 	QUrl url = extractOriginalUrl(reply);
 	qint64 progress = 0;
@@ -125,7 +130,10 @@ void ImageDownloader::sl_reply_downloadProgress(qint64 bytesReceived, qint64 byt
 }
 
 QUrl ImageDownloader::extractOriginalUrl(QNetworkReply* reply) {
-	Q_ASSERT(reply != 0);
+	if (!reply) {
+		WARNING("Null pointer recieved");
+		return QUrl();
+	}
 
 	QUrl originalRequestUrl = reply->request().attribute(OriginalUrlAttribute).isValid() ?
 				reply->request().attribute(OriginalUrlAttribute).toUrl() :
@@ -135,6 +143,11 @@ QUrl ImageDownloader::extractOriginalUrl(QNetworkReply* reply) {
 }
 
 void ImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
+	if (!reply) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+
 	QUrl currentReplyUrl = reply->url();
 	QUrl originalRequestUrl = extractOriginalUrl(reply);
 
@@ -282,7 +295,11 @@ void ImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
 }
 
 void ImageDownloader::disconnectAndDeleteReply(QNetworkReply* reply) {
-	Q_ASSERT(reply != 0);
+	if (!reply) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+
 	reply->disconnect();
 	reply->deleteLater();
 }

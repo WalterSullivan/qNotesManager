@@ -16,11 +16,12 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "textedit.h"
+
 #include "textdocument.h"
 #include "hyperlinkeditwidget.h"
+#include "global.h"
 
 #include <QMimeData>
-
 #include <QDebug>
 #include <QTextBlock>
 #include <QTextFragment>
@@ -583,7 +584,8 @@ void TextEdit::sl_TableAlignAction_Triggered() {
 	} else if (act == tableAlignJustify) {
 		a = Qt::AlignJustify;
 	} else {
-		Q_ASSERT(false);
+		WARNING("Unknown sender");
+		return;
 	}
 
 

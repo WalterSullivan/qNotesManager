@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QtGlobal>
 
 #define WARNING(msg) qWarning("%s\nIn: %s ( %s(%i) )", msg, __FUNCTION__, __FILE__,__LINE__);
+#define CRITICAL(msg) qCritical("%s\nIn: %s ( %s(%i) )", msg, __FUNCTION__, __FILE__,__LINE__);
 #define FATAL(msg) qFatal("%s\nIn: %s ( %s(%i) )", msg, __FUNCTION__, __FILE__,__LINE__);
 
 #define WARNINGIF(exp, msg, ret) if (!(exp)) {qWarning("Warning: %s\nIn: %s ( %s(%i) )", msg, __FUNCTION__, __FILE__,__LINE__); return ret;}

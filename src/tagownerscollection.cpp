@@ -17,7 +17,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "tagownerscollection.h"
 
-
+#include "global.h"
 
 using namespace qNotesManager;
 
@@ -25,8 +25,14 @@ TagOwnersCollection::TagOwnersCollection() {
 }
 
 void TagOwnersCollection::Add(Note* note) {
-	Q_ASSERT(note != 0);
-	Q_ASSERT(!owners.contains(note));
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (owners.contains(note)) {
+		WARNING("Item is already in the list");
+		return;
+	}
 
 	emit sg_ItemAboutToBeAdded(note);
 	owners.append(note);
@@ -34,8 +40,14 @@ void TagOwnersCollection::Add(Note* note) {
 }
 
 void TagOwnersCollection::Remove(Note* note) {
-	Q_ASSERT(note != 0);
-	Q_ASSERT(owners.contains(note));
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!owners.contains(note)) {
+		WARNING("Item is not in the list");
+		return;
+	}
 
 	emit sg_ItemAboutToBeRemoved(note);
 	owners.removeAll(note);
@@ -43,7 +55,10 @@ void TagOwnersCollection::Remove(Note* note) {
 }
 
 bool TagOwnersCollection::Contains(Note* note) const {
-	Q_ASSERT(note != 0);
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return false;
+	}
 
 	return owners.contains(note);
 }
@@ -61,7 +76,10 @@ int TagOwnersCollection::Count() const {
 }
 
 Note* TagOwnersCollection::ItemAt(int index) const {
-	Q_ASSERT(index >= 0 && index < owners.count());
+	if (index < 0 || index >= owners.count()) {
+		WARNING("Index is out of bounds");
+		return 0;
+	}
 
 	return owners.at(index);
 }

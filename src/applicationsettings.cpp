@@ -18,6 +18,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "applicationsettings.h"
 
 #include "boibuffer.h"
+#include "global.h"
 
 #include <QFile>
 
@@ -36,7 +37,7 @@ void ApplicationSettings::Load() {
 
 	if (!f.open(QIODevice::ReadOnly)) {
 		loadDefaultValues();
-		qWarning("Could not open settings file for reading");
+		WARNING("Could not open settings file for reading");
 		return;
 	}
 
@@ -51,7 +52,7 @@ void ApplicationSettings::Load() {
 	buffer.read(version);
 
 	if (version > 0) {
-		qWarning("Wrong settings file version");
+		WARNING("Wrong settings file version");
 		loadDefaultValues();
 		return;
 	}
@@ -61,7 +62,7 @@ void ApplicationSettings::Load() {
 		loadVersion_0(&buffer);
 		break;
 	default:
-		qWarning("Wrong settings file version");
+		WARNING("Wrong settings file version");
 		loadDefaultValues();
 		return;
 	}
@@ -152,7 +153,7 @@ void ApplicationSettings::Save() {
 	QFile f("settings");
 
 	if (!f.open(QIODevice::WriteOnly)) {
-		qWarning("Could not write settings file. Check your permissions");
+		WARNING("Could not write settings file. Check your permissions");
 		return;
 	}
 

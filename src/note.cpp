@@ -16,6 +16,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "note.h"
+
 #include "application.h"
 #include "document.h"
 #include "textdocument.h"
@@ -25,7 +26,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QBuffer>
 #include <QFileInfo>
 #include <QDebug>
-
 
 using namespace qNotesManager;
 
@@ -106,7 +106,10 @@ void Note::SetIcon(QString id) {
 	if (iconID == id) {
 		return;
 	}
-	Q_ASSERT(!id.isEmpty());
+	if (id.isEmpty()) {
+		WARNING("New icon id is empty");
+		return;
+	}
 
 	iconID = id;
 
@@ -146,7 +149,10 @@ QColor Note::GetNameForeColor() const {
 }
 
 void Note::SetNameForeColor(QColor c) {
-	if (!c.isValid()) {return;}
+	if (!c.isValid()) {
+		WARNING("New color is invalid");
+		return;
+	}
 
 	if (nameForeColor == c) {
 		return;
@@ -163,7 +169,10 @@ QColor Note::GetNameBackColor() const {
 }
 
 void Note::SetNameBackColor(QColor c) {
-	if (!c.isValid()) {return;}
+	if (!c.isValid()) {
+		WARNING("New color is invalid");
+		return;
+	}
 
 	if (nameBackColor == c) {
 		return;

@@ -16,27 +16,23 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "document.h"
+
 #include "folder.h"
 #include "abstractfolderitem.h"
 #include "note.h"
 #include "tag.h"
 #include "application.h"
-#ifdef DEBUG
-#include "tracelogger.h"
-#endif
 #include "cipherer.h"
 #include "compressor.h"
-
 #include "invaliddataexception.h"
 #include "ioexception.h"
 #include "operationabortedexception.h"
-
 #include "hierarchymodel.h"
 #include "tagsmodel.h"
 #include "datesmodel.h"
-
 #include "boibuffer.h"
 #include "crc32.h"
+#include "global.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -155,23 +151,15 @@ bool Document::IsChanged() const {
 
 /*static*/
 Document* Document::Open(QString fileName) {
-#ifdef DEBUG
-		Q_ASSERT(!fileName.isEmpty());
-#else
 	if (fileName.isEmpty()) {
 		throw InvalidDataException("Specify valid filename to load", "Filename argument is empty", WHERE);
 	}
-#endif
 
 
 	QFile file(fileName);
-#ifdef DEBUG
-	Q_ASSERT(file.exists());
-#else
 	if (!file.exists()) {
 		throw InvalidDataException("Specify valid filename to load", "Filename argument is empty", WHERE);
 	}
-#endif
 
 
 	if (file.size() < 13) { // must me guaranteed program can read 9 bytes of signature and fileSize data
@@ -457,20 +445,29 @@ Document* Document::Open(QString fileName) {
 		while (dataBuffer.pos() < blockLastByte) {
 			quint32 folderID = 0;
 			readResult = dataBuffer.read(folderID);
-			Q_ASSERT(folderItems.contains(folderID));
+			if (!folderItems.contains(folderID)) {
+				WARNING("Could not find item by ID");
+				throw Exception("File is corrupted", "", WHERE);
+			}
 			Folder* parentFolder = dynamic_cast<Folder*>(folderItems.value(folderID));
-			Q_ASSERT(parentFolder != 0);
+			if (!parentFolder) {
+				WARNING("Casting error");
+				parentFolder = doc->rootFolder;
+			}
 
 			quint32 childrenCount = 0;
 			readResult = dataBuffer.read(childrenCount);
 
 			while (childrenCount > 0) {
+				childrenCount--;
 				quint32 childID = 0;
 				readResult = dataBuffer.read(childID);
-				Q_ASSERT(folderItems.contains(childID));
+				if (!folderItems.contains(childID)) {
+					WARNING("Could not find item by ID");
+					continue;
+				}
 				AbstractFolderItem* childItem = folderItems.value(childID);
 				parentFolder->Items.Add(childItem);
-				childrenCount--;
 			}
 		}
 	}
@@ -485,20 +482,29 @@ Document* Document::Open(QString fileName) {
 		while (dataBuffer.pos() < blockLastByte) {
 			quint32 tagID = 0;
 			readResult = dataBuffer.read(tagID);
-			Q_ASSERT(tagsIDs.contains(tagID));
+			if (!tagsIDs.contains(tagID)) {
+				WARNING("Could not find item by ID");
+				throw Exception("File is corrupted", "", WHERE);
+			}
 			Tag* tag = tagsIDs.value(tagID);
 
 			quint32 ownersCount = 0;
 			readResult = dataBuffer.read(ownersCount);
 
 			while (ownersCount > 0) {
+				ownersCount--;
 				quint32 ownerID = 0;
 				readResult = dataBuffer.read(ownerID);
-				Q_ASSERT(folderItems.contains(ownerID));
+				if (!folderItems.contains(ownerID)) {
+					WARNING("Could not find note by ID");
+					continue;
+				}
 				Note* note = dynamic_cast<Note*>(folderItems.value(ownerID));
-				Q_ASSERT(note != 0);
+				if (!note) {
+					WARNING("Casting error");
+					continue;
+				}
 				note->Tags.Add(tag);
-				ownersCount--;
 			}
 		}
 	}
@@ -548,8 +554,9 @@ void Document::Save(QString name, quint16 version) {
 		fileName = name;
 	}
 
-	Q_ASSERT(!fileName.isEmpty());
-
+	if (fileName.isEmpty()) {
+		throw InvalidDataException("Specify valid filename to save", "Filename argument is empty", WHERE);
+	}
 
 
 	QByteArray fileDataArray;
@@ -796,14 +803,12 @@ void Document::Save(QString name, quint16 version) {
 
 		while (!foldersStack.isEmpty()) {
 			const Folder* folder = foldersStack.pop();
-			Q_ASSERT(folderItemsIDs.contains(folder));
 			const quint32 folderID = folderItemsIDs.value(folder);
 			const quint32 childrenCount = (quint32)folder->Items.Count();
 			dataBuffer.write(folderID);
 			dataBuffer.write(childrenCount);
 			for (int i = 0; i < folder->Items.Count(); ++i) {
 				const AbstractFolderItem* child = folder->Items.ItemAt(i);
-				Q_ASSERT(folderItemsIDs.contains(child));
 				const quint32 childID = folderItemsIDs.value(child);
 				dataBuffer.write(childID);
 				if (child->GetItemType() == AbstractFolderItem::Type_Folder) {
@@ -941,7 +946,7 @@ void Document::RegisterItem(AbstractFolderItem* const item) {
 		QObject::connect(n, SIGNAL(sg_TagAdded(Tag*)), this, SLOT(sl_Note_TagAdded(Tag*)));
 		QObject::connect(n, SIGNAL(sg_TagRemoved(Tag*)), this, SLOT(sl_Note_TagRemoved(Tag*)));
 
-		// TODO: Register tags
+		// TODO: Register tags ?
 
 		allNotes.append(n);
 		emit sg_ItemRegistered(n);
@@ -983,13 +988,8 @@ void Document::RegisterTag(Tag* tag) {
 void Document::UnregisterTag(Tag* tag) {
 	allTags.removeAll(tag);
 	tagsByName.remove(tag->GetName());
-	// VER: 4.2
-	QList<QStandardItem *> itemsList = tagsListModel->findItems(tag->GetName(), Qt::MatchExactly, 0);
-	Q_ASSERT(itemsList.size() == 1);
-	// VER: 4.2
-	QStandardItem * item = tagsListModel->takeItem(itemsList.at(0)->row());
-	Q_ASSERT(item != 0);
-	Q_ASSERT(item == itemsList.at(0));
+	QList<QStandardItem*> itemsList = tagsListModel->findItems(tag->GetName(), Qt::MatchExactly, 0);
+	QStandardItem* item = tagsListModel->takeItem(itemsList.at(0)->row());
 	delete item;
 
 	emit sg_ItemUnregistered(tag);
@@ -997,7 +997,10 @@ void Document::UnregisterTag(Tag* tag) {
 }
 
 void Document::sl_Note_TagAdded(Tag* tag) {
-	Q_ASSERT(tag != 0);
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 
 	if (!allTags.contains(tag)) {
 		RegisterTag(tag);
@@ -1005,8 +1008,13 @@ void Document::sl_Note_TagAdded(Tag* tag) {
 }
 
 void Document::sl_Note_TagRemoved(Tag* tag) {
-	Q_ASSERT(tag != 0);
-	Q_ASSERT(allTags.contains(tag));
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!allTags.contains(tag)) {
+		WARNING("Unknown tag");
+	}
 
 	if (tag->Owners.Count() == 0) {
 		UnregisterTag(tag);
@@ -1055,9 +1063,21 @@ QList<Note*> Document::GetNotesList() const {
 }
 
 void Document::AddCustomIcon(QPixmap image, QString name) {
+	if (image.isNull()) {
+		WARNING("Null image recieved");
+		return;
+	}
+	if (name.isEmpty()) {
+		WARNING("Empty name recieved");
+		return;
+	}
 	QFileInfo file(name);
 	QString base = file.completeBaseName();
 	QString suffix = file.suffix();
+	if (base.isEmpty() || suffix.isEmpty()) {
+		WARNING("Image name is incomplete");
+		return;
+	}
 	int addNumber = 1;
 	while (customIcons.contains(name)) {
 		name = base.append(QString::number(addNumber)).append(".").append(suffix);
@@ -1075,13 +1095,20 @@ void Document::AddCustomIcon(QPixmap image, QString name) {
 }
 
 void Document::RemoveCustomIcon(QString key) {
-	if (!customIcons.contains(key)) {return;}
+	if (!customIcons.contains(key)) {
+		WARNING("Icon with passed key not found");
+		return;
+	}
 
 	QList<QStandardItem*> itemsList = customIconsModel->findItems(key, Qt::MatchExactly, 0);
-	Q_ASSERT(itemsList.size() == 1);
-	QStandardItem * item = customIconsModel->takeItem(itemsList.at(0)->row());
-	Q_ASSERT(item != 0);
-	Q_ASSERT(item == itemsList.at(0));
+	if (itemsList.size() != 1) {
+		WARNING("A few icons with the same key found");
+	}
+	QStandardItem* item = customIconsModel->takeItem(itemsList.at(0)->row());
+	if (item == 0) {
+		WARNING("Error retrieving icon model item");
+		return;
+	}
 	for (int i = 0; i < allNotes.size(); ++i) {
 		if (allNotes.at(i)->GetIconID() == key) {
 			allNotes.at(i)->SetIcon(Application::I()->DefaultNoteIcon);
@@ -1100,20 +1127,23 @@ void Document::RemoveCustomIcon(QString key) {
 }
 
 QPixmap Document::GetItemIcon(const QString key) const {
-	Q_ASSERT(!key.isEmpty());
+	if (key.isEmpty()) {
+		WARNING("Empty key passed");
+		return QPixmap();
+	}
 
 	if (key.mid(0, 1) == ":") {
 		if (Application::I()->GetStandardIcons().contains(key)) {
 			return Application::I()->GetStandardIcons().value(key);
 		} else {
-			qWarning(qPrintable("Requested non-existent icon: " + key));
+			WARNING(qPrintable("Icon with passed key not found: " + key));
 			return QPixmap();
 		}
 	} else {
 		if (customIcons.contains(key)) {
 			return customIcons.value(key);
 		} else {
-			qWarning(qPrintable("Requested non-existent icon: " + key));
+			WARNING(qPrintable("Icon with passed key not found: " + key));
 			return QPixmap();
 		}
 	}
@@ -1124,7 +1154,9 @@ quint8 Document::GetCompressionLevel() const {
 }
 
 void Document::SetCompressionLevel(const quint8 level) {
-	Q_ASSERT(level >= Compressor::MinimumLevel && level <= Compressor::MaximumLevel);
+	if (level < Compressor::MinimumLevel || level > Compressor::MaximumLevel) {
+		WARNING("Wrong argument value recieved");
+	}
 
 	if (compressionLevel != level) {
 		compressionLevel = level;
@@ -1141,8 +1173,9 @@ QString Document::GetPassword() const {
 }
 
 void Document::SetCipherData(const quint8 id, const QString& _password) {
-	if (id != 0) {
-		Q_ASSERT(!_password.isEmpty());
+	if (id != 0 && _password.isEmpty()) {
+		WARNING("Password is empty");
+		return;
 	}
 
 	if (cipherID != id) {

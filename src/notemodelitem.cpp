@@ -16,24 +16,32 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "notemodelitem.h"
+
 #include "basemodel.h"
 #include "note.h"
+#include "global.h"
+
 #include <QBrush>
 #include <QApplication>
 #include <QPalette>
 #include <QPainter>
 
-
-
 using namespace qNotesManager;
 
 NoteModelItem::NoteModelItem(Note* note) : BaseModelItem(BaseModelItem::note), _storedData(note) {
-	Q_ASSERT(note != 0);
-	QObject::connect(note, SIGNAL(sg_VisualPropertiesChanged()),
+	if (!note) {
+		WARNING("Null pointer recieved");
+	} else {
+		QObject::connect(note, SIGNAL(sg_VisualPropertiesChanged()),
 					 this, SLOT(sl_Note_PropertiesChanged()));
+	}
 }
 
 QVariant NoteModelItem::data(int role) const {
+	if (!_storedData) {
+		return QVariant();
+	}
+
 	if (role == Qt::DecorationRole) {
 		if (_storedData->IsLocked()) {
 			QPixmap shadedIcon = QIcon(_storedData->GetIcon()).pixmap(_storedData->GetIcon().size(),

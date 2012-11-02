@@ -16,6 +16,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "folder.h"
+
 #include "application.h"
 #include "document.h"
 #include "note.h"
@@ -207,7 +208,7 @@ void Folder::SetLocked(bool e) {
 			Note* n = dynamic_cast<Note*>(item);
 			n->SetLocked(e);
 		} else {
-			Q_ASSERT(false);
+			WARNING("Unknown item type");
 		}
 	}
 }
@@ -300,4 +301,3 @@ Folder* Folder::Deserialize(const int version, BOIBuffer& stream, const QHash<qu
 
 	return f;
 }
-

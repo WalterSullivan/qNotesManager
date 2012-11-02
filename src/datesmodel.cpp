@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "document.h"
 #include "datemodelitem.h"
 #include "notemodelitem.h"
+#include "global.h"
 
 #include <QDebug>
 
@@ -52,8 +53,10 @@ void DatesModel::sl_Item_DataChanged(BaseModelItem* item) {
 
 void DatesModel::sl_Note_DateChanged() {
 	Note* note = qobject_cast<Note*>(QObject::sender());
-
-	Q_ASSERT(note != 0);
+	if (note == 0) {
+		WARNING("Casting error");
+		return;
+	}
 
 	QDate noteDate;
 	switch (lookupField) {
@@ -114,8 +117,15 @@ void DatesModel::sl_Note_DateChanged() {
 }
 
 void DatesModel::sl_NoteRegistered(Note* note) {
-	Q_ASSERT(note != 0);
-	Q_ASSERT(!notesBridge.contains(note));
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (notesBridge.contains(note)) {
+		WARNING("Note already registered");
+		return;
+	}
+
 
 	QDateTime (Note::*fp)() const;
 	fp = 0;
@@ -145,8 +155,11 @@ void DatesModel::sl_NoteRegistered(Note* note) {
 	notesBridge.insert(note, noteItem);
 }
 
-void DatesModel::sl_NoteUnregistered(Note* note) { // +
-	Q_ASSERT(note != 0);
+void DatesModel::sl_NoteUnregistered(Note* note) {
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 
 	if (!notesBridge.contains(note)) {return;}
 
@@ -159,8 +172,14 @@ void DatesModel::sl_NoteUnregistered(Note* note) { // +
 }
 
 void DatesModel::addNoteToTree(NoteModelItem* noteItem) {
-	Q_ASSERT(noteItem != 0);
-	Q_ASSERT(noteItem->GetStoredData() != 0);
+	if (!noteItem) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (noteItem->GetStoredData() == 0) {
+		WARNING("Item has no internal data");
+		return;
+	}
 
 	QDate noteDate;
 
@@ -329,8 +348,14 @@ qint32 DatesModel::GenerateDateID(const int year, const int month, const int day
 }
 
 qint32 DatesModel::GenerateDateID(const BaseModelItem* item) const {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(item->DataType() == BaseModelItem::date);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return 0;
+	}
+	if (item->DataType() != BaseModelItem::date) {
+		WARNING("Item has wrong data type");
+		return 0;
+	}
 
 	const DateModelItem* ditem = dynamic_cast<const DateModelItem*>(item);
 	const DateModelItem* year = 0;
@@ -338,33 +363,48 @@ qint32 DatesModel::GenerateDateID(const BaseModelItem* item) const {
 
 	switch (ditem->component) {
 	case DateModelItem::Year:
-
 		return GenerateDateID(ditem->value);
 		break;
 
 	case DateModelItem::Month:
-
-		Q_ASSERT(ditem->parent() != 0);
+		if (ditem->parent() == 0) {
+			WARNING("Item has no parent");
+			return 0;
+		}
 		year = dynamic_cast<const DateModelItem*>(item->parent());
-		Q_ASSERT(year != 0);
+		if (year == 0) {
+			WARNING("Casting error");
+			return 0;
+		}
 		return GenerateDateID(year->value, ditem->value);
 		break;
 
 	case DateModelItem::Day:
-
-		Q_ASSERT(ditem->parent() != 0);
+		if (ditem->parent() == 0) {
+			WARNING("Item has no parent");
+			return 0;
+		}
 		month = dynamic_cast<const DateModelItem*>(item->parent());
-		Q_ASSERT(month != 0);
+		if (month == 0) {
+			WARNING("Casting error");
+			return 0;
+		}
 
-		Q_ASSERT(month->parent() != 0);
+		if (month->parent() == 0) {
+			WARNING("Item has no parent");
+			return 0;
+		}
 		year = dynamic_cast<const DateModelItem*>(month->parent());
-		Q_ASSERT(year != 0);
+		if (year == 0) {
+			WARNING("Casting error");
+			return 0;
+		}
 
 		return GenerateDateID(year->value, month->value, ditem->value);
 		break;
 
 	default:
-		Q_ASSERT(false);
-		return -1;
+		WARNING("Wrong case branch");
+		return 0;
 	}
 }

@@ -26,7 +26,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "global.h"
 #include "notefragment.h"
 
-
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QEvent>
@@ -35,8 +34,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 NoteEditWidget::NoteEditWidget(Note* n) : QWidget(0) {
-	if (n == 0) {
-		WARNING("Null pointer");
+	if (!n) {
+		WARNING("Null pointer recieved");
 	}
 
 	propertiesPanelCollapsed = false;
@@ -180,16 +179,16 @@ Note* NoteEditWidget::CurrentNote() const {
 }
 
 void NoteEditWidget::ScrollTo(int position) {
-	if (currentNote == 0) {
-		WARNING("Null pointer");
+	if (!currentNote) {
+		WARNING("Null pointer recieved");
 		return;
 	}
 	textEditWidget->ScrollTo(position);
 }
 
 void NoteEditWidget::ShowFragment(const NoteFragment& fragment) {
-	if (currentNote == 0) {
-		WARNING("Null pointer");
+	if (!currentNote) {
+		WARNING("Null pointer recieved");
 		return;
 	}
 
@@ -223,22 +222,22 @@ void NoteEditWidget::ShowFragment(const NoteFragment& fragment) {
 		sourceEdit->setSelection(fragment.MatchStart, fragment.MatchLength);
 		break;
 	default:
-		qDebug() << "Unhandled case branch!";
+		WARNING("Unhandled case branch");
 	}
 
 }
 
 int NoteEditWidget::CurrentPosition() const {
-	if (currentNote == 0) {
-		WARNING("Null pointer");
+	if (!currentNote) {
+		WARNING("Null pointer recieved");
 		return -1;
 	}
 	return textEditWidget->CurrentPosition();
 }
 
 void NoteEditWidget::updateControls() {
-	if (currentNote == 0) {
-		WARNING("Null pointer");
+	if (!currentNote) {
+		WARNING("Null pointer recieved");
 		setEnabled(false);
 		return;
 	}
@@ -279,8 +278,8 @@ void NoteEditWidget::sl_TextCreationDateTime_Changed(const QDateTime& newDateTim
 void NoteEditWidget::sl_TagsEdit_CollectionChanged(QStringList tags) {
 	qDebug() << "Tags collection changed";
 
-	if (currentNote == 0) {
-		WARNING("Null pointer");
+	if (!currentNote) {
+		WARNING("Null pointer recieved");
 		return;
 	}
 

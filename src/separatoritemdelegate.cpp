@@ -16,7 +16,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "separatoritemdelegate.h"
+
 #include "basemodelitem.h"
+#include "global.h"
 
 #include <QPainter>
 #include <QDebug>
@@ -25,7 +27,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 SeparatorItemDelegate::SeparatorItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {
-
 	setItemEditorFactory(new QItemEditorFactory());
 }
 
@@ -33,7 +34,10 @@ SeparatorItemDelegate::SeparatorItemDelegate(QObject *parent) : QStyledItemDeleg
 void SeparatorItemDelegate::paint (QPainter* painter, const QStyleOptionViewItem& option,
 						const QModelIndex& index) const {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
-	Q_ASSERT(item != 0);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 	if (item->DataType() != BaseModelItem::Separator) {
 		QStyledItemDelegate::paint(painter, option, index);
 		return;

@@ -16,7 +16,10 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "searchmodelitem.h"
+
 #include "note.h"
+#include "global.h"
+
 #include <QBrush>
 
 using namespace qNotesManager;
@@ -25,7 +28,12 @@ SearchModelItem::SearchModelItem(const NoteFragment& f) :
 		BaseModelItem(BaseModelItem::SearchResult),
 		fragment(f) {
 	expired = false;
-	QObject::connect(fragment.NotePrt, SIGNAL(sg_TextChanged()), this, SLOT(sl_Note_TextChanged()));
+	if (!fragment.NotePrt) {
+		WARNING("Null pointer recieved");
+	} else {
+		QObject::connect(fragment.NotePrt, SIGNAL(sg_TextChanged()),
+						 this, SLOT(sl_Note_TextChanged()));
+	}
 }
 
 /* virtual */
@@ -54,6 +62,7 @@ QVariant SearchModelItem::data(int role) const {
 				return QPixmap(":/gui/edit-lipsum");
 				break;
 			default:
+				WARNING("Unknown fragment type");
 				return QVariant();
 				break;
 		}
@@ -64,7 +73,7 @@ QVariant SearchModelItem::data(int role) const {
 /* virtual */
 Qt::ItemFlags SearchModelItem::flags () const {
 	Qt::ItemFlags f = BaseModelItem::flags();
-	if (expired && ((f & Qt::ItemIsEnabled) == Qt::ItemIsEnabled)) {
+	if (expired && (f & Qt::ItemIsEnabled)) {
 		f ^= Qt::ItemIsEnabled;
 	}
 

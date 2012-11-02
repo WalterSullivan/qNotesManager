@@ -16,6 +16,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "tag.h"
+
 #include "exception.h"
 #include "boibuffer.h"
 

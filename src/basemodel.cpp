@@ -17,6 +17,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "basemodel.h"
 #include "basemodelitem.h"
+#include "global.h"
 
 using namespace qNotesManager;
 
@@ -41,7 +42,10 @@ void BaseModel::SetDisplayRootItem(BaseModelItem* item) {
 		while(parent->parent() != 0) {
 			parent = parent->parent();
 		}
-		Q_ASSERT(parent == rootItem);
+		if (parent != rootItem) {
+			WARNING("Item doesn't belong to model hierarchy");
+			return;
+		}
 	}
 
 	if (displayRootItem != 0 && (displayRootItem->ChildrenCount() > 0)) {
@@ -91,12 +95,10 @@ QModelIndex BaseModel::parent(const QModelIndex& child) const {
 	if (!child.isValid()) {return QModelIndex();}
 
 	BaseModelItem* item = static_cast<BaseModelItem*>(child.internalPointer());
-	Q_ASSERT(item != 0);
 
 	if (item->parent() == 0 || item->parent() == displayRootItem) {return QModelIndex();}
 
 	BaseModelItem* parentItem = item->parent();
-	Q_ASSERT(parentItem != 0);
 
 	int row = 0;
 	if (parentItem->parent() != 0) {
@@ -114,7 +116,6 @@ int BaseModel::rowCount(const QModelIndex& parent) const {
 	}
 
 	BaseModelItem* item = static_cast<BaseModelItem*>(parent.internalPointer());
-	Q_ASSERT(item != NULL);
 	return item->ChildrenCount();
 }
 
@@ -137,7 +138,6 @@ Qt::ItemFlags BaseModel::flags (const QModelIndex& index) const {
 		return Qt::NoItemFlags;
 	} else {
 		BaseModelItem* modelItem = static_cast<BaseModelItem*>(index.internalPointer());
-		Q_ASSERT(modelItem != 0);
 		return modelItem->flags();
 	}
 }

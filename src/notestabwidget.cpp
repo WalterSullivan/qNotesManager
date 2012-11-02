@@ -16,8 +16,10 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "notestabwidget.h"
+
 #include "noteeditwidget.h"
 #include "note.h"
+#include "global.h"
 
 #include <QBoxLayout>
 
@@ -57,7 +59,11 @@ NotesTabWidget::NotesTabWidget(QWidget *parent) : QWidget(parent) {
 
 void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 	(void)newTab;
-	Q_ASSERT(note != 0);
+
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 
 	if (hash.contains(note)) {
 		QWidget* noteWidget = hash.value(note);
@@ -77,20 +83,35 @@ void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 }
 
 void NotesTabWidget::CloseNote(const Note* n) {
-	Q_ASSERT(n != 0);
+	if (!n) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 
-	if (!hash.contains(n)) {return;}
-
-	QObject::disconnect(n, 0, this, 0);
+	if (!hash.contains(n)) {
+		WARNING("Specified note is not open");
+		return;
+	}
 
 	QWidget* widget = hash.take(n);
 	int tabIndex = tabWidget->indexOf(widget);
-	Q_ASSERT(tabIndex != -1);
+
+	if (tabIndex == -1) {
+		WARNING("Could not find associated widget");
+		return;
+	}
+
+	QObject::disconnect(n, 0, this, 0);
 	tabWidget->removeTab(tabIndex);
 	delete widget;
 }
 
 void NotesTabWidget::ShowFragment(const NoteFragment& fragment) {
+	if (!fragment.NotePrt) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+
 	if (!hash.contains(fragment.NotePrt)) {
 		OpenNote(const_cast<Note*>(fragment.NotePrt));
 	}
@@ -107,10 +128,25 @@ void NotesTabWidget::Clear() {
 
 void NotesTabWidget::sl_Note_PropertiesChanged() {
 	const Note* note = qobject_cast<Note*>(QObject::sender());
-	Q_ASSERT(hash.contains(note));
+	if (note == 0) {
+		WARNING("Could not find sender note");
+		return;
+	}
+
+	if (!hash.contains(note)) {
+		WARNING("Sender note is not registered");
+		QObject::disconnect(note, 0, this, 0);
+		return;
+	}
+
 	QWidget* widget = hash.value(note);
 	int tabIndex = tabWidget->indexOf(widget);
-	Q_ASSERT(tabIndex != -1);
+
+	if (tabIndex == -1) {
+		WARNING("Could not find associated widget");
+		return;
+	}
+
 	tabWidget->setTabIcon(tabIndex, note->GetIcon());
 	tabWidget->setTabText(tabIndex, note->GetName());
 }
@@ -121,18 +157,27 @@ QList<const Note*> NotesTabWidget::DisplayedNotes() const {
 
 Note* NotesTabWidget::CurrentNote() const {
 	NoteEditWidget* noteWidget = 0;
+
 	if (tabWidget->count() > 0) {
 		noteWidget = dynamic_cast<NoteEditWidget*>(tabWidget->currentWidget());
 	} else {
 		return 0;
 	}
 
-	Q_ASSERT(noteWidget != 0);
+	if (noteWidget == 0) {
+		WARNING("Casting error");
+		return 0;
+	}
+
 	return noteWidget->CurrentNote();
 }
 
 void NotesTabWidget::SetCurrentNote(const Note* note) {
-	Q_ASSERT(note != 0);
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+
 	if (hash.contains(note)) {
 		QWidget* noteWidget = hash.value(note);
 		tabWidget->setCurrentWidget(noteWidget);
@@ -171,10 +216,16 @@ void NotesTabWidget::sl_TabWidget_TabCloseRequested(int index) {
 #endif
 
 void NotesTabWidget::closeTab(int index) {
-	if (index == -1) {return;}
+	if (index == -1) {
+		WARNING("Wrong tab index");
+		return;
+	}
 
 	QWidget* widget = tabWidget->widget(index);
-	Q_ASSERT(widget != 0);
+	if (widget == 0) {
+		WARNING("Can't find widget by index");
+		return;
+	}
 	NoteEditWidget* noteWidget = dynamic_cast<NoteEditWidget*>(widget);
 	const Note* note = noteWidget->CurrentNote();
 

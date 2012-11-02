@@ -22,6 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "datesmodel.h"
 #include "basemodelitem.h"
 #include "notemodelitem.h"
+#include "global.h"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
@@ -74,8 +75,12 @@ void DateNavigationWidget::sl_View_clicked (const QModelIndex& index) {
 
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
-		Note* n = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-		Q_ASSERT(n != 0);
+		NoteModelItem* noteItem = dynamic_cast<NoteModelItem*>(item);
+		if (noteItem == 0) {
+			WARNING("Casting error");
+			return;
+		}
+		Note* n = noteItem->GetStoredData();
 		emit sg_NoteClicked(n);
 	}
 }
@@ -85,8 +90,12 @@ void DateNavigationWidget::sl_View_doubleClicked (const QModelIndex& index) {
 
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
-		Note* n = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-		Q_ASSERT(n != 0);
+		NoteModelItem* noteItem = dynamic_cast<NoteModelItem*>(item);
+		if (noteItem == 0) {
+			WARNING("Casting error");
+			return;
+		}
+		Note* n = noteItem->GetStoredData();
 		emit sg_NoteDoubleClicked(n);
 	}
 }

@@ -16,7 +16,10 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "searchresultitemdelegate.h"
+
 #include "searchmodelitem.h"
+#include "global.h"
+
 #include <QPainter>
 #include <QApplication>
 #include <QDebug>
@@ -30,7 +33,10 @@ SearchResultItemDelegate::SearchResultItemDelegate(QObject *parent) : QStyledIte
 void SearchResultItemDelegate::paint (QPainter* painter, const QStyleOptionViewItem& option,
 									  const QModelIndex& index) const {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
-	Q_ASSERT(item != 0);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 	if (item->DataType() != BaseModelItem::SearchResult) {
 		QStyledItemDelegate::paint(painter, option, index);
 		return;
@@ -42,15 +48,23 @@ void SearchResultItemDelegate::paint (QPainter* painter, const QStyleOptionViewI
 		icon = index.model()->data(index, Qt::DecorationRole).value<QPixmap>();
 		drawIcon = true;
 	}
+
 	const int iconTextInterval = 6;
 	const int iconOffset = 1;
 
 	const QString text = index.model()->data(index, Qt::DisplayRole).toString();
 	QVariant tempVariant = index.model()->data(index, SearchModelItem::HighlightStartRole);
-	Q_ASSERT(!tempVariant.isNull());
+	if (tempVariant.isNull()) {
+		WARNING("Could not retrieve data from item");
+		return;
+	}
 	const int matchStart = tempVariant.toInt();
+
 	tempVariant = index.model()->data(index, SearchModelItem::HightlightLengthRole);
-	Q_ASSERT(!tempVariant.isNull());
+	if (tempVariant.isNull()) {
+		WARNING("Could not retrieve data from item");
+		return;
+	}
 	const int matchLength = tempVariant.toInt();
 
 	QStyleOptionViewItem opt(option);

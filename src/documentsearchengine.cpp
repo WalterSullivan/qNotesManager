@@ -16,15 +16,15 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "documentsearchengine.h"
+
 #include "document.h"
 #include "documentsearchthread.h"
+#include "global.h"
 
 #include <QEventLoop>
 #include <QCoreApplication>
 #include <QRegExp>
-
 #include <QDebug>
-
 
 using namespace qNotesManager;
 
@@ -66,7 +66,10 @@ bool DocumentSearchEngine::IsQueryValid(QString query, bool useRegExp) const {
 
 void DocumentSearchEngine::StartSearch(QString query, bool matchCase, bool searchWholeWord,
 								  bool useRegexp) {
-	Q_ASSERT(!thread->isRunning());
+	if (thread->isRunning()) {
+		WARNING("Thread is already running");
+		return;
+	}
 
 	query = query.trimmed();
 	if (query.isEmpty()) {

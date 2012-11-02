@@ -16,12 +16,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "searchresultsmodel.h"
+
 #include "notemodelitem.h"
 #include "searchmodelitem.h"
 #include "note.h"
+#include "global.h"
 
 #include <QDebug>
-
 
 using namespace qNotesManager;
 
@@ -38,7 +39,10 @@ void SearchResultsModel::AddResult(const NoteFragment& fragment) {
 		noteItem = notesHash.value(fragment.NotePrt);
 	} else {
 		Note* note = const_cast<Note*>(fragment.NotePrt);
-		Q_ASSERT(note != 0);
+		if (!note) {
+			WARNING("Null pointer recieved");
+			return;
+		}
 		noteItem = new NoteModelItem(note);
 		notesHash.insert(fragment.NotePrt, noteItem);
 
@@ -65,7 +69,10 @@ void SearchResultsModel::AddResult(const NoteFragment& fragment) {
 }
 
 void SearchResultsModel::RemoveResultsForNote(const Note* n) {
-	Q_ASSERT(n != 0);
+	if (!n) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 	if (!notesHash.contains(n)) {return;}
 
 	NoteModelItem* noteItem = notesHash.value(n);
@@ -94,6 +101,10 @@ void SearchResultsModel::ClearResults() {
 }
 
 bool SearchResultsModel::ContainsResultForNote(const Note* note) {
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return false;
+	}
 	return notesHash.contains(note);
 }
 

@@ -16,11 +16,11 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "basemodelitem.h"
-#include "basemodel.h"
 
-#ifdef DEBUG
-	#include <QDebug>
-#endif
+#include "basemodel.h"
+#include "global.h"
+
+#include <QDebug>
 
 using namespace qNotesManager;
 
@@ -48,24 +48,29 @@ Qt::ItemFlags BaseModelItem::flags () const {
 }
 
 // Adds item 'item' into the end children list.
-// It is supposed that 'item' is a valid pointer.
 void BaseModelItem::AddChild(BaseModelItem* item) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(!childrenList.contains(item));
-	Q_ASSERT(item->parentItem == 0);
-
-
 	AddChildTo(item, childrenList.size());
 }
 
 // Adds item 'item' into children list in specified position.
-// It is supposed that 'item' is a valid pointer.
 // NOTE: 'position' parameter is ignored when sorting is enabled
 void BaseModelItem::AddChildTo(BaseModelItem* item, int position) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(!childrenList.contains(item));
-	Q_ASSERT(item->parentItem == 0);
-	Q_ASSERT(position >= 0 && position <= childrenList.size());
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (item->parentItem != 0) {
+		WARNING("Item already has a parent");
+		return;
+	}
+	if (childrenList.contains(item)) {
+		WARNING("Item is already in the list");
+		return;
+	}
+	if (position < 0 || position > childrenList.size()) {
+		WARNING("Wrong position");
+		return;
+	}
 
 	childrenList.insert(position, item);
 	item->parentItem = this;
@@ -73,21 +78,31 @@ void BaseModelItem::AddChildTo(BaseModelItem* item, int position) {
 }
 
 // Removes child item
-// It is supposed that 'item' is a valid pointer.
 void BaseModelItem::RemoveChild(BaseModelItem* item) {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(childrenList.contains(item));
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!childrenList.contains(item)) {
+		WARNING("Item is not in the list");
+		return;
+	}
 
 	childrenList.removeAll(item);
 	item->parentItem = 0;
 	insertIndexCache.Clear();
 }
 
-// Returns index of child item. It is supposed that 'item' is actually child item.
-// It is supposed that 'item' is a valid pointer.
+// Returns index of child item.
 int BaseModelItem::IndexOfChild(BaseModelItem* item) const {
-	Q_ASSERT(item != 0);
-	Q_ASSERT(childrenList.contains(item));
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return -1;
+	}
+	if (!childrenList.contains(item)) {
+		WARNING("Item is not in the list");
+		return -1;
+	}
 
 	return childrenList.indexOf(item);
 }
@@ -97,13 +112,12 @@ int BaseModelItem::ChildrenCount() const {
 	return childrenList.count();
 }
 
-// Returns child item at position 'index'. It is supposed that 'index' is valid index
+// Returns child item at position 'index'.
 BaseModelItem* BaseModelItem::ChildAt(int index) const {
-	if (!(index >= 0 && index < childrenList.count())) {
-		qWarning("Item at non-existent index requested");
+	if (index < 0 || index >= childrenList.count()) {
+		WARNING("Item at wrong index requested");
 		return 0;
 	}
-
 
 	return childrenList.at(index);
 }
@@ -118,9 +132,12 @@ void BaseModelItem::Clear() {
 }
 
 // Returns true if object is a child or a grandchild of item 'parent', otherwise returns false.
-// It is supposed that 'parent' is a valid pointer.
 bool BaseModelItem::IsOffspringOf(const BaseModelItem* parent) const {
-	Q_ASSERT(parent != 0);
+	if (!parent) {
+		WARNING("Null pointer recieved");
+		return false;
+	}
+
 	if (parent == this) {return false;}
 
 	const BaseModelItem* f = parent;
@@ -140,9 +157,12 @@ QVariant BaseModelItem::data(int role) const {
 }
 
 // Returns index where a new item will be inserted with AddChild()
-// It is supposed that 'item' is a valid pointer.
 int BaseModelItem::FindInsertIndex(const BaseModelItem* item) const {
-	Q_ASSERT(item != 0);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return -1;
+	}
+
 	int newIndex = -1;
 	// Cached index. Mechanism not finished
 	//if (insertIndexCache.IsValid() && insertIndexCache.prt == item) {
@@ -164,17 +184,18 @@ int BaseModelItem::FindInsertIndex(const BaseModelItem* item) const {
 
 // virtual
 // Compares internal item data for sorting purpose. Returns true by default.
-// It is supposed that 'item' is a valid pointer.
 bool BaseModelItem::LessThan(const BaseModelItem*) const {
 	return true;
 }
 
 // Returns index for a new item when list is sorted
-// It is supposed that 'item' is a valid pointer.
 int BaseModelItem::findInsertIndex_Sorted(const BaseModelItem* item) const {
 	// TODO: add anchors handling
 	// TODO: handle Qt::DescendingOrder
-	Q_ASSERT(item != 0);
+	if (!item) {
+		WARNING("Null pointer recieved");
+		return -1;
+	}
 
 	const int size = ChildrenCount();
 
@@ -211,7 +232,6 @@ int BaseModelItem::findInsertIndex_Sorted(const BaseModelItem* item) const {
 }
 
 // Returns index for a new item when list is not sorted
-// It is supposed that 'item' is a valid pointer.
 int BaseModelItem::findInsertIndex_Simple(const BaseModelItem* item) const {
 	// TODO: add anchors handling
 	return ChildrenCount();

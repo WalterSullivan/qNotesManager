@@ -16,20 +16,30 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "notetagscollection.h"
+
 #include "tag.h"
 #include "note.h"
+#include "global.h"
 
-#ifdef DEBUG
 #include <QDebug>
-#endif
 
 using namespace qNotesManager;
 
-NoteTagsCollection::NoteTagsCollection(Note* owner) : owner(owner) {}
+NoteTagsCollection::NoteTagsCollection(Note* owner) : owner(owner) {
+	if (!owner) {
+		WARNING("Null pointer recieved");
+	}
+}
 
 void NoteTagsCollection::Add(Tag* tag) {
-	Q_ASSERT(tag != 0);
-	Q_ASSERT(!tags.contains(tag));
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (tags.contains(tag)) {
+		WARNING("Tag already in the list");
+		return;
+	}
 
 	emit sg_ItemAboutToBeAdded(tag);
 	tags.append(tag);
@@ -38,8 +48,14 @@ void NoteTagsCollection::Add(Tag* tag) {
 }
 
 void NoteTagsCollection::Remove(Tag* tag) {
-	Q_ASSERT(tag != 0);
-	Q_ASSERT(tags.contains(tag));
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!tags.contains(tag)) {
+		WARNING("Tag is not in the list");
+		return;
+	}
 
 	emit sg_ItemAboutToBeRemoved(tag);
 	tags.removeOne(tag);
@@ -48,7 +64,10 @@ void NoteTagsCollection::Remove(Tag* tag) {
 }
 
 bool NoteTagsCollection::Contains(Tag* tag) const {
-	Q_ASSERT(tag != 0);
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return false;
+	}
 	
 	return tags.contains(tag);
 }
@@ -64,7 +83,10 @@ int NoteTagsCollection::Count() const {
 }
 
 Tag* NoteTagsCollection::ItemAt(int index) const {
-	Q_ASSERT(index >= 0 && index < tags.count());
+	if (index < 0 || index >= tags.count()) {
+		WARNING("Index is out of bounds");
+		return 0;
+	}
 
 	return tags.at(index);
 }

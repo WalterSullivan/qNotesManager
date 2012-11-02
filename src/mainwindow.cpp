@@ -16,6 +16,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "mainwindow.h"
+
 #include "navigationpanelwidget.h"
 #include "document.h"
 #include "application.h"
@@ -31,6 +32,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "cipherer.h"
 #include "operationabortedexception.h"
 #include "ioexception.h"
+#include "global.h"
 
 #include <QDebug>
 #include <QHBoxLayout>
@@ -306,7 +308,10 @@ void MainWindow::changeEvent (QEvent* event) {
 }
 
 void MainWindow::sl_NoteDoubleClicked(Note* note) {
-	Q_ASSERT(note != 0);
+	if (!note) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 	notesTabWidget->OpenNote(note);
 }
 
@@ -385,7 +390,10 @@ void MainWindow::OpenDocument(QString fileName) {
 
 void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {return;}
+	if (doc == 0) {
+		WARNING("No current document set");
+		return;
+	}
 
 	saveDocumentVisualSettings();
 
@@ -419,7 +427,10 @@ void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 
 void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {return;}
+	if (doc == 0) {
+		WARNING("No current document set");
+		return;
+	}
 
 	saveDocumentVisualSettings();
 	QString filename = QFileDialog::getSaveFileName(this, "Select a name");
@@ -444,7 +455,10 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 
 void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled) {
 	Document* oldDoc = Application::I()->CurrentDocument();
-	if (oldDoc == 0) {return;}
+	if (oldDoc == 0) {
+		WARNING("No current document set");
+		return;
+	}
 
 	if (oldDoc->IsChanged()) {
 		QMessageBox::StandardButton result = QMessageBox::question(this, "Save document?",
@@ -471,13 +485,17 @@ void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled) {
 }
 
 void MainWindow::sl_DocumentPropertiesAction_Triggered() {
-	Q_ASSERT(Application::I()->CurrentDocument() != 0);
+	Document* doc = Application::I()->CurrentDocument();
+	if (doc == 0) {
+		WARNING("Current document not set");
+		return;
+	}
 
 	if (docProperties == 0) {
 		docProperties = new DocumentPropertiesWidget(0);
 	}
 
-	docProperties->SetDocument(Application::I()->CurrentDocument());
+	docProperties->SetDocument(doc);
 	docProperties->exec();
 }
 
@@ -509,6 +527,7 @@ void MainWindow::sl_SearchResults_ShowRequest() {
 
 void MainWindow::sl_ExitAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
+
 	if (doc != 0) {
 		bool cancelled = false;
 		sl_CloseDocumentAction_Triggered(&cancelled);
@@ -606,7 +625,10 @@ void MainWindow::sl_Application_NoteDeleted(Note* n) {
 
 void MainWindow::saveDocumentVisualSettings() const {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {return;}
+	if (doc == 0) {
+		WARNING("Current document not set");
+		return;
+	}
 
 	doc->VisualSettings.ActiveNavigationTab = navigationPanel->CurrentTabIndex();
 	doc->VisualSettings.ActiveNote = notesTabWidget->CurrentNote();
@@ -615,7 +637,10 @@ void MainWindow::saveDocumentVisualSettings() const {
 
 void MainWindow::restoreDocumentVisualSettings() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {return;}
+	if (doc == 0) {
+		WARNING("Current document not set");
+		return;
+	}
 
 	navigationPanel->SetCurrentTab(doc->VisualSettings.ActiveNavigationTab);
 	const QList<Note*> notes = doc->GetNotesList();
@@ -682,7 +707,10 @@ void MainWindow::sl_QuickNoteAction_Triggered() {
 	const int maxCaptionSize = 16;
 
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {return;}
+	if (doc == 0) {
+		WARNING("Current document not set");
+		return;
+	}
 
 	const QMimeData* data = QApplication::clipboard()->mimeData();
 	if (!(data->hasText() || data->hasHtml())) {return;}

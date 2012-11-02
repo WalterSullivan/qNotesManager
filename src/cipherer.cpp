@@ -16,8 +16,10 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "cipherer.h"
-#include <QDebug>
+
 #include "invaliddataexception.h"
+
+#include <QDebug>
 
 using namespace qNotesManager;
 
@@ -40,11 +42,6 @@ QByteArray Cipherer::Decrypt(const QByteArray& data, const QByteArray& keyData, 
 
 QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 							QCA::Direction direction, int cipherID) {
-#ifdef DEBUG
-	Q_ASSERT(!data.isEmpty());
-	Q_ASSERT(!keyData.isEmpty());
-	Q_ASSERT(avaliableCipherTypes.contains(cipherID));
-#else
 	if (data.isEmpty()) {
 		throw InvalidDataException("Encryption error", "data argument is empty", WHERE);
 	}
@@ -56,7 +53,6 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 								   "cipher id is not valid (" + QString::number(cipherID) + ")",
 								   WHERE);
 	}
-#endif
 
 	QCA::Initializer init;
 	QCA::SecureArray arg = data;

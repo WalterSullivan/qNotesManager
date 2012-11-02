@@ -33,8 +33,8 @@ TagsModel::TagsModel(Document *doc) : BaseModel(doc) {
 	root->SetSorted(true);
 	SetRootItem(root);
 
-	if (doc == 0) {
-		WARNING("Null reference");
+	if (!doc) {
+		WARNING("Null pointer recieved");
 		return;
 	}
 
@@ -52,8 +52,10 @@ TagsModel::TagsModel(Document *doc) : BaseModel(doc) {
 void TagsModel::sl_Tag_OwnerAdded(Note* note) {
 	Tag* tag = qobject_cast<Tag*>(QObject::sender());
 
-	Q_ASSERT(tag != 0);
-
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 	if (!tagsBridge.contains(tag)) {
 		WARNING("Got signal from unknown item");
 		return;
@@ -77,8 +79,11 @@ void TagsModel::sl_Tag_OwnerAdded(Note* note) {
 
 void TagsModel::sl_Tag_OwnerRemoved(Note* note) {
 	Tag* tag = qobject_cast<Tag*>(QObject::sender());
-	Q_ASSERT(tag != 0);
 
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
 	if (!tagsBridge.contains(tag)) {
 		WARNING("Got signal from unknown item");
 		return;
@@ -96,7 +101,7 @@ void TagsModel::sl_Tag_OwnerRemoved(Note* note) {
 		}
 	}
 
-	if (noteItem == 0) {
+	if (!noteItem) {
 		WARNING("Corresponding item not found");
 		return;
 	}
@@ -116,8 +121,16 @@ void TagsModel::sl_Tag_OwnerRemoved(Note* note) {
 
 void TagsModel::sl_Tag_OwnersRemoved() {
 	Tag* tag = qobject_cast<Tag*>(QObject::sender());
-	Q_ASSERT(tag != 0);
-	Q_ASSERT(tagsBridge.contains(tag));
+
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!tagsBridge.contains(tag)) {
+		WARNING("Got signal from unknown item");
+		return;
+	}
+
 	BaseModelItem* tagItem = tagsBridge.value(tag);
 
 
@@ -128,7 +141,10 @@ void TagsModel::sl_Tag_OwnersRemoved() {
 		BaseModelItem* childItem = 0;
 		for (int i = 0; i < tagItem->ChildrenCount(); ++i) {
 			childItem = tagItem->ChildAt(i);
-			Q_ASSERT(childItem->DataType() == BaseModelItem::note);
+			if (childItem->DataType() != BaseModelItem::note) {
+				WARNING("Item has wrong type");
+				continue;
+			}
 			NoteModelItem* noteItem = dynamic_cast<NoteModelItem*>(childItem);
 			Note* note = noteItem->GetStoredData();
 			notesBridge.remove(note, noteItem);
@@ -139,8 +155,14 @@ void TagsModel::sl_Tag_OwnersRemoved() {
 }
 
 void TagsModel::sl_Document_TagRegistered(Tag* tag) {
-	Q_ASSERT(tag != 0);
-	Q_ASSERT(!tagsBridge.contains(tag));
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (tagsBridge.contains(tag)) {
+		WARNING("Item is already registered");
+		return;
+	}
 
 	QObject::connect(tag, SIGNAL(sg_OwnerAdded(Note*)),
 					 this, SLOT(sl_Tag_OwnerAdded(Note*)));
@@ -173,9 +195,17 @@ void TagsModel::sl_Document_TagRegistered(Tag* tag) {
 }
 
 void TagsModel::sl_Document_TagUnregistered(Tag* tag) {
-	Q_ASSERT(tag != 0);
-	Q_ASSERT(tagsBridge.contains(tag));
-	Q_ASSERT(tag->Owners.Count() == 0);
+	if (!tag) {
+		WARNING("Null pointer recieved");
+		return;
+	}
+	if (!tagsBridge.contains(tag)) {
+		WARNING("Item is not registered");
+		return;
+	}
+	if (tag->Owners.Count() > 0) {
+		WARNING("Tag has owners");
+	}
 
 	QObject::disconnect(tag, 0, this, 0);
 
@@ -193,7 +223,10 @@ void TagsModel::sl_Document_TagUnregistered(Tag* tag) {
 
 void TagsModel::sl_Item_DataChanged(BaseModelItem* item) {
 	const BaseModelItem* parentItem = item->parent();
-	Q_ASSERT(parentItem != 0);
+	if (!parentItem) {
+		WARNING("Could not find item parent");
+		return;
+	}
 	QModelIndex itemIndex = createIndex(parentItem->IndexOfChild(item), 0, item);
 	emit dataChanged(itemIndex, itemIndex);
 }

@@ -29,8 +29,6 @@ AbstractFolderItem::~AbstractFolderItem() {
 }
 
 void AbstractFolderItem::SetParent(Folder* newParent) {
-	//Q_ASSERT(newParent != 0); Reminder: do not turn this assern on! newParent may be 0.
-
 	if (newParent == this) {
 		WARNING("Trying to set item as it's parent");
 		return;
