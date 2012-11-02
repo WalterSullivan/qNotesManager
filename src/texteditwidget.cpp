@@ -38,6 +38,7 @@ using namespace qNotesManager;
 
 TextEditWidget::TextEditWidget(QWidget *parent) : QWidget(parent) {
 	CreateControls();
+	readOnly = false;
 }
 
 void TextEditWidget::CreateControls() {
@@ -350,7 +351,14 @@ void TextEditWidget::SetResource (QString id, QVariant resource) {
 	textField->setLineWrapColumnOrWidth ( 0 );
 }
 
+void TextEditWidget::SetReadOnly(bool ro) {
+	if (readOnly == ro) {return;}
 
+	readOnly = ro;
+
+	TBRMainBar->setEnabled(!readOnly);
+	textField->setReadOnly(readOnly);
+}
 
 // Event handlers ======================================================================================
 

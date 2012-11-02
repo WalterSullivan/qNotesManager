@@ -100,6 +100,8 @@ namespace qNotesManager {
 		void CreateControls();
 		void continueSearch();
 
+		bool readOnly;
+
 
 	public:
 		explicit TextEditWidget (QWidget *parent = 0);
@@ -118,6 +120,8 @@ namespace qNotesManager {
 		int CurrentPosition() const;
 		void SetDocument(TextDocument*);
 		QList<QAction*> EditActionsList() const;
+
+		void SetReadOnly(bool);
 
 
 	signals:
