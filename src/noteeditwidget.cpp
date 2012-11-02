@@ -242,19 +242,29 @@ void NoteEditWidget::updateControls() {
 		return;
 	}
 
-	setEnabled(!currentNote->IsLocked());
+	bool enabled = !currentNote->IsLocked();
+	textEditWidget->SetReadOnly(!enabled);
+	captionEdit->setEnabled(enabled);
+	authorEdit->setEnabled(enabled);
+	textCreationCheckbox->setEnabled(enabled);
+	textCreationDateEdit->setEnabled(enabled);
+	sourceEdit->setEnabled(enabled);
+	tagsEdit->setEnabled(enabled);
+	commentEdit->setEnabled(enabled);
+
 
 	textEditWidget->SetDocument(currentNote->GetTextDocument());
 	captionEdit->setText(currentNote->GetName());
 	authorEdit->setText(currentNote->GetAuthor());
 	if (currentNote->GetTextCreationDate().isValid()) {
 		textCreationCheckbox->setChecked(true);
+		textCreationDateEdit->setEnabled(true);
 		textCreationDateEdit->setDateTime(currentNote->GetTextCreationDate());
 	} else {
 		textCreationCheckbox->setChecked(false);
+		textCreationDateEdit->setEnabled(false);
 		textCreationDateEdit->setDateTime(currentNote->GetTextCreationDate());
 	}
-
 	sourceEdit->setText(currentNote->GetSource());
 	QString tagsList;
 	for (int i = 0; i < currentNote->Tags.Count(); ++i) {
