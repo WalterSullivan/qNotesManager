@@ -251,6 +251,9 @@ void NoteEditWidget::updateControls() {
 	sourceEdit->setEnabled(enabled);
 	tagsEdit->setEnabled(enabled);
 	commentEdit->setEnabled(enabled);
+	foreach (QAction* action, EditActionsList()) {
+		action->setEnabled(enabled);
+	}
 
 
 	textEditWidget->SetDocument(currentNote->GetTextDocument());
