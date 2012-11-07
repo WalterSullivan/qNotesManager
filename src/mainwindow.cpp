@@ -486,13 +486,13 @@ void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled) {
 
 void MainWindow::sl_DocumentPropertiesAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
+	if (!doc) {
 		WARNING("Current document not set");
 		return;
 	}
 
-	if (docProperties == 0) {
-		docProperties = new DocumentPropertiesWidget(0);
+	if (!docProperties) {
+		docProperties = new DocumentPropertiesWidget(this);
 	}
 
 	docProperties->SetDocument(doc);
