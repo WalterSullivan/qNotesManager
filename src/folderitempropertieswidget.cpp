@@ -32,6 +32,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialog(parent) {
+	customIconsWidget = 0;
+
 	creationDateLabel = new QLabel("Creation date:", this);
 	creationDateLabelD = new QLabel("", this);
 
@@ -174,19 +176,21 @@ void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {
 		reject();
 	}
 
-	CustomIconsListWidget* w = new CustomIconsListWidget();
+	if (!customIconsWidget) {
+		customIconsWidget = new CustomIconsListWidget(this);
+	}
 
 	if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Folder) {
 		Folder* f = dynamic_cast<Folder*>(itemToEdit);
-		w->SelectIcon(f->GetIconID());
+		customIconsWidget->SelectIcon(f->GetIconID());
 	} else if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Note) {
 		Note* n = dynamic_cast<Note*>(itemToEdit);
-		w->SelectIcon(n->GetIconID());
+		customIconsWidget->SelectIcon(n->GetIconID());
 	}
-	if (w->exec() != QDialog::Accepted) {return;}
+	if (customIconsWidget->exec() != QDialog::Accepted) {return;}
 
-	selectedIconKey = w->SelectedIconKey;
-	iconLabel->setPixmap(w->SelectedIcon);
+	selectedIconKey = customIconsWidget->SelectedIconKey;
+	iconLabel->setPixmap(customIconsWidget->SelectedIcon);
 }
 
 void FolderItemPropertiesWidget::sl_ResetIconToDefaultButton_Clicked() {

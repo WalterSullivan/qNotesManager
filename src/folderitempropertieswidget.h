@@ -26,6 +26,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 namespace qNotesManager {
 	class AbstractFolderItem;
+	class CustomIconsListWidget;
 
 	class FolderItemPropertiesWidget : public QDialog {
 	Q_OBJECT
@@ -49,6 +50,8 @@ namespace qNotesManager {
 
 		QPushButton*	okButton;
 		QPushButton*	cancelButton;
+
+		CustomIconsListWidget* customIconsWidget;
 
 		QString selectedIconKey;
 
