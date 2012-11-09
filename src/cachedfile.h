@@ -14,6 +14,8 @@ namespace qNotesManager {
 		QByteArray Data;
 		QString FileName;
 
+		quint32 GetCRC32() const;
+
 
 		//void Serialize(const int version, BOIBuffer& stream);
 
