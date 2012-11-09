@@ -29,6 +29,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 namespace qNotesManager {
 	class ImageDownloader;
+	class CachedImageFile;
 
 	class TextDocument : public QTextDocument {
 	Q_OBJECT
@@ -44,8 +45,12 @@ namespace qNotesManager {
 		quint32 CalculateImageCRC(const QImage&) const;
 		QTimer restartDownloadsTimer;
 
+		QHash<QString, CachedImageFile*> originalImages;
+
 	public:
 		explicit TextDocument(QObject *parent = 0);
+		~TextDocument();
+
 		QSet<QString> GetImagesList() const;
 		void InsertImage(QImage image, QTextCursor cursor);
 		void InsertImage(QUrl url, QTextCursor cursor);

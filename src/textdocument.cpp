@@ -20,6 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "imagedownloader.h"
 #include "crc32.h"
 #include "global.h"
+#include "cachedimagefile.h"
 
 #include <QFileInfo>
 #include <QDebug>
@@ -49,6 +50,13 @@ TextDocument::TextDocument(QObject *parent) : QTextDocument(parent) {
 	restartDownloadsTimer.setInterval(60000); // restart in 1 minute
 	QObject::connect(&restartDownloadsTimer, SIGNAL(timeout()),
 					 this, SLOT(sl_RestartDownloadsTimer_Timeout()));
+}
+
+TextDocument::~TextDocument() {
+	foreach (const QString name, originalImages.keys()) {
+		delete originalImages[name];
+	}
+	originalImages.clear();
 }
 
 void TextDocument::sl_Downloader_DownloadFinished (QUrl url, QImage image) {
