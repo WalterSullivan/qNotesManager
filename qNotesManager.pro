@@ -117,7 +117,9 @@ HEADERS += src/tag.h \
     src/global.h \
     src/boibuffer.h \
     src/crc32.h \
-    src/applicationsettings.h
+    src/applicationsettings.h \
+    src/cachedfile.h \
+    src/cachedimagefile.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -172,5 +174,7 @@ SOURCES += src/tagownerscollection.cpp \
     src/documentsearchengine.cpp \
     src/boibuffer.cpp \
     src/crc32.cpp \
-    src/applicationsettings.cpp
+    src/applicationsettings.cpp \
+    src/cachedfile.cpp \
+    src/cachedimagefile.cpp
 RESOURCES += icons.qrc
