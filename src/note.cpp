@@ -32,10 +32,14 @@ using namespace qNotesManager;
 Note::Note(QString _name) :
 		AbstractFolderItem(AbstractFolderItem::Type_Note),
 		name(_name),
+		text(QString("")),
 		creationDate(QDateTime::currentDateTime()),
 		modificationDate(QDateTime::currentDateTime()),
 		textDate(QDateTime()),
-		text(QString("")),
+		iconID(":/standard/note"),
+		author(QString()),
+		source(QString()),
+		comment(QString()),
 		defaultForeColor(QColor(0, 0, 0, 255)),
 		defaultBackColor(QColor(0, 0, 0, 0)),
 		nameForeColor(defaultForeColor),
@@ -60,7 +64,7 @@ Note::Note(QString _name) :
 
 	QObject::connect(document, SIGNAL(contentsChanged()), this, SLOT(sl_DocumentChanged()));
 
-	iconID = ":/standard/note";
+
 
 	if (name.isEmpty()) {name = "New note";}
 }
