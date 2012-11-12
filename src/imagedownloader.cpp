@@ -18,6 +18,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "imagedownloader.h"
 
 #include "global.h"
+#include "cachedimagefile.h"
 
 #include <QDebug>
 #include <QFile>
@@ -264,30 +265,8 @@ void ImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
 	}
 
 	QByteArray replyData = reply->readAll();
-	QImage image;
-	image = QImage::fromData(replyData, fileSuffix.data());
-	if (image.isNull()) {
-		// If image was not loaded, let QImage class to determine image's format
-		image = QImage::fromData(replyData);
-		if (image.isNull()) {
-#ifdef DEBUG
-				// To check what was returned
-				QFile file("lastFile");
-				file.open(QIODevice::WriteOnly | QIODevice::Truncate);
-				file.write(replyData);
-				file.close();
-				qDebug() << "Data saved in file 'lastFile' for inspection";
-#endif
-
-			qDebug() << "ERROR: Unable to load image";
-			downloadFailed(originalRequestUrl, "Unable to load image");
-			disconnectAndDeleteReply(reply);
-			return;
-		}
-		fileSuffix = "PNG"; // use PNG format to store unknown images
-	}
-
-	image.setText("FORMAT", fileSuffix.data());
+	QFileInfo info(currentReplyUrl.toString());
+	CachedImageFile* image = new CachedImageFile(replyData, info.fileName(), fileSuffix);
 
 	activeDownloads.remove(originalRequestUrl);
 	emit sg_DownloadFinished(originalRequestUrl, image);

@@ -26,6 +26,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QImage>
 
 namespace qNotesManager {
+	class CachedImageFile;
+
 	class ImageDownloader : public QObject {
 	Q_OBJECT
 	public:
@@ -56,7 +58,7 @@ namespace qNotesManager {
 		void disconnectAndDeleteReply(QNetworkReply*);
 
 	signals:
-		void sg_DownloadFinished (QUrl url, QImage image);
+		void sg_DownloadFinished (QUrl url, CachedImageFile* image);
 		void sg_DownloadError (QUrl url, QString errorDescription);
 		void sg_Progress(QUrl url, int percent);
 
