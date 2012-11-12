@@ -182,10 +182,10 @@ void TextEdit::insertFromMimeData(const QMimeData* source) {
 
 
 	if (source->hasImage()) { // paste image
-		QImage image = source->imageData().value<QImage>();
-		image.setText("FORMAT", "PNG"); // use PNG format to store unknown images
-		TextDocument* doc = dynamic_cast<TextDocument*>(document());
-		doc->InsertImage(image, textCursor());
+		//QImage image = source->imageData().value<QImage>();
+		//image.setText("FORMAT", "PNG"); // use PNG format to store unknown images
+		//TextDocument* doc = dynamic_cast<TextDocument*>(document());
+		//doc->InsertImage(image, textCursor());
 
 	} else if (source->hasUrls()) {
 		// paste urls, for example from file manager
@@ -198,14 +198,7 @@ void TextEdit::insertFromMimeData(const QMimeData* source) {
 }
 
 void TextEdit::insertImageFromFile(QString fileName) {
-	QFileInfo info(fileName);
-	if (!info.exists()) {return;}
-	if (QImageReader::supportedImageFormats().contains(info.suffix().toLower().toLatin1())) {
-		QImage image = QImage(info.filePath(), info.suffix().toStdString().c_str());
-		image.setText("FORMAT", info.suffix());
-		TextDocument* doc = dynamic_cast<TextDocument*>(document());
-		doc->InsertImage(image, textCursor());
-	}
+	textCursor().insertImage(QUrl::fromLocalFile(fileName).toString());
 }
 
 void TextEdit::sl_InsertImageFromUrlAction_Triggered() {

@@ -40,8 +40,8 @@ TextDocument::TextDocument(QObject *parent) : QTextDocument(parent) {
 
 	QObject::connect(downloader, SIGNAL(sg_DownloadError(QUrl,QString)),
 					 this, SLOT(sl_Downloader_DownloadError(QUrl,QString)), Qt::DirectConnection);
-	QObject::connect(downloader, SIGNAL(sg_DownloadFinished(QUrl,QImage)),
-					 this, SLOT(sl_Downloader_DownloadFinished(QUrl,QImage)), Qt::DirectConnection);
+	QObject::connect(downloader, SIGNAL(sg_DownloadFinished(QUrl,CachedImageFile*)),
+					 this, SLOT(sl_Downloader_DownloadFinished(QUrl,CachedImageFile*)), Qt::DirectConnection);
 	QObject::connect(downloader, SIGNAL(sg_Progress(QUrl,int)),
 					 this, SLOT(sl_Downloader_Progress(QUrl,int)), Qt::DirectConnection);
 
@@ -59,17 +59,31 @@ TextDocument::~TextDocument() {
 	originalImages.clear();
 }
 
-void TextDocument::sl_Downloader_DownloadFinished (QUrl url, QImage image) {
+void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* image) {
 	if (errorDownloads.contains(url)) {errorDownloads.removeOne(url);}
 
-	quint32 hash = CalculateImageCRC(image);
+	if (!image->IsValidImage()) {
+		if (!errorDownloads.contains(url)) {
+			errorDownloads.append(url);
+			if (!restartDownloadsTimer.isActive()) {
+				restartDownloadsTimer.start();
+			}
+		}
+		delete image;
+		activeDownloads.removeAll(url);
+		return;
+	}
+
+	quint32 hash = image->GetCRC32();
 	QString name = QString::number(hash);
 	QUrl newUrl(name);
 	if (!resource(QTextDocument::ImageResource, newUrl).isValid()) {
 		qDebug() << "Resource for id " << name << " not found. Adding resource";
-		addResource(QTextDocument::ImageResource, newUrl, image);
+		addResource(QTextDocument::ImageResource, newUrl, image->GetImage());
+		originalImages.insert(name, image);
 	} else {
-		qDebug() << "Resource for id " << name << " found";
+		qDebug() << "!!!! Resource for id " << name << " found";
+		delete image;
 	}
 
 	replaceImageUrl(url.toString(), name);
@@ -110,6 +124,10 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 	}
 
 	if (type == QTextDocument::ImageResource) {
+		if (originalImages.contains(url.toString())) {
+			return originalImages.value(url.toString())->GetImage();
+		}
+
 		if (url.scheme() == "http" || url.scheme() == "https") {
 			if (errorDownloads.contains(url)) {
 				return errorDummyImage;
@@ -129,26 +147,28 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 				qDebug() << "Unable to load local file: " << url.toLocalFile();
 				return QVariant();
 			}
-			QImage image(info.absoluteFilePath());
-			if (image.isNull()) {
+
+			CachedImageFile* image = CachedImageFile::FromFile(info.absoluteFilePath());
+
+			if (!image->IsValidImage()) {
 				qDebug() << "Unable to load local file: " << url.toLocalFile();
+				delete image;
 				return QVariant();
 			}
-			image.setText("FORMAT", info.suffix());
 
-			quint32 hash = CalculateImageCRC(image);
+			quint32 hash = image->GetCRC32();
 			QString name = QString::number(hash);
 			QUrl newUrl(name);
 			if (!resource(QTextDocument::ImageResource, newUrl).isValid()) {
 				qDebug() << "Resource for id " << name << " not found. Adding resource";
-				addResource(QTextDocument::ImageResource, newUrl, image);
+				addResource(QTextDocument::ImageResource, newUrl, image->GetImage());
+				originalImages.insert(name, image);
 			} else {
 				qDebug() << "Resource for id " << name << " found";
+				delete image;
 			}
 
 			replaceImageUrl(url.toString(), name);
-
-			return image;
 		} else {
 			qDebug() << "Resource with unknown scheme requested: " << url.toString();
 		}
@@ -284,4 +304,15 @@ void TextDocument::sl_RestartDownloadsTimer_Timeout() {
 		downloader->Download(url);
 		it.remove();
 	}
+}
+
+CachedImageFile* TextDocument::GetCachedImage(QString name) const {
+	return originalImages.contains(name) ? originalImages.value(name) : 0;
+}
+
+void TextDocument::AddImage(CachedImageFile* image) {
+	quint32 hash = image->GetCRC32();
+	QString name = QString::number(hash);
+	originalImages.insert(name, image);
+	addResource(QTextDocument::ImageResource, QUrl(name), image->GetImage());
 }
