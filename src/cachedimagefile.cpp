@@ -1,5 +1,8 @@
 #include "cachedimagefile.h"
 
+#include <QFile>
+#include <QFileInfo>
+
 using namespace qNotesManager;
 
 CachedImageFile::CachedImageFile(const QByteArray& array, QString name, QString format) :
@@ -30,4 +33,18 @@ QPixmap CachedImageFile::GetPixmap(QSize preferredSize) const {
 	}
 
 	return pixmap;
+}
+
+CachedImageFile* CachedImageFile::FromFile(QString fileName) {
+	QFile f(fileName);
+
+	if (!f.exists()) {
+		return 0;
+	}
+
+	f.open(QIODevice::ReadOnly);
+	QByteArray array = f.readAll();
+	f.close();
+
+	return new CachedImageFile(array, fileName, QFileInfo(fileName).suffix());
 }

@@ -16,6 +16,8 @@ namespace qNotesManager {
 
 		quint32 GetCRC32() const;
 
+		static CachedFile* FromFile(QString fileName);
+
 
 		//void Serialize(const int version, BOIBuffer& stream);
 

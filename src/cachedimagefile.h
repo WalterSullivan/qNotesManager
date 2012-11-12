@@ -18,6 +18,8 @@ namespace qNotesManager {
 		QSize ImageSize() const;
 		QImage GetImage() const;
 		QPixmap GetPixmap(QSize preferredSize) const;
+
+		static CachedImageFile* FromFile(QString fileName);
 	};
 }
 #endif // CACHEDIMAGEFILE_H
