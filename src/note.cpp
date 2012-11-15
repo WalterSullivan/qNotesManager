@@ -327,7 +327,7 @@ void Note::Serialize(const int version, BOIBuffer& stream, const QHash<QString, 
 	imagesArrayBuffer.open(QIODevice::WriteOnly);
 
 	foreach (QString imageName, imagesNamesList) {
-		CachedImageFile* image = document->GetCachedImage(imageName);
+		CachedImageFile* image = document->GetResourceImage(imageName);
 		if (!image) {
 			WARNING("Image not found");
 			continue;
@@ -499,7 +499,7 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream, const QHash<quint3
 	note->nameForeColor.setRgba(r_foreColor);
 	note->locked = (bool)r_locked;
 	foreach(QString name, images.keys()) {
-		note->document->AddImage(images.value(name));
+		note->document->AddResourceImage(images.value(name));
 	}
 	note->document->blockSignals(true);
 	note->document->setHtml(r_textArray);

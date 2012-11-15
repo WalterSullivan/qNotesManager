@@ -306,11 +306,11 @@ void TextDocument::sl_RestartDownloadsTimer_Timeout() {
 	}
 }
 
-CachedImageFile* TextDocument::GetCachedImage(QString name) const {
+CachedImageFile* TextDocument::GetResourceImage(QString name) const {
 	return originalImages.contains(name) ? originalImages.value(name) : 0;
 }
 
-void TextDocument::AddImage(CachedImageFile* image) {
+void TextDocument::AddResourceImage(CachedImageFile* image) {
 	quint32 hash = image->GetCRC32();
 	QString name = QString::number(hash);
 	originalImages.insert(name, image);

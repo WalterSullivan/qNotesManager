@@ -52,8 +52,9 @@ namespace qNotesManager {
 		~TextDocument();
 
 		QSet<QString> GetImagesList() const;
-		CachedImageFile* GetCachedImage(QString name) const;
-		void AddImage(CachedImageFile*);
+
+		CachedImageFile* GetResourceImage(QString name) const;
+		void AddResourceImage(CachedImageFile*);
 
 		void InsertImage(QImage image, QTextCursor cursor);
 		void InsertImage(QUrl url, QTextCursor cursor);
@@ -69,6 +70,7 @@ namespace qNotesManager {
 		void sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* image);
 		void sl_Downloader_DownloadError (QUrl url, QString errorDescription);
 		void sl_Downloader_Progress(QUrl url, int percent);
+
 		void sl_RestartDownloadsTimer_Timeout();
 
 	};
