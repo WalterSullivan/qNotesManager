@@ -61,16 +61,19 @@ TextDocument::~TextDocument() {
 }
 
 void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* image) {
-	if (errorDownloads.contains(url)) {errorDownloads.removeOne(url);}
+	if (errorDownloads.contains(url)) {
+		errorDownloads.removeOne(url);
+	}
 
-	if (!image->IsValidImage()) {
+	if (!image || !image->IsValidImage()) {
 		if (!errorDownloads.contains(url)) {
 			errorDownloads.append(url);
 			if (!restartDownloadsTimer.isActive()) {
 				restartDownloadsTimer.start();
 			}
 		}
-		delete image;
+
+		if (image) {delete image;}
 		activeDownloads.removeAll(url);
 		return;
 	}
