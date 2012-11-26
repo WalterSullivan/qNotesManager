@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "imagedownloader.h"
+#include "httpimagedownloader.h"
 
 #include "global.h"
 #include "cachedimagefile.h"
@@ -29,7 +29,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-ImageDownloader::ImageDownloader(QObject *parent) : QObject(parent), OriginalUrlAttribute((QNetworkRequest::Attribute)1000) {
+HttpImageDownloader::HttpImageDownloader(QObject *parent) :
+		QObject(parent),
+		OriginalUrlAttribute((QNetworkRequest::Attribute)1000) {
 	manager = new QNetworkAccessManager(this);
 
 	connect(manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
@@ -66,23 +68,23 @@ ImageDownloader::ImageDownloader(QObject *parent) : QObject(parent), OriginalUrl
 	networkErrorMessages.insert(399,	"QNetworkReply::ProtocolFailure");
 }
 
-ImageDownloader::~ImageDownloader() {
+HttpImageDownloader::~HttpImageDownloader() {
 	CancelAllDownloads();
 }
 
-void ImageDownloader::SetProxy(QNetworkProxy& p) {
+void HttpImageDownloader::SetProxy(QNetworkProxy& p) {
 	manager->setProxy(p);
 }
 
-bool ImageDownloader::IsProxyEnabled() const {
+bool HttpImageDownloader::IsProxyEnabled() const {
 	return manager->proxy().type() != QNetworkProxy::NoProxy;
 }
 
-void ImageDownloader::DisableProxy() {
+void HttpImageDownloader::DisableProxy() {
 	manager->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
 }
 
-void ImageDownloader::Download(QUrl url) {
+void HttpImageDownloader::Download(QUrl url) {
 	if (activeDownloads.contains(url)) {return;}
 
 	QNetworkReply* reply = manager->get(QNetworkRequest(url));
@@ -92,29 +94,29 @@ void ImageDownloader::Download(QUrl url) {
 	connect(reply, SIGNAL(downloadProgress(qint64,qint64)),this, SLOT(sl_reply_downloadProgress(qint64,qint64)));
 }
 
-void ImageDownloader::CancelDownload(QUrl url) {
+void HttpImageDownloader::CancelDownload(QUrl url) {
 	if (activeDownloads.contains(url)) {
 		activeDownloads[url]->abort();
 		activeDownloads.remove(url);
 	}
 }
 
-void ImageDownloader::CancelAllDownloads() {
+void HttpImageDownloader::CancelAllDownloads() {
 	foreach (QUrl url, activeDownloads.keys()) {
 		activeDownloads[url]->abort();
 		activeDownloads.remove(url);
 	}
 }
 
-QList<QUrl> ImageDownloader::ActiveDownloads() const {
+QList<QUrl> HttpImageDownloader::ActiveDownloads() const {
 	return activeDownloads.keys();
 }
 
-bool ImageDownloader::HasActiveDownload(const QUrl url) const {
+bool HttpImageDownloader::HasActiveDownload(const QUrl url) const {
 	return activeDownloads.contains(url);
 }
 
-void ImageDownloader::sl_reply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
+void HttpImageDownloader::sl_reply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(QObject::sender());
 	if (!reply) {
 		WARNING("Casting error");
@@ -130,7 +132,7 @@ void ImageDownloader::sl_reply_downloadProgress(qint64 bytesReceived, qint64 byt
 	emit sg_Progress(url, (int)progress);
 }
 
-QUrl ImageDownloader::extractOriginalUrl(QNetworkReply* reply) {
+QUrl HttpImageDownloader::extractOriginalUrl(QNetworkReply* reply) {
 	if (!reply) {
 		WARNING("Null pointer recieved");
 		return QUrl();
@@ -143,7 +145,7 @@ QUrl ImageDownloader::extractOriginalUrl(QNetworkReply* reply) {
 	return originalRequestUrl;
 }
 
-void ImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
+void HttpImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
 	if (!reply) {
 		WARNING("Null pointer recieved");
 		return;
@@ -273,7 +275,7 @@ void ImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
 	disconnectAndDeleteReply(reply);
 }
 
-void ImageDownloader::disconnectAndDeleteReply(QNetworkReply* reply) {
+void HttpImageDownloader::disconnectAndDeleteReply(QNetworkReply* reply) {
 	if (!reply) {
 		WARNING("Null pointer recieved");
 		return;
@@ -283,27 +285,23 @@ void ImageDownloader::disconnectAndDeleteReply(QNetworkReply* reply) {
 	reply->deleteLater();
 }
 
-void ImageDownloader::downloadFailed(QUrl url, QString message) {
+void HttpImageDownloader::downloadFailed(QUrl url, QString message) {
 	activeDownloads.remove(url);
 	emit sg_DownloadError(url, message);
 }
 
-void ImageDownloader::downloadSucceded(QUrl) {
+void HttpImageDownloader::downloadSucceded(QUrl) {
 
 }
 
-
-void ImageDownloader::sl_netManager_authenticationRequired (QNetworkReply*, QAuthenticator*) {
-	qDebug() << "[sl_netManager_authenticationRequired]";
+void HttpImageDownloader::sl_netManager_authenticationRequired (QNetworkReply*, QAuthenticator*) {
+	WARNING("sl_netManager_authenticationRequired");
 }
 
-void ImageDownloader::sl_netManager_proxyAuthenticationRequired (const QNetworkProxy&, QAuthenticator*) {
-	qDebug() << "[sl_netManager_proxyAuthenticationRequired]";
+void HttpImageDownloader::sl_netManager_proxyAuthenticationRequired (const QNetworkProxy&, QAuthenticator*) {
+	WARNING("sl_netManager_proxyAuthenticationRequired");
 }
 
-void ImageDownloader::sl_netManager_sslErrors (QNetworkReply*, const QList<QSslError>&) {
-	qDebug() << "[sl_netManager_sslErrors] SslError :";
-	//for (int i = 0; i < errors.size(); ++i) {
-	//	qDebug() << "\t\t" << sslError[errors[i].error()];
-	//}
+void HttpImageDownloader::sl_netManager_sslErrors (QNetworkReply*, const QList<QSslError>&) {
+	WARNING("sl_netManager_sslError");
 }

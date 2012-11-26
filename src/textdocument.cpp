@@ -17,7 +17,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "textdocument.h"
 
-#include "imagedownloader.h"
+#include "imageloader.h"
 #include "crc32.h"
 #include "global.h"
 #include "cachedimagefile.h"
@@ -36,14 +36,15 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 TextDocument::TextDocument(QObject *parent) : QTextDocument(parent) {
-	downloader = new ImageDownloader(this);
+	loader = new ImageLoader(this);
 
-	QObject::connect(downloader, SIGNAL(sg_DownloadError(QUrl,QString)),
+	QObject::connect(loader, SIGNAL(sg_DownloadError(QUrl,QString)),
 					 this, SLOT(sl_Downloader_DownloadError(QUrl,QString)), Qt::DirectConnection);
-	QObject::connect(downloader, SIGNAL(sg_DownloadFinished(QUrl,CachedImageFile*)),
+	QObject::connect(loader, SIGNAL(sg_DownloadFinished(QUrl,CachedImageFile*)),
 					 this, SLOT(sl_Downloader_DownloadFinished(QUrl,CachedImageFile*)), Qt::DirectConnection);
-	QObject::connect(downloader, SIGNAL(sg_Progress(QUrl,int)),
+	QObject::connect(loader, SIGNAL(sg_Progress(QUrl,int)),
 					 this, SLOT(sl_Downloader_Progress(QUrl,int)), Qt::DirectConnection);
+
 
 	createDummyImages();
 
@@ -88,8 +89,8 @@ void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* im
 
 	replaceImageUrl(url.toString(), name);
 	// A bug may happen here. QTextEdit sends resource requests anisochronously, and even after
-	// 'replaceImageUrl' line a request for old url may come. If such request will come after
-	// 'activeDownloads.removeAll(url);' line, old url will be queued for downloading again.
+	// 'replaceImageUrl' line a request for old url may be requested. If such request will come after
+	// 'activeDownloads.removeAll(url)' line, old url will be queued for downloading again.
 
 	qDebug() << "Removing " << url << "from active downloads list";
 	activeDownloads.removeAll(url);
@@ -123,56 +124,21 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 		return QVariant();
 	}
 
-	if (type == QTextDocument::ImageResource) {
-		if (originalImages.contains(url.toString())) {
-			return originalImages.value(url.toString())->GetImage();
-		}
-
-		if (url.scheme() == "http" || url.scheme() == "https") {
+		if (type == QTextDocument::ImageResource) {
 			if (errorDownloads.contains(url)) {
 				return errorDummyImage;
 			}
-			if (!activeDownloads.contains(url)/*downloader->HasActiveDownload(name)*/) {
+			if (!activeDownloads.contains(url)) {
 				qDebug() << "Creating download task";
 				activeDownloads.append(url);
-				downloader->Download(url);
+				loader->Download(url);
 				return QVariant();
 			} else {
 				qDebug() << "Url " << url << "is in active downloads list. Skipping";
 				return loadingDummyImage;
 			}
-		} else if (url.scheme() == "file") {
-			QFileInfo info(url.toLocalFile());
-			if (!info.exists()) {
-				qDebug() << "Unable to load local file: " << url.toLocalFile();
-				return QVariant();
-			}
-
-			CachedImageFile* image = CachedImageFile::FromFile(info.absoluteFilePath());
-
-			if (!image->IsValidImage()) {
-				qDebug() << "Unable to load local file: " << url.toLocalFile();
-				delete image;
-				return QVariant();
-			}
-
-			quint32 hash = image->GetCRC32();
-			QString name = QString::number(hash);
-			QUrl newUrl(name);
-			if (!resource(QTextDocument::ImageResource, newUrl).isValid()) {
-				qDebug() << "Resource for id " << name << " not found. Adding resource";
-				addResource(QTextDocument::ImageResource, newUrl, image->GetImage());
-				originalImages.insert(name, image);
-			} else {
-				qDebug() << "Resource for id " << name << " found";
-				delete image;
-			}
-
-			replaceImageUrl(url.toString(), name);
-		} else {
-			qDebug() << "Resource with unknown scheme requested: " << url.toString();
 		}
-	}
+
 	return QVariant();
 }
 
@@ -301,7 +267,8 @@ void TextDocument::sl_RestartDownloadsTimer_Timeout() {
 	while (it.hasNext()) {
 		QUrl url = it.next();
 		activeDownloads.append(url);
-		downloader->Download(url);
+		loader->Download(url);
+
 		it.remove();
 	}
 }

@@ -28,13 +28,14 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTimer>
 
 namespace qNotesManager {
-	class ImageDownloader;
+	class ImageLoader;
 	class CachedImageFile;
 
 	class TextDocument : public QTextDocument {
 	Q_OBJECT
 	private:
-		ImageDownloader* downloader;
+		ImageLoader* loader;
+
 		QList<QUrl> activeDownloads;
 		QList<QUrl> errorDownloads;
 		void replaceImageUrl(QString oldName, QString newName);

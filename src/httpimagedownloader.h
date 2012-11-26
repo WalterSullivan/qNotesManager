@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEDOWNLOADER_H
-#define IMAGEDOWNLOADER_H
+#ifndef HTTPIMAGEDOWNLOADER_H
+#define HTTPIMAGEDOWNLOADER_H
 
 #include <QObject>
 #include <QNetworkAccessManager>
@@ -25,22 +25,23 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QMap>
 #include <QImage>
 
+
 namespace qNotesManager {
 	class CachedImageFile;
 
-	class ImageDownloader : public QObject {
+	class HttpImageDownloader : public QObject {
 	Q_OBJECT
 	public:
-		explicit ImageDownloader(QObject *parent);
-		~ImageDownloader();
+		explicit HttpImageDownloader(QObject *parent);
+		~HttpImageDownloader();
 
 		void SetProxy(QNetworkProxy&);
 		bool IsProxyEnabled() const;
 		void DisableProxy();
 
-		void Download(const QUrl);
-		void CancelDownload(const QUrl);
-		void CancelAllDownloads();
+		/* virtual */ void Download(const QUrl);
+		/* virtual */ void CancelDownload(const QUrl);
+		/* virtual */ void CancelAllDownloads();
 
 		QList<QUrl> ActiveDownloads() const;
 		bool HasActiveDownload(const QUrl) const;
@@ -73,4 +74,4 @@ namespace qNotesManager {
 	};
 }
 
-#endif // IMAGEDOWNLOADER_H
+#endif // HTTPIMAGEDOWNLOADER_H

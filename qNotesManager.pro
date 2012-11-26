@@ -98,7 +98,6 @@ HEADERS += src/tag.h \
     src/compressor.h \
     src/colorpickerbutton.h \
     src/hyperlinkeditwidget.h \
-    src/imagedownloader.h \
     src/noteeditwidget.h \
     src/notestabwidget.h \
     src/textedit.h \
@@ -119,7 +118,10 @@ HEADERS += src/tag.h \
     src/crc32.h \
     src/applicationsettings.h \
     src/cachedfile.h \
-    src/cachedimagefile.h
+    src/cachedimagefile.h \
+    src/imageloader.h \
+    src/localimageloader.h \
+    src/httpimagedownloader.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -161,7 +163,6 @@ SOURCES += src/tagownerscollection.cpp \
     src/hyperlinkeditwidget.cpp \
     src/colorpickerbutton.cpp \
     src/noteeditwidget.cpp \
-    src/imagedownloader.cpp \
     src/notestabwidget.cpp \
     src/texteditwidget.cpp \
     src/textedit.cpp \
@@ -176,5 +177,8 @@ SOURCES += src/tagownerscollection.cpp \
     src/crc32.cpp \
     src/applicationsettings.cpp \
     src/cachedfile.cpp \
-    src/cachedimagefile.cpp
+    src/cachedimagefile.cpp \
+    src/localimageloader.cpp \
+    src/imageloader.cpp \
+    src/httpimagedownloader.cpp
 RESOURCES += icons.qrc
