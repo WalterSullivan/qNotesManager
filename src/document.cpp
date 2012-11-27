@@ -1100,6 +1100,14 @@ void Document::RemoveCustomIcon(QString key) {
 		return;
 	}
 
+	if (DefaultFolderIcon == key) {
+		DefaultFolderIcon = Application::I()->DefaultFolderIcon;
+	}
+
+	if (DefaultNoteIcon == key) {
+		DefaultNoteIcon = Application::I()->DefaultNoteIcon;
+	}
+
 	QList<QStandardItem*> itemsList = customIconsModel->findItems(key, Qt::MatchExactly, 0);
 	if (itemsList.size() != 1) {
 		WARNING("A few icons with the same key found");
@@ -1111,15 +1119,16 @@ void Document::RemoveCustomIcon(QString key) {
 	}
 	for (int i = 0; i < allNotes.size(); ++i) {
 		if (allNotes.at(i)->GetIconID() == key) {
-			allNotes.at(i)->SetIcon(Application::I()->DefaultNoteIcon);
+			allNotes.at(i)->SetIcon(DefaultNoteIcon);
 		}
 	}
 
 	for (int i = 0; i < allFolders.size(); ++i) {
 		if (allFolders.at(i)->GetIconID() == key) {
-			allFolders.at(i)->SetIconID(Application::I()->DefaultFolderIcon);
+			allFolders.at(i)->SetIconID(DefaultFolderIcon);
 		}
 	}
+
 	delete item;
 	customIcons.remove(key);
 
