@@ -589,7 +589,7 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 		Application::I()->Settings.LastDocumentName = doc->GetFilename();
 
 		restoreDocumentVisualSettings();
-		sl_Clipboard_DataChanged();
+
 		sl_EditMenuContentChanged();
 	}
 
@@ -600,6 +600,8 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	closeDocumentAction->setEnabled(enable);
 	documentPropertiesAction->setEnabled(enable);
 	globalSearchAction->setEnabled(enable);
+	sl_Clipboard_DataChanged();
+
 	updateWindowTitle();
 }
 
