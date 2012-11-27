@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LOCALFILELOADER_H
-#define LOCALFILELOADER_H
+#ifndef LOCALIMAGELOADER_H
+#define LOCALIMAGELOADER_H
 
 #include <QObject>
 #include <QList>
@@ -48,4 +48,4 @@ namespace qNotesManager {
 
 	};
 }
-#endif // LOCALFILELOADER_H
+#endif // LOCALIMAGELOADER_H
