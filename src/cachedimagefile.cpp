@@ -7,32 +7,32 @@ using namespace qNotesManager;
 
 CachedImageFile::CachedImageFile(const QByteArray& array, QString name, QString format) :
 		CachedFile(array, name),
+		cachedPixmapSize(QSize()),
+		cachedPixmap(QPixmap()),
 		Format(format) {
+	cachedPixmap.loadFromData(Data, Format.toStdString().c_str());
+	cachedPixmapSize = cachedPixmap.size();
 }
 
 bool CachedImageFile::IsValidImage() const {
-	return !QImage::fromData(Data, Format.toStdString().c_str()).isNull();
+	return !cachedPixmap.isNull();
 }
 
 QSize CachedImageFile::ImageSize() const {
-	QImage image = QImage::fromData(Data, Format.toStdString().c_str());
-	return image.isNull() ? QSize() : image.size();
-}
-
-QImage CachedImageFile::GetImage() const {
-	return QImage::fromData(Data, Format.toStdString().c_str());
+	return cachedPixmap.isNull() ? QSize() : cachedPixmap.size();
 }
 
 QPixmap CachedImageFile::GetPixmap(QSize preferredSize) const {
-	QPixmap pixmap;
-	if (!pixmap.loadFromData(Data, Format.toStdString().c_str())) {
-		return QPixmap();
-	}
-	if (preferredSize.isValid()) {
-		pixmap = pixmap.scaled(preferredSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+	if (cachedPixmap.isNull()) {
+		return cachedPixmap;
 	}
 
-	return pixmap;
+	if (preferredSize.isValid() && preferredSize != cachedPixmapSize) {
+		pixmap = pixmap.scaled(preferredSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+		cachedPixmapSize = preferredSize;
+	}
+
+	return cachedPixmap;
 }
 
 CachedImageFile* CachedImageFile::FromFile(QString fileName) {
