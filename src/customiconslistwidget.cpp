@@ -64,7 +64,6 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 	setWindowTitle("Pick icon");
 
 	SelectedIconKey = "";
-	SelectedIcon = QPixmap();
 }
 
 void CustomIconsListWidget::sl_OKButton_Clicked() {
@@ -76,17 +75,12 @@ void CustomIconsListWidget::sl_OKButton_Clicked() {
 		WARNING("Selected icon key is empty");
 		return;
 	}
-	SelectedIcon = Application::I()->CurrentDocument()->GetItemIcon(SelectedIconKey);
-	if (SelectedIcon.isNull()) {
-		WARNING("Selected icon is null");
-		return;
-	}
+
 	accept();
 }
 
 void CustomIconsListWidget::sl_CancelButton_Clicked() {
 	SelectedIconKey = "";
-	SelectedIcon = QPixmap();
 	reject();
 }
 

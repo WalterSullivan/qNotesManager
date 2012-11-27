@@ -34,7 +34,6 @@ namespace qNotesManager {
 	public:
 		explicit CustomIconsListWidget(QWidget *parent = 0);
 		QString SelectedIconKey;
-		QPixmap SelectedIcon;
 
 		void SelectIcon(QString key);
 

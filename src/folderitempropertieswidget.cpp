@@ -187,10 +187,17 @@ void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {
 		Note* n = dynamic_cast<Note*>(itemToEdit);
 		customIconsWidget->SelectIcon(n->GetIconID());
 	}
+
 	if (customIconsWidget->exec() != QDialog::Accepted) {return;}
 
+	Document* doc = Application::I()->CurrentDocument();
+	if (doc == 0) {
+		WARNING("Current document is 0");
+		return;
+	}
+
 	selectedIconKey = customIconsWidget->SelectedIconKey;
-	iconLabel->setPixmap(customIconsWidget->SelectedIcon);
+	iconLabel->setPixmap(doc->GetItemIcon(selectedIconKey));
 }
 
 void FolderItemPropertiesWidget::sl_ResetIconToDefaultButton_Clicked() {
