@@ -65,6 +65,9 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 	setWindowTitle("Pick icon");
 
 	SelectedIconKey = "";
+
+	QObject::connect(Application::I(), SIGNAL(sg_CurrentDocumentChanged(Document*)),
+					 this, SLOT(sl_Application_DocumentChanged()));
 }
 
 void CustomIconsListWidget::sl_OKButton_Clicked() {
@@ -131,4 +134,14 @@ void CustomIconsListWidget::SelectIcon(QString key) {
 
 void CustomIconsListWidget::sl_ListView_DoubleClicked (const QModelIndex& index) {
 	sl_OKButton_Clicked();
+}
+
+void CustomIconsListWidget::sl_Application_DocumentChanged() {
+	QStandardItemModel* model = 0;
+
+	if (Application::I()->CurrentDocument()) {
+		model = Application::I()->CurrentDocument()->customIconsModel;
+	}
+
+	listView->setModel(model);
 }

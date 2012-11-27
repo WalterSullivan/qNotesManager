@@ -23,6 +23,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QPushButton>
 
 namespace qNotesManager {
+	class Document;
+
 	class CustomIconsListWidget : public QDialog {
 	Q_OBJECT
 	private:
@@ -45,6 +47,7 @@ namespace qNotesManager {
 		void sl_CancelButton_Clicked();
 		void sl_AddIconButton_Clicked();
 		void sl_ListView_DoubleClicked (const QModelIndex& index);
+		void sl_Application_DocumentChanged();
 
 	};
 }
