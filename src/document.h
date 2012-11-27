@@ -43,6 +43,7 @@ namespace qNotesManager {
 	class HierarchyModel;
 	class TagsModel;
 	class DatesModel;
+	class CachedImageFile;
 
 	class Document : public QObject {
 	Q_OBJECT
@@ -72,7 +73,7 @@ namespace qNotesManager {
 		DatesModel* modificationDateModel;
 		DatesModel* textDateModel;
 
-		QHash<QString, QPixmap> customIcons;
+		QHash<QString, CachedImageFile*> customIcons;
 
 		QString fileName; // Document filename
 		quint16 fileVersion;
@@ -120,7 +121,7 @@ namespace qNotesManager {
 		bool LockFolderItems;
 
 		QStandardItemModel*		customIconsModel;
-		void AddCustomIcon(QPixmap, QString);
+		void AddCustomIcon(CachedImageFile*);
 		void RemoveCustomIcon(QString);
 		QPixmap GetItemIcon(const QString) const;
 

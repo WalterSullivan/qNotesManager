@@ -20,6 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "application.h"
 #include "document.h"
 #include "global.h"
+#include "cachedimagefile.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -90,11 +91,18 @@ void CustomIconsListWidget::sl_AddIconButton_Clicked() {
 													  filter);
 
 	foreach (QString fileName, list) {
+
 		QFileInfo info(fileName);
 		if (!info.exists()) {continue;}
-		QPixmap image(fileName, info.suffix().toStdString().c_str());
-		if (image.isNull()) {continue;}
-		Application::I()->CurrentDocument()->AddCustomIcon(image, info.fileName());
+
+		CachedImageFile* image = CachedImageFile::FromFile(fileName);
+		if (!image->IsValidImage()) {
+			WARNING("Selected file is not a valid image");
+			delete image;
+			continue;
+		}
+
+		Application::I()->CurrentDocument()->AddCustomIcon(image);
 	}
 }
 
@@ -107,6 +115,7 @@ void CustomIconsListWidget::SelectIcon(QString key) {
 	for (int i = 0; i < listView->model()->rowCount(); ++i) {
 		QModelIndex index = listView->model()->index(i, 0);
 		if (!index.isValid()) {return;}
+
 		QString itemKey = index.data(Qt::UserRole + 1).toString();
 		if (itemKey.isEmpty()) {
 			WARNING("Model item key field is empty");

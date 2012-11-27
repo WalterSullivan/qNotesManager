@@ -33,6 +33,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "boibuffer.h"
 #include "crc32.h"
 #include "global.h"
+#include "cachedimagefile.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -110,6 +111,10 @@ Document::~Document() {
 	delete rootFolder;
 	delete trashFolder;
 	delete tempFolder;
+
+	foreach (QString key, customIcons.keys()) {
+		delete customIcons[key];
+	}
 }
 
 QString Document::GetFilename() const {
@@ -351,15 +356,16 @@ Document* Document::Open(QString fileName) {
 			readResult = dataBuffer.read(nameArraySize);
 			QByteArray nameArray(nameArraySize, 0x0);
 			readResult = dataBuffer.read(nameArray.data(), nameArraySize);
-			QFileInfo iconInfo(nameArray);
-			quint32 pixmapSize = 0;
-			readResult = dataBuffer.read(pixmapSize);
-			QByteArray pixmapArray(pixmapSize, 0x0);
-			readResult = dataBuffer.read(pixmapArray.data(), pixmapSize);
-			QPixmap pixmap;
-			pixmap.loadFromData(pixmapArray, iconInfo.suffix().toStdString().c_str());
 
-			doc->customIcons.insert(QString(nameArray), pixmap);
+			QFileInfo iconInfo(nameArray);
+			quint32 imageDataSize = 0;
+			readResult = dataBuffer.read(imageDataSize);
+			QByteArray pixmapArray(imageDataSize, 0x0);
+			readResult = dataBuffer.read(pixmapArray.data(), imageDataSize);
+
+			CachedImageFile* image = new CachedImageFile(pixmapArray, nameArray, iconInfo.suffix());
+
+			doc->AddCustomIcon(image);
 		}
 	}
 
@@ -645,32 +651,19 @@ void Document::Save(QString name, quint16 version) {
 
 		qint64 blockStart = dataBuffer.pos();
 
-		QBuffer pixmapBuffer;
-
 		foreach(QString name, customIcons.keys()) {
-			const QByteArray nameArray = name.toUtf8();
+			CachedImageFile* image = customIcons.value(name);
+
+			const QByteArray nameArray = image->FileName.toUtf8();
 			const quint32 nameArraySize = nameArray.size();
-			QPixmap pixmap = customIcons.value(name);
-			QFileInfo pixmapInfo(nameArray);
 			dataBuffer.write(nameArraySize);
 			dataBuffer.write(nameArray.constData(), nameArraySize);
-			quint32 pixmapSize = 0;
-			const qint64 pixmapSizePosition = dataBuffer.pos();
-			dataBuffer.write(pixmapSize);
 
-			QByteArray pixmapArray;
-			pixmapBuffer.setBuffer(&pixmapArray);
-			pixmapBuffer.open(QIODevice::WriteOnly);
-			pixmap.save(&pixmapBuffer, qPrintable(pixmapInfo.suffix()));
-			pixmapBuffer.close();
-			dataBuffer.write(pixmapArray);
-
-			pixmapSize = (quint32)(dataBuffer.pos() - pixmapSizePosition);
-			const qint64 end = dataBuffer.pos();
-			dataBuffer.seek(pixmapSizePosition);
-			dataBuffer.write(pixmapSize);
-			dataBuffer.seek(end);
+			const quint32 imageDataSize = image->Data.size();
+			dataBuffer.write(imageDataSize);
+			dataBuffer.write(image->Data.constData(), imageDataSize);
 		}
+
 		const qint64 lastPos = dataBuffer.pos();
 		iconsBlockSize = lastPos - blockStart;
 		dataBuffer.seek(iconsBlockSizePosition);
@@ -1062,31 +1055,22 @@ QList<Note*> Document::GetNotesList() const {
 	return allNotes;
 }
 
-void Document::AddCustomIcon(QPixmap image, QString name) {
-	if (image.isNull()) {
+void Document::AddCustomIcon(CachedImageFile* image) {
+	if (!image) {
 		WARNING("Null image recieved");
 		return;
 	}
-	if (name.isEmpty()) {
-		WARNING("Empty name recieved");
+
+	if (!image->IsValidImage()) {
+		WARNING("Invalid image recieved");
+		delete image;
 		return;
-	}
-	QFileInfo file(name);
-	QString base = file.completeBaseName();
-	QString suffix = file.suffix();
-	if (base.isEmpty() || suffix.isEmpty()) {
-		WARNING("Image name is incomplete");
-		return;
-	}
-	int addNumber = 1;
-	while (customIcons.contains(name)) {
-		name = base.append(QString::number(addNumber)).append(".").append(suffix);
-		addNumber++;
 	}
 
+	QString name = QString::number(image->GetCRC32());
 	customIcons.insert(name, image);
 
-	QStandardItem* i = new QStandardItem(image, QString());
+	QStandardItem* i = new QStandardItem(image->GetPixmap(QSize(16, 16)), QString());
 	i->setData(name, Qt::UserRole + 1);
 	i->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	customIconsModel->appendRow(i);
@@ -1130,6 +1114,8 @@ void Document::RemoveCustomIcon(QString key) {
 	}
 
 	delete item;
+
+	delete customIcons[key];
 	customIcons.remove(key);
 
 	onChange();
@@ -1150,7 +1136,7 @@ QPixmap Document::GetItemIcon(const QString key) const {
 		}
 	} else {
 		if (customIcons.contains(key)) {
-			return customIcons.value(key);
+			return customIcons.value(key)->GetPixmap(QSize(16, 16));
 		} else {
 			WARNING(qPrintable("Icon with passed key not found: " + key));
 			return QPixmap();
