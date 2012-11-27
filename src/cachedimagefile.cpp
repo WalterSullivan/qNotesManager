@@ -46,5 +46,5 @@ CachedImageFile* CachedImageFile::FromFile(QString fileName) {
 	QByteArray array = f.readAll();
 	f.close();
 
-	return new CachedImageFile(array, fileName, QFileInfo(fileName).suffix());
+	return new CachedImageFile(array, QFileInfo(fileName).fileName(), QFileInfo(fileName).suffix());
 }
