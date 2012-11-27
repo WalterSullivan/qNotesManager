@@ -28,7 +28,7 @@ QPixmap CachedImageFile::GetPixmap(QSize preferredSize) const {
 	}
 
 	if (preferredSize.isValid() && preferredSize != cachedPixmapSize) {
-		pixmap = pixmap.scaled(preferredSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+		cachedPixmap = cachedPixmap.scaled(preferredSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 		cachedPixmapSize = preferredSize;
 	}
 

@@ -27,8 +27,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 namespace qNotesManager {
 	class CachedImageFile : public CachedFile {
 	private:
-		QSize cachedPixmapSize;
-		QPixmap cachedPixmap;
+		mutable QSize cachedPixmapSize;
+		mutable QPixmap cachedPixmap;
 
 	public:
 		CachedImageFile(const QByteArray& array, QString name, QString format);
