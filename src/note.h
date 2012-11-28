@@ -100,8 +100,8 @@ namespace qNotesManager {
 
 		TextDocument* GetTextDocument() const;
 
-		void Serialize(const int version, BOIBuffer& stream, const QHash<QString, quint32>&) const;
-		static Note* Deserialize(const int version, BOIBuffer& stream, const QHash<quint32, QString>&);
+		void Serialize(const int version, BOIBuffer& stream) const;
+		static Note* Deserialize(const int version, BOIBuffer& stream);
 
 
 		NoteTagsCollection Tags;

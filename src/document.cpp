@@ -369,25 +369,6 @@ Document* Document::Open(QString fileName) {
 		}
 	}
 
-	QHash<quint32, QString> iconIndexes;
-	// Read icon indexes
-	{
-		quint32 blockSize = 0;
-		readResult = dataBuffer.read(blockSize);
-		const qint64 blockEndByte = dataBuffer.pos() + blockSize;
-
-		while(dataBuffer.pos() < blockEndByte) {
-			quint32 id = 0;
-			readResult = dataBuffer.read(id);
-			quint32 nameArraySize = 0;
-			readResult = dataBuffer.read(nameArraySize);
-			QByteArray nameArray(nameArraySize, 0x0);
-			readResult = dataBuffer.read(nameArray.data(), nameArraySize);
-
-			iconIndexes.insert(id, QString(nameArray));
-		}
-	}
-
 	QHash<quint32, Tag*> tagsIDs;
 	// Reading tags
 	{
@@ -414,7 +395,7 @@ Document* Document::Open(QString fileName) {
 		while (dataBuffer.pos() < blockEndByte) {
 			quint32 folderItemID = 0;
 			readResult = dataBuffer.read(folderItemID);
-			Note* note = Note::Deserialize(r_fileVersion, dataBuffer, iconIndexes);
+			Note* note = Note::Deserialize(r_fileVersion, dataBuffer);
 
 			folderItems.insert(folderItemID, note);
 		}
@@ -436,7 +417,7 @@ Document* Document::Open(QString fileName) {
 		// Read user folders
 		while(dataBuffer.pos() < blockLastByte) {
 			readResult = dataBuffer.read(folderID);
-			Folder* folder = Folder::Deserialize(r_fileVersion, dataBuffer, iconIndexes);
+			Folder* folder = Folder::Deserialize(r_fileVersion, dataBuffer);
 			folderItems.insert(folderID, folder);
 		}
 	}
@@ -671,44 +652,6 @@ void Document::Save(QString name, quint16 version) {
 		dataBuffer.seek(lastPos);
 	}
 
-	// Generate icons indexes
-	QHash<QString, quint32> iconIndexes;
-	{
-		quint32 currentIndex = 1;
-		const QList<QString>& standardIconsNames = Application::I()->GetStandardIcons().keys();
-		foreach (QString name, standardIconsNames) {
-			iconIndexes.insert(name, currentIndex);
-			currentIndex++;
-		}
-		const QList<QString>& customIconsNames = customIcons.keys();
-		foreach(QString name, customIconsNames) {
-			iconIndexes.insert(name, currentIndex);
-			currentIndex++;
-		}
-	}
-
-	// Write icons indexes
-	{
-		quint32 blockSize = 0;
-		const qint64 blockSizePosition = dataBuffer.pos();
-		dataBuffer.write(blockSize);
-
-		const qint64 blockStartPosition = dataBuffer.pos();
-		foreach (const QString name, iconIndexes.keys()) {
-			const quint32 id = iconIndexes.value(name);
-			const QByteArray nameArray = name.toUtf8();
-			const quint32 nameArraySize = nameArray.size();
-			dataBuffer.write(id);
-			dataBuffer.write(nameArraySize);
-			dataBuffer.write(nameArray.constData(), nameArraySize);
-		}
-		const qint64 blockEndPosition = dataBuffer.pos();
-		blockSize = blockEndPosition - blockStartPosition;
-		dataBuffer.seek(blockSizePosition);
-		dataBuffer.write(blockSize);
-		dataBuffer.seek(blockEndPosition);
-	}
-
 	// Write tags
 	QHash<const Tag*, quint32> tagsIDs;
 	{
@@ -745,7 +688,7 @@ void Document::Save(QString name, quint16 version) {
 			dataBuffer.write(folderOrNoteID);
 			folderItemsIDs.insert(note, folderOrNoteID);
 			folderOrNoteID++;
-			note->Serialize(version, dataBuffer, iconIndexes);
+			note->Serialize(version, dataBuffer);
 		}
 		const qint64 blockEndPosition = dataBuffer.pos();
 		blockSize = blockEndPosition - blockStartPosition;
@@ -772,7 +715,7 @@ void Document::Save(QString name, quint16 version) {
 			dataBuffer.write(folderOrNoteID);
 			folderItemsIDs.insert(f, folderOrNoteID);
 			folderOrNoteID++;
-			f->Serialize(version, dataBuffer, iconIndexes);
+			f->Serialize(version, dataBuffer);
 		}
 
 		const qint64 blockEndPosition = dataBuffer.pos();

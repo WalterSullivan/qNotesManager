@@ -88,8 +88,8 @@ namespace qNotesManager {
 
 
 
-		void Serialize(const int version, BOIBuffer& stream, const QHash<QString, quint32>&) const;
-		static Folder* Deserialize(const int version, BOIBuffer& stream, const QHash<quint32, QString>&);
+		void Serialize(const int version, BOIBuffer& stream) const;
+		static Folder* Deserialize(const int version, BOIBuffer& stream);
 
 	signals:
 		void sg_VisualPropertiesChanged();

@@ -227,13 +227,14 @@ QString Folder::GetPath() const {
 	return path;
 }
 
-void Folder::Serialize(const int version, BOIBuffer& stream, const QHash<QString, quint32>& hash) const {
+void Folder::Serialize(const int version, BOIBuffer& stream) const {
 	(void)version;
 	const QByteArray s_caption = name.toUtf8();
 	const quint32 s_captionSize = s_caption.size();
 	const quint32 s_creationDate = creationDate.toTime_t();
 	const quint32 s_modificationDate = modificationDate.toTime_t();
-	const quint32 s_iconID = hash.value(iconID);
+	const QByteArray s_iconID = iconID.toAscii();
+	const quint32 s_iconIDSize = s_iconID.size();
 	const quint32 s_backColor = nameBackColor.rgba();
 	const quint32 s_foreColor = nameForeColor.rgba();
 	const quint8 s_locked = (quint8)locked;
@@ -241,7 +242,8 @@ void Folder::Serialize(const int version, BOIBuffer& stream, const QHash<QString
 								sizeof(s_captionSize) +
 								sizeof(s_creationDate) +
 								sizeof(s_modificationDate) +
-								sizeof(s_iconID) +
+								s_iconIDSize +
+								sizeof(s_iconIDSize) +
 								sizeof(s_backColor) +
 								sizeof(s_foreColor) +
 								sizeof(s_locked);
@@ -251,14 +253,15 @@ void Folder::Serialize(const int version, BOIBuffer& stream, const QHash<QString
 	stream.write(s_caption.constData(), s_captionSize);
 	stream.write(s_creationDate);
 	stream.write(s_modificationDate);
-	stream.write(s_iconID);
+	stream.write(s_iconIDSize);
+	stream.write(s_iconID.constData(), s_iconIDSize);
 	stream.write(s_backColor);
 	stream.write(s_foreColor);
 	stream.write(s_locked);
 }
 
 /* static */
-Folder* Folder::Deserialize(const int version, BOIBuffer& stream, const QHash<quint32, QString>& hash) {
+Folder* Folder::Deserialize(const int version, BOIBuffer& stream) {
 	(void)version;
 	qint64 bytesRead = 0;
 
@@ -275,8 +278,10 @@ Folder* Folder::Deserialize(const int version, BOIBuffer& stream, const QHash<qu
 	bytesRead = stream.read(r_creationDate);
 	quint32 r_modificationDate = 0;
 	bytesRead = stream.read(r_modificationDate);
-	quint32 r_iconID = 0;
-	bytesRead = stream.read(r_iconID);
+	quint32 r_iconIDSize = 0;
+	bytesRead = stream.read(r_iconIDSize);
+	QByteArray r_iconID(r_iconIDSize, 0x0);
+	bytesRead = stream.read(r_iconID.data(), r_iconIDSize);
 	quint32 r_backColor = 0;
 	bytesRead = stream.read(r_backColor);
 	quint32 r_foreColor = 0;
@@ -295,7 +300,7 @@ Folder* Folder::Deserialize(const int version, BOIBuffer& stream, const QHash<qu
 	f->nameForeColor.setRgba(r_foreColor);
 	f->nameBackColor.setRgba(r_backColor);
 	f->locked = (bool)r_locked;
-	f->iconID = hash.value(r_iconID);
+	f->iconID = r_iconID;
 	f->creationDate = QDateTime::fromTime_t(r_creationDate);
 	f->modificationDate = QDateTime::fromTime_t(r_modificationDate);
 
