@@ -208,11 +208,11 @@ void FolderItemPropertiesWidget::sl_ResetIconToDefaultButton_Clicked() {
 	}
 
 	if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Folder) {
-		iconLabel->setPixmap(doc->GetItemIcon(doc->DefaultFolderIcon));
-		selectedIconKey = doc->DefaultFolderIcon;
+		iconLabel->setPixmap(doc->GetItemIcon(doc->GetDefaultFolderIcon()));
+		selectedIconKey = doc->GetDefaultFolderIcon();
 	} else if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Note) {
-		iconLabel->setPixmap(doc->GetItemIcon(doc->DefaultNoteIcon));
-		selectedIconKey = doc->DefaultNoteIcon;
+		iconLabel->setPixmap(doc->GetItemIcon(doc->GetDefaultNoteIcon()));
+		selectedIconKey = doc->GetDefaultNoteIcon();
 	}
 }
 
@@ -224,8 +224,8 @@ void FolderItemPropertiesWidget::sl_SetDefaultIconButton_Clicked() {
 	}
 
 	if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Folder) {
-		doc->DefaultFolderIcon = selectedIconKey;
+		doc->SetDefaultFolderIcon(selectedIconKey);
 	} else if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Note) {
-		doc->DefaultNoteIcon = selectedIconKey;
+		doc->SetDefaultNoteIcon(selectedIconKey);
 	}
 }

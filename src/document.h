@@ -87,6 +87,8 @@ namespace qNotesManager {
 		QDateTime creationDate;
 		QDateTime modificationDate;
 
+		QString DefaultNoteIcon;
+		QString DefaultFolderIcon;
 
 	public:
 		explicit Document();
@@ -135,8 +137,10 @@ namespace qNotesManager {
 		QDateTime GetCreationDate() const;
 		QDateTime GetModificationDate() const;
 
-		QString DefaultNoteIcon;
-		QString DefaultFolderIcon;
+		QString GetDefaultNoteIcon() const;
+		QString GetDefaultFolderIcon() const;
+		void SetDefaultNoteIcon(QString id);
+		void SetDefaultFolderIcon(QString id);
 
 	signals:
 		void sg_Changed();	// Emitted when document was changed

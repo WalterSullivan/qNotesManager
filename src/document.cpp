@@ -1188,4 +1188,26 @@ void Document::SetCipherData(const quint8 id, const QString& _password) {
 	}
 }
 
+QString Document::GetDefaultNoteIcon() const {
+	return DefaultNoteIcon;
+}
+
+QString Document::GetDefaultFolderIcon() const {
+	return DefaultFolderIcon;
+}
+
+void Document::SetDefaultNoteIcon(QString id) {
+	if (DefaultNoteIcon == id) {return;}
+
+	DefaultNoteIcon = id;
+	onChange();
+}
+
+void Document::SetDefaultFolderIcon(QString id) {
+	if (DefaultFolderIcon == id) {return;}
+
+	DefaultFolderIcon = id;
+	onChange();
+}
+
 
