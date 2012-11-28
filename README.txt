@@ -1,10 +1,17 @@
     qNotesManager
 
      1. About
-       qNotesManager
-       Basic features:
-       <insert features here>
-
+       qNotesManager is an advanced note-taking software.
+       What you can do (basic features):
+       - Format note text in WYSIWYG-editor;
+	   - Insert images in your notes;
+	   - Assign tags to your notes;
+	   - Group yout notes in categories (folders);
+	   - Save file may be encrypted if you want to keep your information in
+	   secret;
+	   - Quick note function: create a new note with text from clipboard with
+	   just one click;
+	   - And more.
 
        Copyright (C) 2012  Yury Hamenkov
        waltersullivan.11121@gmail.com
@@ -34,8 +41,8 @@
 	   - qca-ossl2
 	   
 	   Building on Windows 32:
-	   All required libraries are located in libs/win32 directory. To run executable, make sure excutable's
-	   directory contains these files:
+	   All required libraries are located in libs/win32 directory. To run 
+	   executable, make sure excutable's directory contains these files:
 	   -libeay32.dll
 	   -ssleay32.dll
 	   -qca2.dll
@@ -45,7 +52,9 @@
 	   Install required libraries with your package manager.
 	   
 	   Building on Mac:
-	   
+	   I have no possibility to test this software on Mac. However Qt is a
+	   crossplatform framework and it should work fine. If you are a Mac
+	   developer and want to help, please contact me.
 
        To build this program:
 
