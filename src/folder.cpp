@@ -70,10 +70,6 @@ Folder::Folder(QString _name, FolderType _type) :
 	} else if (type == TrashFolder) {
 		name = "Trash bin";
 	}
-	if (type == UserFolder) {
-		//iconID = Application::I()->CurrentDocument()->DefaultFolderIcon;
-		iconID = Application::I()->DefaultFolderIcon;
-	}
 	if (name.isEmpty()) {name = "New folder";}
 }
 

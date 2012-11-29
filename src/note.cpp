@@ -37,7 +37,7 @@ Note::Note(QString _name) :
 		creationDate(QDateTime::currentDateTime()),
 		modificationDate(QDateTime::currentDateTime()),
 		textDate(QDateTime()),
-		iconID(":/standard/note"),
+		iconID(""),
 		author(QString()),
 		source(QString()),
 		comment(QString()),

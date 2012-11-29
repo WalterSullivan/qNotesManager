@@ -862,6 +862,11 @@ void Document::sl_Folder_ItemRemoved(AbstractFolderItem* const item) {
 void Document::RegisterItem(AbstractFolderItem* const item) {
 	if (item->GetItemType() == AbstractFolderItem::Type_Folder) {
 		Folder* f = dynamic_cast<Folder*>(item);
+
+		if (f->GetIconID().isEmpty()) {
+			f->SetIconID(DefaultFolderIcon);
+		}
+
 		QObject::connect(f, SIGNAL(sg_ItemAdded(AbstractFolderItem*const, int)),
 						 this, SLOT(sl_Folder_ItemAdded(AbstractFolderItem*const, int)));
 		QObject::connect(f, SIGNAL(sg_ItemRemoved(AbstractFolderItem*const)),
@@ -878,6 +883,9 @@ void Document::RegisterItem(AbstractFolderItem* const item) {
 
 	} else if (item->GetItemType() == AbstractFolderItem::Type_Note) {
 		Note* n = dynamic_cast<Note*>(item);
+		if (n->GetIconID().isEmpty()) {
+			n->SetIcon(DefaultNoteIcon);
+		}
 		QObject::connect(n, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 		QObject::connect(n, SIGNAL(sg_TagAdded(Tag*)), this, SLOT(sl_Note_TagAdded(Tag*)));
 		QObject::connect(n, SIGNAL(sg_TagRemoved(Tag*)), this, SLOT(sl_Note_TagRemoved(Tag*)));
