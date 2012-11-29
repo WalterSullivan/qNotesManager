@@ -72,10 +72,10 @@ int main(int argc, char** argv) {
 	Application::I()->Settings.Load();
 	MainWindow w;
 	QObject::connect(&app, SIGNAL(aboutToQuit()), &w, SLOT(sl_QApplication_AboutToQuit()));
+
+
 	if (Application::I()->Settings.ShowWindowOnStart) {
 		w.show();
-	} else {
-		w.hide();
 	}
 
 	if (Application::I()->Settings.OpenLastDocumentOnStart &&

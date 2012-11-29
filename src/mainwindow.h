@@ -111,6 +111,9 @@ namespace qNotesManager {
 		/*virtual*/ bool eventFilter (QObject* watched, QEvent* event);
 		/*virtual*/ void closeEvent (QCloseEvent* event);
 		/*virtual*/ void changeEvent (QEvent* event);
+		/*virtual*/ void resizeEvent (QResizeEvent* event);
+		/*virtual*/ void moveEvent (QMoveEvent* event);
+
 	signals:
 
 	public slots:

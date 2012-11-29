@@ -300,11 +300,25 @@ void MainWindow::closeEvent (QCloseEvent* event) {
 /*virtual*/
 void MainWindow::changeEvent (QEvent* event) {
 	QMainWindow::changeEvent(event);
-	if ( (event->type() == QEvent::WindowStateChange) &&
-			isMinimized() &&
+
+	if (event->type() == QEvent::WindowStateChange) {
+		if (isMinimized() &&
 			(Application::I()->Settings.minimizeToTray)) {
-		QTimer::singleShot(0, this, SLOT(hide()));
+			QTimer::singleShot(0, this, SLOT(hide()));
+		}
 	}
+}
+
+void MainWindow::resizeEvent (QResizeEvent* event) {
+	QMainWindow::resizeEvent(event);
+
+	if (!isMaximized()) {Application::I()->Settings.windowSize = size();}
+}
+
+void MainWindow::moveEvent (QMoveEvent* event) {
+	QMainWindow::moveEvent(event);
+
+	if (!isMaximized()) {Application::I()->Settings.windowPosition = pos();}
 }
 
 void MainWindow::sl_NoteDoubleClicked(Note* note) {
@@ -764,8 +778,6 @@ void MainWindow::sl_EditMenuContentChanged() {
 }
 
 void MainWindow::sl_QApplication_AboutToQuit() {
-	Application::I()->Settings.windowPosition = pos();
-	Application::I()->Settings.windowSize = size();
 	Application::I()->Settings.windowState = windowState();
 
 	Application::I()->Settings.Save();
