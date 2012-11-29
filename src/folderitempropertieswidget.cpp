@@ -158,7 +158,7 @@ void FolderItemPropertiesWidget::sl_OKButton_Clicked() {
 	} else if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Note) {
 		Note* n = dynamic_cast<Note*>(itemToEdit);
 		n->SetName(nameLineEdit->text());
-		n->SetIcon(selectedIconKey);
+		n->SetIconID(selectedIconKey);
 	}
 
 	itemToEdit = 0;

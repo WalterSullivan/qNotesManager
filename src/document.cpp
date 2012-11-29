@@ -884,7 +884,7 @@ void Document::RegisterItem(AbstractFolderItem* const item) {
 	} else if (item->GetItemType() == AbstractFolderItem::Type_Note) {
 		Note* n = dynamic_cast<Note*>(item);
 		if (n->GetIconID().isEmpty()) {
-			n->SetIcon(DefaultNoteIcon);
+			n->SetIconID(DefaultNoteIcon);
 		}
 		QObject::connect(n, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 		QObject::connect(n, SIGNAL(sg_TagAdded(Tag*)), this, SLOT(sl_Note_TagAdded(Tag*)));
@@ -1054,7 +1054,7 @@ void Document::RemoveCustomIcon(QString key) {
 	}
 	for (int i = 0; i < allNotes.size(); ++i) {
 		if (allNotes.at(i)->GetIconID() == key) {
-			allNotes.at(i)->SetIcon(DefaultNoteIcon);
+			allNotes.at(i)->SetIconID(DefaultNoteIcon);
 		}
 	}
 

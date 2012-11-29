@@ -67,7 +67,7 @@ namespace qNotesManager {
 		QDateTime GetModificationDate() const;
 
 		QPixmap GetIcon() const;
-		void SetIcon(QString id);
+		void SetIconID(QString id);
 		QString GetIconID() const;
 
 		QString GetText() const;

@@ -107,7 +107,7 @@ QPixmap Note::GetIcon() const {
 	return icon;
 }
 
-void Note::SetIcon(QString id) {
+void Note::SetIconID(QString id) {
 	if (iconID == id) {
 		return;
 	}
