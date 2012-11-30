@@ -38,7 +38,7 @@ namespace qNotesManager {
 
 		QList<QUrl> activeDownloads;
 		QList<QUrl> errorDownloads;
-		void replaceImageUrl(QString oldName, QString newName);
+		void replaceImageUrl(QUrl oldName, QString newName);
 
 		QPixmap loadingDummyImage;
 		QPixmap errorDummyImage;

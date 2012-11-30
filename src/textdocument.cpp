@@ -81,7 +81,7 @@ void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* im
 	quint32 hash = image->GetCRC32();
 	QString name = QString::number(hash);
 	QUrl newUrl(name);
-	if (!resource(QTextDocument::ImageResource, newUrl).isValid()) {
+	if (!originalImages.contains(name)) {
 		qDebug() << "Resource for id " << name << " not found. Adding resource";
 		addResource(QTextDocument::ImageResource, newUrl, image->GetPixmap());
 		originalImages.insert(name, image);
@@ -90,7 +90,7 @@ void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* im
 		delete image;
 	}
 
-	replaceImageUrl(url.toString(), name);
+	replaceImageUrl(url, name);
 	// A bug may happen here. QTextEdit sends resource requests anisochronously, and even after
 	// 'replaceImageUrl' line a request for old url may be requested. If such request will come after
 	// 'activeDownloads.removeAll(url)' line, old url will be queued for downloading again.
@@ -135,7 +135,7 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 				qDebug() << "Creating download task";
 				activeDownloads.append(url);
 				loader->Download(url);
-				return QVariant();
+				return loadingDummyImage;
 			} else {
 				qDebug() << "Url " << url << "is in active downloads list. Skipping";
 				return loadingDummyImage;
@@ -168,7 +168,7 @@ void TextDocument::createDummyImages() {
 	painter.end();
 }
 
-void TextDocument::replaceImageUrl(QString oldName, QString newName) {
+void TextDocument::replaceImageUrl(QUrl oldName, QString newName) {
 	QTextBlock block = begin();
 	while(block.isValid()) {
 		QTextBlock::iterator iterator;
@@ -176,7 +176,8 @@ void TextDocument::replaceImageUrl(QString oldName, QString newName) {
 			QTextFragment fragment = iterator.fragment();
 			if(fragment.isValid() && fragment.charFormat().isImageFormat()) {
 				QTextImageFormat format = fragment.charFormat().toImageFormat();
-				if (format.name() != oldName) {continue;}
+
+				if (QUrl::fromEncoded(format.name().toUtf8()) != oldName) {continue;}
 				qDebug() << "Changing url from" << format.name() << "to" << newName;
 				format.setName(newName);
 				QTextCursor cursor(this);
