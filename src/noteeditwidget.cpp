@@ -135,10 +135,12 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(0) {
 
 	currentNote = n;
 	if (currentNote) {
-		QObject::connect(currentNote, SIGNAL(sg_DataChanged()),
-						 this, SLOT(sl_Note_DataChanged()));
+		QObject::connect(currentNote, SIGNAL(sg_PropertyChanged()),
+						 this, SLOT(sl_Note_PropertyChanged()));
 	}
-	updateControls();
+
+	fillControlsWithData();
+	updateControlsStatus();
 }
 
 
@@ -235,26 +237,64 @@ int NoteEditWidget::CurrentPosition() const {
 	return textEditWidget->CurrentPosition();
 }
 
-void NoteEditWidget::updateControls() {
+void NoteEditWidget::updateControlsData() {
 	if (!currentNote) {
 		WARNING("Null pointer recieved");
 		setEnabled(false);
 		return;
 	}
 
-	bool enabled = !currentNote->IsLocked();
-	textEditWidget->SetReadOnly(!enabled);
-	captionEdit->setEnabled(enabled);
-	authorEdit->setEnabled(enabled);
-	textCreationCheckbox->setEnabled(enabled);
-	textCreationDateEdit->setEnabled(enabled);
-	sourceEdit->setEnabled(enabled);
-	tagsEdit->setEnabled(enabled);
-	commentEdit->setEnabled(enabled);
-	foreach (QAction* action, EditActionsList()) {
-		action->setEnabled(enabled);
+	captionEdit->setText(currentNote->GetName());
+	authorEdit->setText(currentNote->GetAuthor());
+	if (currentNote->GetTextCreationDate().isValid()) {
+		textCreationCheckbox->setChecked(true);
+		textCreationDateEdit->setEnabled(true);
+		textCreationDateEdit->setDateTime(currentNote->GetTextCreationDate());
+	} else {
+		textCreationCheckbox->setChecked(false);
+		textCreationDateEdit->setEnabled(false);
+		textCreationDateEdit->setDateTime(currentNote->GetTextCreationDate());
+	}
+	sourceEdit->setText(currentNote->GetSource());
+	QString tagsList;
+	for (int i = 0; i < currentNote->Tags.Count(); ++i) {
+		const Tag* const tag = currentNote->Tags.ItemAt(i);
+
+		if (i > 0) {tagsList.append("; ");}
+		tagsList.append(tag->GetName());
+	}
+	tagsEdit->setText(tagsList);
+	commentEdit->setText(currentNote->GetComment());
+}
+
+void NoteEditWidget::updateControlsStatus() {
+	if (!currentNote) {
+		setEnabled(false);
+		currentNoteLocked = true;
+		return;
+	}
+	if (currentNoteLocked == currentNote->IsLocked()) {
+		return;
 	}
 
+	currentNoteLocked = currentNote->IsLocked();
+	textEditWidget->SetReadOnly(currentNoteLocked);
+	captionEdit->setEnabled(!currentNoteLocked);
+	authorEdit->setEnabled(!currentNoteLocked);
+	textCreationCheckbox->setEnabled(!currentNoteLocked);
+	textCreationDateEdit->setEnabled(!currentNoteLocked);
+	sourceEdit->setEnabled(!currentNoteLocked);
+	tagsEdit->setEnabled(!currentNoteLocked);
+	commentEdit->setEnabled(!currentNoteLocked);
+	foreach (QAction* action, EditActionsList()) {
+		action->setEnabled(!currentNoteLocked);
+	}
+}
+
+void NoteEditWidget::fillControlsWithData() {
+	if (!currentNote) {
+		return;
+	}
 
 	textEditWidget->SetDocument(currentNote->GetTextDocument());
 	captionEdit->setText(currentNote->GetName());
@@ -308,8 +348,9 @@ void NoteEditWidget::sl_TagsEdit_CollectionChanged(QStringList tags) {
 	}
 }
 
-void NoteEditWidget::sl_Note_DataChanged() {
-	updateControls();
+void NoteEditWidget::sl_Note_PropertyChanged() {
+	updateControlsStatus();
+	updateControlsData();
 }
 
 // virtual

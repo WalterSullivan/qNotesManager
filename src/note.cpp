@@ -91,6 +91,7 @@ void Note::SetName (QString s) {
 	lock.unlock();
 
 	emit sg_VisualPropertiesChanged();
+	emit sg_PropertyChanged();
 	onChange();
 }
 
@@ -119,6 +120,7 @@ void Note::SetIconID(QString id) {
 	iconID = id;
 
 	emit sg_VisualPropertiesChanged();
+	emit sg_PropertyChanged();
 	onChange();
 }
 
@@ -166,6 +168,7 @@ void Note::SetNameForeColor(QColor c) {
 	nameForeColor = c;
 
 	emit sg_VisualPropertiesChanged();
+	emit sg_PropertyChanged();
 	onChange();
 }
 
@@ -186,6 +189,7 @@ void Note::SetNameBackColor(QColor c) {
 	nameBackColor = c;
 
 	emit sg_VisualPropertiesChanged();
+	emit sg_PropertyChanged();
 	onChange();
 }
 
@@ -214,6 +218,7 @@ void Note::SetLocked(bool e) {
 	lock.unlock();
 
 	emit sg_VisualPropertiesChanged();
+	emit sg_PropertyChanged();
 	onChange();
 }
 
@@ -232,6 +237,7 @@ void Note::SetAuthor(QString a) {
 	author = a;
 	lock.unlock();
 
+	emit sg_PropertyChanged();
 	onChange();
 }
 
@@ -250,6 +256,7 @@ void Note::SetSource(QString s) {
 	source = s;
 	lock.unlock();
 
+	emit sg_PropertyChanged();
 	onChange();
 }
 
@@ -265,6 +272,7 @@ void Note::SetTextCreationDate(QDateTime d) {
 	textDate = d;
 
 	emit sg_TextDateChanged();
+	emit sg_PropertyChanged();
 	onChange();
 }
 
@@ -283,13 +291,14 @@ void Note::SetComment(QString c) {
 	comment = c;
 	lock.unlock();
 
+	emit sg_PropertyChanged();
 	onChange();
 }
 
 void Note::sl_DocumentChanged() {
-	lock.lockForWrite();
-	text = document->toPlainText();
-	lock.unlock();
+	//lock.lockForWrite();
+	//text = document->toPlainText();
+	//lock.unlock();
 
 	onChange();
 }
@@ -514,11 +523,17 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 }
 
 void Note::onChange() {
-	modificationDate = QDateTime::currentDateTime();
-	emit sg_ModifyDateChanged();
+	QDateTime now = QDateTime::currentDateTime();
+	bool modifyDateChanged = modificationDate.date() != now.date();
+	modificationDate = now;
+
+	if (modifyDateChanged) {
+		emit sg_ModifyDateChanged();
+	}
 	emit sg_DataChanged();
 }
 
 void Note::sl_TagsCollectionModified(Tag*) {
+	emit sg_PropertyChanged();
 	onChange();
 }

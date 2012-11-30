@@ -108,6 +108,7 @@ namespace qNotesManager {
 
 	signals:
 		void sg_VisualPropertiesChanged(); // emitted when name or icon or other properties has been changed
+		void sg_PropertyChanged();
 		void sg_DataChanged(); // emitted when any data has been changed
 
 		void sg_ModifyDateChanged();

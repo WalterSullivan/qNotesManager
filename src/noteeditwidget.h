@@ -61,8 +61,11 @@ namespace qNotesManager {
 		void expandPropertiesPanel();
 
 		Note* currentNote;
+		bool currentNoteLocked;
 
-		void updateControls();
+		void updateControlsStatus();
+		void fillControlsWithData();
+		void updateControlsData();
 
 	public:
 		explicit NoteEditWidget(Note* n = 0);
@@ -81,7 +84,8 @@ namespace qNotesManager {
 		void sl_TextCreationCheckbox_Toggled(bool);
 		void sl_TextCreationDateTime_Changed(const QDateTime&);
 		void sl_TagsEdit_CollectionChanged(QStringList);
-		void sl_Note_DataChanged();
+
+		void sl_Note_PropertyChanged();
 
 	};
 }
