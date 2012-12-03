@@ -21,18 +21,43 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QObject>
 #include <QList>
 #include <QUrl>
+#include <QReadWriteLock>
+#include <QThread>
 
 namespace qNotesManager {
 	class CachedImageFile;
+
+	class LocalImageLoadWorker : public QObject {
+		Q_OBJECT
+	private:
+		QList<QUrl> queue;
+		QReadWriteLock lock;
+
+	public:
+		explicit LocalImageLoadWorker(QObject* parent) {};
+		void AddUrl(const QUrl);
+		void CancelAllDownloads();
+
+	signals:
+		void sg_DownloadFinished (QUrl url, CachedImageFile* image);
+		void sg_DownloadError (QUrl url, QString errorDescription);
+
+		void sg_finished();
+
+	public slots:
+		void sl_process();
+	};
 
 	class LocalImageLoader : public QObject {
 	Q_OBJECT
 	private:
 		QList<QUrl> queue;
+		QThread* thread;
+		LocalImageLoadWorker* worker;
 
 	public:
 		explicit LocalImageLoader(QObject *parent);
-		~LocalImageLoader(){};
+		~LocalImageLoader();
 
 		void Download(const QUrl);
 		void CancelDownload(const QUrl);
@@ -42,10 +67,8 @@ namespace qNotesManager {
 		void sg_DownloadFinished (QUrl url, CachedImageFile* image);
 		void sg_DownloadError (QUrl url, QString errorDescription);
 		void sg_Progress(QUrl url, int percent);
-
-	private slots:
-		void sl_processDownloads();
-
 	};
 }
+
+
 #endif // LOCALIMAGELOADER_H
