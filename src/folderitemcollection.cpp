@@ -23,7 +23,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-FolderItemCollection::FolderItemCollection(Folder* owner) : _owner(owner) {
+FolderItemCollection::FolderItemCollection(Folder* owner) : QObject(owner), _owner(owner) {
 	if (!owner) {
 		WARNING("Null pointer recieved");
 	}
@@ -176,7 +176,7 @@ void FolderItemCollection::Move(AbstractFolderItem* item, int to, Folder* newPar
 		}
 		_items.removeAll(item);
 		newParent ->Items._items.insert(to, item);
-		item->SetParent(newParent );
+		item->SetParent(newParent);
 	}
 
 	emit sg_ItemMoved(item, to, newParent);
