@@ -29,8 +29,6 @@ BaseModel::BaseModel(QObject *parent) : QAbstractItemModel(parent) {
 /*virtual*/
 BaseModel::~BaseModel() {
 	SetDisplayRootItem(0);
-
-	if (rootItem != 0) {delete rootItem;}
 }
 
 void BaseModel::SetDisplayRootItem(BaseModelItem* item) {
@@ -68,8 +66,16 @@ BaseModelItem* const BaseModel::GetDisplayRootItem() const {
 }
 
 void BaseModel::SetRootItem(BaseModelItem* item) {
+	if (rootItem == item) {return;}
+
+	if (rootItem) {
+		rootItem->setParent(0);
+	}
+
 	rootItem = item;
-	SetDisplayRootItem(item);
+	SetDisplayRootItem(rootItem);
+
+	item->setParent(this); // QObject parentship
 }
 
 BaseModelItem* BaseModel::GetRootItem() const {
