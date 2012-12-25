@@ -37,6 +37,7 @@ void AbstractFolderItem::SetParent(Folder* newParent) {
 	if (newParent == parent) {return;}
 
 	parent = newParent;
+	setParent(newParent);  // QObject's parentship
 	emit sg_ParentChanged(newParent);
 }
 
