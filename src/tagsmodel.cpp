@@ -150,7 +150,7 @@ void TagsModel::sl_Tag_OwnersRemoved() {
 			notesBridge.remove(note, noteItem);
 			delete noteItem;
 		}
-		tagItem->Clear();
+		tagItem->ClearChildrenList();
 	endRemoveRows();
 }
 

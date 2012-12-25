@@ -33,7 +33,6 @@ BaseModelItem::BaseModelItem(ItemType type)
 }
 
 BaseModelItem::~BaseModelItem() {
-	Clear();
 }
 
 // Return item parent or 0 if there is none.
@@ -74,6 +73,7 @@ void BaseModelItem::AddChildTo(BaseModelItem* item, int position) {
 
 	childrenList.insert(position, item);
 	item->parentItem = this;
+	item->setParent(this); // QObject parentship
 	insertIndexCache.Clear();
 }
 
@@ -90,6 +90,7 @@ void BaseModelItem::RemoveChild(BaseModelItem* item) {
 
 	childrenList.removeAll(item);
 	item->parentItem = 0;
+	item->setParent(0); // QObject parentship
 	insertIndexCache.Clear();
 }
 
@@ -122,11 +123,7 @@ BaseModelItem* BaseModelItem::ChildAt(int index) const {
 	return childrenList.at(index);
 }
 
-void BaseModelItem::Clear() {
-	for (int i = 0; i < childrenList.count(); ++i) {
-		delete childrenList.at(i);
-		childrenList[i] = 0;
-	}
+void BaseModelItem::ClearChildrenList() {
 	childrenList.clear();
 	insertIndexCache.Clear();
 }

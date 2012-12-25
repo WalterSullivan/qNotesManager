@@ -89,7 +89,7 @@ namespace qNotesManager {
 		virtual int IndexOfChild(BaseModelItem*) const;
 		virtual int ChildrenCount() const;
 		virtual BaseModelItem* ChildAt(int index) const;
-		void Clear();
+		void ClearChildrenList();
 		bool IsOffspringOf(const BaseModelItem*) const;
 
 		int FindInsertIndex(const BaseModelItem*) const;
