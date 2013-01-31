@@ -160,7 +160,7 @@ void TextEdit::SetDocument(TextDocument* newDocument) {
 
 //virtual
 void TextEdit::insertFromMimeData(const QMimeData* source) {
-	QStringList list = source->formats();
+	/*QStringList list = source->formats();
 	qDebug() << "\n\nMimeData dropped";
 	qDebug() << "\tHas text: " << source->hasText();
 	if (source->hasText()) {
@@ -178,7 +178,7 @@ void TextEdit::insertFromMimeData(const QMimeData* source) {
 		qDebug() << "\t" << s;
 		QByteArray array = source->data(s);
 		qDebug() << "\t" << QString(array) << "\n";
-	}
+	}*/
 
 
 	if (source->hasImage()) { // paste image
