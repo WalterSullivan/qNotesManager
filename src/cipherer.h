@@ -22,8 +22,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QByteArray>
 #include <QHash>
 
-#include "exception.h"
-
 namespace qNotesManager {
 	class Cipherer {
 	private:
@@ -55,19 +53,6 @@ namespace qNotesManager {
 
 		const quint8 DefaultHashID;
 		const quint8 DefaultSecureHashID;
-
-	};
-
-	class QCAException : public Exception {
-	public:
-		QCAException(QString message, QString description, QString position) :
-				Exception(message, description, position) {}
-	};
-
-	class QCANotSupportedException : public QCAException {
-	public:
-		QCANotSupportedException(QString message, QString description, QString position) :
-				QCAException(message, description, position) {}
 	};
 }
 

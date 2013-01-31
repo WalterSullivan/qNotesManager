@@ -17,8 +17,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "cipherer.h"
 
-#include "invaliddataexception.h"
-
 #include <QDebug>
 
 using namespace qNotesManager;
@@ -28,6 +26,7 @@ Cipherer::Cipherer() :
 		defaultCipherPadding(QCA::Cipher::PKCS7),
 		DefaultHashID(0),
 		DefaultSecureHashID(0)
+
 {
 	avaliableCipherTypes.insert(1, "aes128");
 }
@@ -43,15 +42,13 @@ QByteArray Cipherer::Decrypt(const QByteArray& data, const QByteArray& keyData, 
 QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 							QCA::Direction direction, int cipherID) {
 	if (data.isEmpty()) {
-		throw InvalidDataException("Encryption error", "data argument is empty", WHERE);
+		return QByteArray();
 	}
 	if (keyData.isEmpty()) {
-		throw InvalidDataException("Encryption error", "keyData argument is empty", WHERE);
+		return QByteArray();
 	}
 	if (!avaliableCipherTypes.contains(cipherID)) {
-		throw InvalidDataException("Encryption error",
-								   "cipher id is not valid (" + QString::number(cipherID) + ")",
-								   WHERE);
+		return QByteArray();
 	}
 
 	QCA::Initializer init;
@@ -61,8 +58,7 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 	QString fullCipherType = QString(cipherType + "-cbc-pkcs7");
 
 	if (!QCA::isSupported(fullCipherType.toStdString().c_str())) {
-		throw QCANotSupportedException("Encryption algorithm " + cipherType + " is not supported.",
-									   "", WHERE);
+		return QByteArray();
 	}
 
 	QCA::SymmetricKey key(keyData);
@@ -80,12 +76,12 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 	if (direction == QCA::Encode) {
 		QCA::SecureArray u = cipher.update(arg);
 		if (!cipher.ok()) {
-			throw QCAException("Encryption error", "cipher.ok() returned false", WHERE);
+			return QByteArray();
 		}
 
 		QCA::SecureArray f = cipher.final();
 		if (!cipher.ok()) {
-			throw QCAException("Encryption error", "cipher.ok() returned false", WHERE);
+			return QByteArray();
 		}
 
 		u.append(f);
@@ -93,7 +89,7 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 	} else {
 		QCA::SecureArray f = cipher.process(data);
 		if (!cipher.ok()) {
-			throw QCAException("Encryption error", "cipher.ok() returned false", WHERE);
+			return QByteArray();
 		}
 		resultArray = QByteArray(f.data(), f.size());
 	}
@@ -128,8 +124,7 @@ QByteArray Cipherer::GetHash(const QByteArray& str, quint8 hashID) {
 
 	QCA::Initializer init;
 	if (!QCA::isSupported(hashType.toStdString().c_str())) {
-		throw QCANotSupportedException("Hash type " + hashType + " is not supported.",
-									   "", WHERE);
+		return QByteArray();
 	}
 
 	QCA::Hash shaHash(hashType);
@@ -156,8 +151,7 @@ QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
 
 	QCA::Initializer init;
 	if (!QCA::isSupported(hashType.toStdString().c_str())) {
-		throw QCANotSupportedException("Hash type " + hashType + " is not supported.",
-									   "", WHERE);
+		return QByteArray();
 	}
 
 	QCA::SymmetricKey key(data);
@@ -173,5 +167,5 @@ QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
 }
 
 bool Cipherer::IsSecureHashSupported(quint8 i) {
-	return (i == 0);
+	return (i == 0); // FIXME
 }

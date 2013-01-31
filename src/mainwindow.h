@@ -34,6 +34,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QMenuBar>
 #include <QSplitter>
 #include <QSystemTrayIcon>
+#include <QSemaphore>
+#include <QProgressBar>
 
 namespace qNotesManager {
 	class NavigationPanelWidget;
@@ -54,7 +56,11 @@ namespace qNotesManager {
 		QSplitter* mainSplitter;
 
 		QToolBar* toolbar;
+
 		QStatusBar* statusBar;
+		QLabel* statusBarActionLabel;
+		QProgressBar* statusBarProgress;
+
 		QMenuBar* menuBar;
 
 		QSystemTrayIcon* trayIcon;
@@ -102,6 +108,8 @@ namespace qNotesManager {
 		void createActions();
 		void createControls();
 		void updateWindowTitle();
+
+		Document* tempDocument;
 
 	public:
 		explicit MainWindow();
@@ -157,6 +165,21 @@ namespace qNotesManager {
 
 		void sl_QApplication_AboutToQuit();
 
+		// Document event handlers
+		void sl_Document_LoadingStarted();
+		void sl_Document_LoadingProgress(int);
+		void sl_Document_LoadingPartiallyFinished();
+		void sl_Document_LoadingFinished();
+		void sl_Document_LoadingFailed(QString errorString);
+		void sl_Document_LoadingAborted();
+		void sl_Document_SavingStarted();
+		void sl_Document_SavingProgress(int);
+		void sl_Document_SavingFinished();
+		void sl_Document_SavingFailed(QString errorString);
+		void sl_Document_SavingAborted();
+		void sl_Document_PasswordRequired(QSemaphore*, QString*);
+		void sl_Document_ConfirmationRequest(QSemaphore*, QString, bool*);
+		void sl_Document_Message(QString);
 	};
 }
 

@@ -121,7 +121,8 @@ HEADERS += src/tag.h \
     src/cachedimagefile.h \
     src/imageloader.h \
     src/localimageloader.h \
-    src/httpimagedownloader.h
+    src/httpimagedownloader.h \
+    src/documentworker.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -180,5 +181,6 @@ SOURCES += src/tagownerscollection.cpp \
     src/cachedimagefile.cpp \
     src/localimageloader.cpp \
     src/imageloader.cpp \
-    src/httpimagedownloader.cpp
+    src/httpimagedownloader.cpp \
+    src/documentworker.cpp
 RESOURCES += icons.qrc

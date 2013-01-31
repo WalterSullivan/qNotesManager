@@ -25,9 +25,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QSet>
 #include <QStandardItemModel>
 #include <QDateTime>
+#include <QSemaphore>
 
 #include "documentvisualsettings.h"
-#include "exception.h"
 
 /*
   Document class represents a document that contains all notes, folder, tags and can be saved to
@@ -47,13 +47,16 @@ namespace qNotesManager {
 
 	class Document : public QObject {
 	Q_OBJECT
-	private:
-		bool isChanged;	// Is document changed since last save
-		void onChange();	// Event, called when document data changed
+	friend class DocumentWorker;
 
-		Folder*		rootFolder;	// Root folder. System folder, cannot be deleted.
-		Folder*		tempFolder;	// Folder for temporary notes. System, cannot be deleted.
-		Folder*		trashFolder;	// Trash folder for deleted items.
+	private:
+		bool hasUnsavedData;
+		bool isModified;
+		void onChange();
+
+		Folder*		rootFolder;
+		Folder*		tempFolder;
+		Folder*		trashFolder;
 
 		QList<Tag*>		allTags;
 		QList<Note*>	allNotes;
@@ -96,10 +99,10 @@ namespace qNotesManager {
 
 		DocumentVisualSettings VisualSettings;
 
-		bool IsChanged() const;	// Returns if document was changed
+		bool HasUnsavedData() const;	// Returns if document was changed
 
-		static Document* Open(QString fileName);// Static method opens file and returns new document from file content
-		void Save(QString name = QString(), quint16 version = 0); // Saves document data
+		void Open(QString fileName);
+		void Save(QString name = QString(), quint16 version = 0);
 
 		QString GetFilename() const;
 
@@ -153,8 +156,25 @@ namespace qNotesManager {
 		void sg_ItemUnregistered(Note*);
 		void sg_ItemUnregistered(Tag*);
 
-		void sg_SavingProgress(int);
+
+		// Worker signals
+		void sg_LoadingStarted();
 		void sg_LoadingProgress(int);
+		void sg_LoadingPartiallyFinished();
+		void sg_LoadingFinished();
+		void sg_LoadingFailed(QString errorString);
+		void sg_LoadingAborted();
+
+		void sg_SavingStarted();
+		void sg_SavingProgress(int);
+		void sg_SavingFinished();
+		void sg_SavingFailed(QString errorString);
+		void sg_SavingAborted();
+
+		void sg_PasswordRequired(QSemaphore*, QString*);
+		void sg_ConfirmationRequest(QSemaphore*, QString, bool*);
+		void sg_Message(QString);
+
 
 	private slots:
 		void sl_Folder_ItemAdded(AbstractFolderItem* const, int);
@@ -164,18 +184,8 @@ namespace qNotesManager {
 		void sl_Note_TagAdded(Tag*);
 		void sl_Note_TagRemoved(Tag*);
 
-	};
+		void sl_returnSelfToMainThread();
 
-	class WrongFileException : public Exception {
-	public:
-		WrongFileException(QString message, QString description, QString position) :
-				Exception(message, description, position) {}
-	};
-
-	class WrongFileVersionException : public Exception {
-	public:
-		WrongFileVersionException(QString message, QString description, QString position) :
-				Exception(message, description, position) {}
 	};
 }
 

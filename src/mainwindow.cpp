@@ -30,8 +30,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "aboutprogramwidget.h"
 #include "applicationsettingswidget.h"
 #include "cipherer.h"
-#include "operationabortedexception.h"
-#include "ioexception.h"
 #include "global.h"
 
 #include <QDebug>
@@ -44,6 +42,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QClipboard>
 #include <QTimer>
+#include <QInputDialog>
 
 using namespace qNotesManager;
 
@@ -210,6 +209,15 @@ void MainWindow::createControls() {
 	// Create statusbar
 	statusBar = new QStatusBar();
 	setStatusBar(statusBar);
+	statusBarActionLabel = new QLabel();
+	statusBar->addWidget(statusBarActionLabel, 3);
+
+	statusBarProgress = new QProgressBar();
+	statusBarProgress->setTextVisible(false);
+	statusBarProgress->setMinimum(0);
+	statusBarProgress->setMaximum(0);
+	statusBar->addWidget(statusBarProgress, 1);
+	statusBarProgress->setVisible(false);
 
 
 	// Create menubar
@@ -372,39 +380,25 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 }
 
 void MainWindow::OpenDocument(QString fileName) {
-	Document* newDoc = 0;
-	try {
-		newDoc = Document::Open(fileName);
-	} catch (const QCAException& e) {
-		QMessageBox::warning(this, QString(),
-							 "Encryption error. Make sure all required dlls are present.");
-		return;
-	} catch (const WrongFileException& e) {
-		QMessageBox::information(this, QString(),
-			QString().append("This file doesn't seem to be ").append(APPNAME).append(" save file"));
-		return;
-	} catch (const WrongFileVersionException& e) {
-		QMessageBox::information(this, QString(), "This file was created in older version of the "
-								 "program and can't be loaded");
-		return;
-	} catch (const OperationAbortedException& e) {
-		return;
-	} catch (const IOException& e) {
-		QMessageBox::warning(this, QString(), "Ploblem loading file");
-		return;
-	}
+	tempDocument = new Document();
 
-	if (newDoc == 0) {
-		QMessageBox::critical(this, "", "Error loading document");
-		return;
-	}
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingAborted()), this, SLOT(sl_Document_LoadingAborted()));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingFailed(QString)), this, SLOT(sl_Document_LoadingFailed(QString)));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingFinished()), this, SLOT(sl_Document_LoadingFinished()));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingPartiallyFinished()), this, SLOT(sl_Document_LoadingPartiallyFinished()));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingProgress(int)), this, SLOT(sl_Document_LoadingProgress(int)));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingStarted()), this, SLOT(sl_Document_LoadingStarted()));
+	QObject::connect(tempDocument, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this, SLOT(sl_Document_ConfirmationRequest(QSemaphore*,QString,bool*)));
+	QObject::connect(tempDocument, SIGNAL(sg_Message(QString)), this, SLOT(sl_Document_Message(QString)));
+	QObject::connect(tempDocument, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)), this, SLOT(sl_Document_PasswordRequired(QSemaphore*,QString*)));
 
-	Application::I()->SetCurrentDocument(newDoc);
+
+	tempDocument->Open(fileName);
 }
 
 void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
+	if (!doc) {
 		WARNING("No current document set");
 		return;
 	}
@@ -415,28 +409,12 @@ void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 	if (doc->GetFilename().isEmpty()) {
 		filename = QFileDialog::getSaveFileName(this, "Select a name");
 		if (filename.isNull() || filename.isEmpty()) {
-			if (actionCancelled != 0) {*actionCancelled = true;}
+			if (actionCancelled) {*actionCancelled = true;}
 			return;
 		}
-
 	}
 
-	try {
-		doc->Save(filename);
-	} catch (const QCAException& e) {
-		QMessageBox::warning(this, QString(), "Encryption error. Make sure all required dlls are present.");
-		return;
-	} catch (const IOException& e) {
-		QMessageBox::warning(this, QString(), "Ploblem loading file");
-		return;
-	} catch (Exception& e) {
-		QMessageBox::warning(this, QString(), "Ploblem loading file");
-		return;
-	}
-
-
-	setWindowModified(false);
-	updateWindowTitle();
+	doc->Save(filename);
 }
 
 void MainWindow::sl_SaveDocumentAsAction_Triggered() {
@@ -450,21 +428,8 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 	QString filename = QFileDialog::getSaveFileName(this, "Select a name");
 	if (filename.isNull()) {return;}
 
-	try {
-		doc->Save(filename);
-	} catch (const QCAException& e) {
-		QMessageBox::warning(this, QString(), "Encryption error. Make sure all required dlls are present.");
-		return;
-	} catch (const IOException& e) {
-		QMessageBox::warning(this, QString(), "Ploblem loading file");
-		return;
-	} catch (Exception& e) {
-		QMessageBox::warning(this, QString(), "Ploblem loading file");
-		return;
-	}
 
-	setWindowModified(false);
-	updateWindowTitle();
+	doc->Save(filename);
 }
 
 void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled) {
@@ -474,20 +439,20 @@ void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled) {
 		return;
 	}
 
-	if (oldDoc->IsChanged()) {
+	if (oldDoc->HasUnsavedData()) {
 		QMessageBox::StandardButton result = QMessageBox::question(this, "Save document?",
 											"Current document has been changed. Save it?",
 											QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
 											QMessageBox::Yes);
 		if (result == QMessageBox::Cancel) {
-			if (actionCancelled != 0) {*actionCancelled = true;}
+			if (actionCancelled) {*actionCancelled = true;}
 			return;
 		}
 		if (result == QMessageBox::Yes) {
 			bool saveCancelled = false;
 			sl_SaveDocumentAction_Triggered(&saveCancelled);
 			if (saveCancelled) {
-				if (actionCancelled != 0) {*actionCancelled = saveCancelled;}
+				if (actionCancelled) {*actionCancelled = saveCancelled;}
 				return;
 			}
 		}
@@ -579,7 +544,7 @@ void MainWindow::sl_AboutQtAction_Triggered() {
 }
 
 void MainWindow::sl_CurrentDocument_Changed() {
-	setWindowModified(Application::I()->CurrentDocument()->IsChanged());
+	setWindowModified(Application::I()->CurrentDocument()->HasUnsavedData());
 }
 
 void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
@@ -590,7 +555,7 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	Document* doc = Application::I()->CurrentDocument();
 	engine->SetTargetDocument(doc);
 	navigationPanel->SetTargetDocument(doc);
-	if (doc == 0) {
+	if (!doc) {
 		if (menuBar->actions().contains(editMenu->menuAction())) {
 			menuBar->removeAction(editMenu->menuAction());
 		}
@@ -599,6 +564,17 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 						 this, SLOT(sl_CurrentDocument_Changed()));
 		QObject::connect(doc, SIGNAL(sg_ItemUnregistered(Note*)),
 						 this, SLOT(sl_Application_NoteDeleted(Note*)));
+
+		QObject::connect(doc, SIGNAL(sg_SavingAborted()),
+						 this, SLOT(sl_Document_SavingAborted()));
+		QObject::connect(doc, SIGNAL(sg_SavingFailed(QString)),
+						 this, SLOT(sl_Document_SavingFailed(QString)));
+		QObject::connect(doc, SIGNAL(sg_SavingFinished()),
+						 this, SLOT(sl_Document_SavingFinished()));
+		QObject::connect(doc, SIGNAL(sg_SavingProgress(int)),
+						 this, SLOT(sl_Document_SavingFinished()));
+		QObject::connect(doc, SIGNAL(sg_SavingStarted()),
+						 this, SLOT(sl_Document_SavingStarted()));
 
 		Application::I()->Settings.LastDocumentName = doc->GetFilename();
 
@@ -628,7 +604,7 @@ void MainWindow::updateWindowTitle() {
 		QString title;
 		title = doc->GetFilename().isEmpty() ? "<unsaved>" : doc->GetFilename();
 		title.append("[*] - ").append(APPNAME);
-		setWindowModified(doc->IsChanged());
+		setWindowModified(doc->HasUnsavedData());
 		setWindowTitle(title);
 	}
 }
@@ -781,4 +757,128 @@ void MainWindow::sl_QApplication_AboutToQuit() {
 	Application::I()->Settings.windowState = windowState();
 
 	Application::I()->Settings.Save();
+}
+
+void MainWindow::sl_Document_LoadingStarted() {
+	statusBarActionLabel->setText("Loading document...");
+	statusBarProgress->setVisible(true);
+	statusBarProgress->setValue(0);
+
+	mainSplitter->setEnabled(false);
+	toolbar->setEnabled(false);
+	menuBar->setEnabled(false);
+}
+
+void MainWindow::sl_Document_LoadingProgress(int progress) {
+	//qDebug() << "MW: Progress:" << progress;
+	statusBarProgress->setValue(progress);
+}
+
+void MainWindow::sl_Document_LoadingPartiallyFinished() {
+
+}
+
+void MainWindow::sl_Document_LoadingFinished() {
+	statusBarActionLabel->setText("");
+	statusBarProgress->reset();
+	statusBarProgress->setVisible(false);
+	Application::I()->SetCurrentDocument(tempDocument);
+	tempDocument = 0;
+
+	mainSplitter->setEnabled(true);
+	toolbar->setEnabled(true);
+	menuBar->setEnabled(true);
+}
+
+void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p) {
+	bool ok = false;
+
+	QString password;
+
+	while (password.isEmpty()) {
+		password = QInputDialog::getText(0, "Enter password",
+										 "This document is protected. Enter password",
+										 QLineEdit::Password, "", &ok);
+		if (!ok) {
+			break;
+		}
+	}
+
+	*p = password;
+	s->release();
+}
+
+void MainWindow::sl_Document_ConfirmationRequest(QSemaphore* s, QString str, bool* abort) {
+	QMessageBox::StandardButton result =
+				QMessageBox::question(0, "Warning", str, QMessageBox::Yes | QMessageBox::No);
+
+	if (result == QMessageBox::No) {
+		*abort = true;
+	}
+	s->release();
+}
+
+void MainWindow::sl_Document_Message(QString str) {
+	QMessageBox::information(0, "", str);
+}
+
+void MainWindow::sl_Document_LoadingFailed(QString errorString) {
+	QMessageBox::critical(0, "", errorString);
+
+	sl_Document_LoadingAborted();
+}
+
+void MainWindow::sl_Document_LoadingAborted() {
+	tempDocument->deleteLater();
+	tempDocument = 0;
+	statusBarActionLabel->setText("");
+	statusBarProgress->reset();
+	statusBarProgress->setVisible(false);
+
+	mainSplitter->setEnabled(true);
+	toolbar->setEnabled(true);
+	menuBar->setEnabled(true);
+}
+
+void MainWindow::sl_Document_SavingStarted() {
+	statusBarActionLabel->setText("Saving document...");
+	statusBarProgress->setVisible(true);
+	statusBarProgress->setValue(0);
+
+	mainSplitter->setEnabled(false);
+	toolbar->setEnabled(false);
+	menuBar->setEnabled(false);
+}
+
+void MainWindow::sl_Document_SavingProgress(int progress) {
+	statusBarProgress->setValue(progress);
+}
+
+void MainWindow::sl_Document_SavingFinished() {
+	statusBarActionLabel->setText("");
+	statusBarProgress->reset();
+	statusBarProgress->setVisible(false);
+
+	mainSplitter->setEnabled(true);
+	toolbar->setEnabled(true);
+	menuBar->setEnabled(true);
+
+	setWindowModified(false);
+	updateWindowTitle();
+}
+
+void MainWindow::sl_Document_SavingFailed(QString errorString) {
+	QMessageBox::critical(0, "", errorString);
+
+	sl_Document_SavingAborted();
+}
+
+void MainWindow::sl_Document_SavingAborted() {
+	statusBarActionLabel->setText("");
+	statusBarProgress->reset();
+	statusBarProgress->setVisible(false);
+
+	mainSplitter->setEnabled(true);
+	toolbar->setEnabled(true);
+	menuBar->setEnabled(true);
 }

@@ -22,18 +22,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "note.h"
 #include "tag.h"
 #include "application.h"
-#include "cipherer.h"
-#include "compressor.h"
-#include "invaliddataexception.h"
-#include "ioexception.h"
-#include "operationabortedexception.h"
 #include "hierarchymodel.h"
 #include "tagsmodel.h"
 #include "datesmodel.h"
-#include "boibuffer.h"
-#include "crc32.h"
-#include "global.h"
 #include "cachedimagefile.h"
+#include "documentworker.h"
+#include "global.h"
+#include "compressor.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -42,12 +37,15 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QStack>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QThread>
+#include <QCoreApplication>
 
 
 using namespace qNotesManager;
 
 Document::Document() : QObject(0) {
 	rootFolder = new Folder("_root_", Folder::SystemFolder);
+	rootFolder->setParent(this);
 	QObject::connect(rootFolder, SIGNAL(sg_ItemAdded(AbstractFolderItem*const, int)),
 					 this, SLOT(sl_Folder_ItemAdded(AbstractFolderItem* const, int)));
 	QObject::connect(rootFolder, SIGNAL(sg_ItemRemoved(AbstractFolderItem*const)),
@@ -55,6 +53,7 @@ Document::Document() : QObject(0) {
 	QObject::connect(rootFolder, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 
 	tempFolder = new Folder("Temporary", Folder::TempFolder);
+	tempFolder->setParent(this);
 	QObject::connect(tempFolder, SIGNAL(sg_ItemAdded(AbstractFolderItem*const, int)),
 					 this, SLOT(sl_Folder_ItemAdded(AbstractFolderItem* const, int)));
 	QObject::connect(tempFolder, SIGNAL(sg_ItemRemoved(AbstractFolderItem*const)),
@@ -62,6 +61,7 @@ Document::Document() : QObject(0) {
 	QObject::connect(tempFolder, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 
 	trashFolder = new Folder("Trash", Folder::TrashFolder);
+	trashFolder->setParent(this);
 	QObject::connect(trashFolder, SIGNAL(sg_ItemAdded(AbstractFolderItem*const, int)),
 					 this, SLOT(sl_Folder_ItemAdded(AbstractFolderItem* const, int)));
 	QObject::connect(trashFolder, SIGNAL(sg_ItemRemoved(AbstractFolderItem*const)),
@@ -100,7 +100,8 @@ Document::Document() : QObject(0) {
 	password = QByteArray();
 	creationDate = QDateTime::currentDateTime();
 	modificationDate = QDateTime::currentDateTime();
-	isChanged = true;
+	hasUnsavedData = false;
+	isModified = false;
 
 
 	DefaultFolderIcon = Application::I()->DefaultFolderIcon;
@@ -114,6 +115,10 @@ Document::~Document() {
 
 	foreach (QString key, customIcons.keys()) {
 		delete customIcons[key];
+	}
+
+	foreach (Tag* t, allTags) {
+		delete t;
 	}
 }
 
@@ -143,710 +148,82 @@ Folder* Document::GetRoot() const {
 
 void Document::onChange() {
 	modificationDate = QDateTime::currentDateTime();
+	if (!isModified) {isModified = true;}
 
-	if (!isChanged) {
-		isChanged = true;
+	if (!hasUnsavedData) {
+		hasUnsavedData = true;
 		emit sg_Changed();
 	}
 }
 
-bool Document::IsChanged() const {
-	return isChanged;
+bool Document::HasUnsavedData() const {
+	return hasUnsavedData;
 }
 
-/*static*/
-Document* Document::Open(QString fileName) {
-	if (fileName.isEmpty()) {
-		throw InvalidDataException("Specify valid filename to load", "Filename argument is empty", WHERE);
-	}
-
-
-	QFile file(fileName);
-	if (!file.exists()) {
-		throw InvalidDataException("Specify valid filename to load", "Filename argument is empty", WHERE);
-	}
-
-
-	if (file.size() < 13) { // must me guaranteed program can read 9 bytes of signature and fileSize data
-		throw WrongFileException("", "File size is less than 13", WHERE);
-	}
-
-	if (!file.open(QIODevice::ReadOnly)) {
-		throw IOException("", "Cannot open file for reading", WHERE);
-	}
-
-	qint64 readResult = 0;
-
-	QByteArray fileDataArray(file.size(), 0x0);
-	readResult = file.read(fileDataArray.data(), fileDataArray.size());
-	file.close();
-
-	BOIBuffer buffer(&fileDataArray);
-	buffer.open(QIODevice::ReadOnly);
-
-	const char s[9] = {0x89, 0x51, 0x4E, 0x4D, 0x53, 0x0D, 0x0A, 0x1A, 0x0A};
-	const QByteArray standardFileSignature(s, 9);
-	QByteArray signature(9, 0x0);
-	readResult = buffer.read(signature.data(), 9);
-	if (signature != standardFileSignature) {
-		throw WrongFileException("", "File has incorrect signature", WHERE);
-	}
-
-	{ // Check CRC
-		quint64 currentpos = buffer.pos();
-		buffer.seek(fileDataArray.size() - 4);
-		quint32 crc = 0;
-		buffer.read(crc);
-
-		quint32 actualCrc = crc32buf(fileDataArray.constData(), fileDataArray.size() - 4);
-		if (crc != actualCrc) {
-			throw WrongFileException("", "File has incorrect checksum", WHERE);
-		}
-
-		buffer.seek(currentpos);
-	}
-	
-	quint16 r_fileVersion = 0;
-	buffer.read(r_fileVersion);
-
-	if ((r_fileVersion >> 8) > (currentFileVersion >> 8)) {
-		throw WrongFileVersionException("", "", WHERE);
-	}
-
-	if (((r_fileVersion >> 8) == (currentFileVersion >> 8)) &&
-		((r_fileVersion & 0x00ff) > (currentFileVersion & 0x00ff))) {
-		QMessageBox::StandardButton result =
-				QMessageBox::question(0, QString(),
-										 "File was created in newer version of program."
-										 "Some data will not be loaded. Continue?",
-										 QMessageBox::Yes | QMessageBox::No);
-		if (result == QMessageBox::No) {
-			throw OperationAbortedException("", "", WHERE);
-		}
-	}
-
-	quint8 r_compressionLevel = 0;
-	buffer.read(r_compressionLevel);
-
-	quint8 r_cipherID = 0;
-	buffer.read(r_cipherID);
-
-	if (r_cipherID != 0 && (!Cipherer().GetAvaliableCipherIDs().contains(r_cipherID))) {
-		throw WrongFileVersionException("", "Cipher is not supported", WHERE);
-	}
-
-	quint8 r_hashID = 0;
-	quint8 r_secureHashID = 0;
-
-	QByteArray r_cipherKey; // correct password
-	if (r_cipherID > 0) {
-		Cipherer c;
-
-		buffer.read(r_hashID);
-		if (!c.IsHashSupported(r_hashID)) {
-			throw WrongFileVersionException("", "Hash algorithm is not supported", WHERE);
-		}
-
-		buffer.read(r_secureHashID);
-		if (!c.IsSecureHashSupported(r_secureHashID)) {
-			throw WrongFileVersionException("", "Hash algorithm is not supported", WHERE);
-		}
-
-		quint32 passwordHashSize = 0;
-		buffer.read(passwordHashSize);
-
-		QByteArray passwordHash(passwordHashSize, 0x0);
-		buffer.read(passwordHash.data(), passwordHashSize);
-
-		bool cancel = false;
-
-		while (true) {
-			QString password = QInputDialog::getText(0, "Enter password",
-												 "This document is protected. Enter password",
-												 QLineEdit::Password, "", &cancel);
-			if (!cancel) {
-				throw OperationAbortedException("", "", WHERE);
-			}
-
-			if (!password.isEmpty()) {
-				QByteArray testPasswordHash = c.GetSecureHash(password.toAscii(), r_secureHashID);
-				if (passwordHash == testPasswordHash) {
-					r_cipherKey = password.toAscii();
-					break;
-				} else {
-					QMessageBox::warning(0, "Error", "Password is wrong");
-				}
-			}
-		}
-	}
-
-
-	quint32 dataBlockSize = 0;
-	buffer.read(dataBlockSize);
-
-	QByteArray dataArray(dataBlockSize, 0x0);
-	buffer.read(dataArray.data(), dataBlockSize);
-	buffer.close();
-
-	if (r_cipherID != 0) {
-		Cipherer c;
-		QByteArray decryptionKey = c.GetHash(r_cipherKey, r_hashID);
-		dataArray = c.Decrypt(dataArray, decryptionKey, r_cipherID);
-		if (dataArray.isNull()) {
-			throw QCAException("Encryption error", "Decrypted data is empty", WHERE);
-		}
-	}
-	if (r_compressionLevel != 0) {
-		Compressor c;
-		dataArray = c.Decompress(dataArray);
-	}
-
-	Document* doc = new Document();
-	doc->fileVersion = r_fileVersion;
-	doc->compressionLevel = r_compressionLevel;
-	doc->cipherID = r_cipherID;
-	doc->password = r_cipherKey;
-	doc->fileName = fileName;
-
-	BOIBuffer dataBuffer(&dataArray);
-	dataBuffer.open(QIODevice::ReadOnly);
-
-	// Read document properties block
-	{
-		quint32 documentBlockSize = 0;
-		dataBuffer.read(documentBlockSize);
-
-		const qint64 blockStart = dataBuffer.pos();
-
-		quint32 docCreationDate = 0;
-		dataBuffer.read(docCreationDate);
-		doc->creationDate = QDateTime::fromTime_t(docCreationDate);
-
-		quint32 docModificationDate = 0;
-		dataBuffer.read(docModificationDate);
-		doc->modificationDate = QDateTime::fromTime_t(docModificationDate);
-
-		quint32 defFolderIconSize = 0;
-		dataBuffer.read(defFolderIconSize);
-		QByteArray defFolderIcon(defFolderIconSize, 0x0);
-		dataBuffer.read(defFolderIcon.data(), defFolderIconSize);
-		doc->DefaultFolderIcon = defFolderIcon;
-
-		quint32 defNoteIconSize = 0;
-		dataBuffer.read(defNoteIconSize);
-		QByteArray defNoteIcon(defNoteIconSize, 0x0);
-		dataBuffer.read(defNoteIcon.data(), defNoteIconSize);
-		doc->DefaultNoteIcon = defNoteIcon;
-
-		const qint64 actualBlockSize = dataBuffer.pos() - blockStart;
-		if (documentBlockSize > actualBlockSize) {
-			dataBuffer.seek(dataBuffer.pos() + documentBlockSize - actualBlockSize);
-		}
-		
-	}
-	
-	// Read user icons
-	{
-		quint32 userIconsBlockSize = 0;
-		readResult = dataBuffer.read(userIconsBlockSize);
-		qint64 blockEnd = dataBuffer.pos() + userIconsBlockSize;
-
-		while(dataBuffer.pos() < blockEnd) {
-			quint32 nameArraySize = 0;
-			readResult = dataBuffer.read(nameArraySize);
-			QByteArray nameArray(nameArraySize, 0x0);
-			readResult = dataBuffer.read(nameArray.data(), nameArraySize);
-
-			QFileInfo iconInfo(nameArray);
-			quint32 imageDataSize = 0;
-			readResult = dataBuffer.read(imageDataSize);
-			QByteArray pixmapArray(imageDataSize, 0x0);
-			readResult = dataBuffer.read(pixmapArray.data(), imageDataSize);
-
-			CachedImageFile* image = new CachedImageFile(pixmapArray, nameArray, iconInfo.suffix());
-
-			doc->AddCustomIcon(image);
-		}
-	}
-
-	QHash<quint32, Tag*> tagsIDs;
-	// Reading tags
-	{
-		quint32 blockSize = 0;
-		readResult = dataBuffer.read(blockSize);
-		const qint64 blockEndByte = dataBuffer.pos() + blockSize;
-
-		while (dataBuffer.pos() < blockEndByte) {
-			quint32 tagID = 0;
-			readResult = dataBuffer.read(tagID);
-			Tag* tag = Tag::Deserialize(r_fileVersion, dataBuffer);
-
-			tagsIDs.insert(tagID, tag);
-		}
-	}
-
-	QHash<quint32, AbstractFolderItem*> folderItems;
-	// Read notes
-	{
-		quint32 blockSize = 0;
-		readResult = dataBuffer.read(blockSize);
-		const qint64 blockEndByte = dataBuffer.pos() + blockSize;
-
-		while (dataBuffer.pos() < blockEndByte) {
-			quint32 folderItemID = 0;
-			readResult = dataBuffer.read(folderItemID);
-			Note* note = Note::Deserialize(r_fileVersion, dataBuffer);
-
-			folderItems.insert(folderItemID, note);
-		}
-	}
-
-	// Read folders
-	{
-		quint32 blockSize = 0;
-		readResult = dataBuffer.read(blockSize);
-
-		const qint64 blockLastByte = dataBuffer.pos() + blockSize;
-
-		quint32 folderID = 0;
-
-		folderItems.insert(0, doc->rootFolder);
-		folderItems.insert(1, doc->tempFolder);
-		folderItems.insert(2, doc->trashFolder);
-
-		// Read user folders
-		while(dataBuffer.pos() < blockLastByte) {
-			readResult = dataBuffer.read(folderID);
-			Folder* folder = Folder::Deserialize(r_fileVersion, dataBuffer);
-			folderItems.insert(folderID, folder);
-		}
-	}
-
-	// Read hierarchy
-	{
-		quint32 blockSize = 0;
-		readResult = dataBuffer.read(blockSize);
-
-		qint64 blockLastByte = dataBuffer.pos() + blockSize;
-
-		while (dataBuffer.pos() < blockLastByte) {
-			quint32 folderID = 0;
-			readResult = dataBuffer.read(folderID);
-			if (!folderItems.contains(folderID)) {
-				WARNING("Could not find item by ID");
-				throw Exception("File is corrupted", "", WHERE);
-			}
-			Folder* parentFolder = dynamic_cast<Folder*>(folderItems.value(folderID));
-			if (!parentFolder) {
-				WARNING("Casting error");
-				parentFolder = doc->rootFolder;
-			}
-
-			quint32 childrenCount = 0;
-			readResult = dataBuffer.read(childrenCount);
-
-			while (childrenCount > 0) {
-				childrenCount--;
-				quint32 childID = 0;
-				readResult = dataBuffer.read(childID);
-				if (!folderItems.contains(childID)) {
-					WARNING("Could not find item by ID");
-					continue;
-				}
-				AbstractFolderItem* childItem = folderItems.value(childID);
-				parentFolder->Items.Add(childItem);
-			}
-		}
-	}
-
-	// Read tags ownership data
-	{
-		quint32 blockSize = 0;
-		readResult = dataBuffer.read(blockSize);
-
-		qint64 blockLastByte = dataBuffer.pos() + blockSize;
-
-		while (dataBuffer.pos() < blockLastByte) {
-			quint32 tagID = 0;
-			readResult = dataBuffer.read(tagID);
-			if (!tagsIDs.contains(tagID)) {
-				WARNING("Could not find item by ID");
-				throw Exception("File is corrupted", "", WHERE);
-			}
-			Tag* tag = tagsIDs.value(tagID);
-
-			quint32 ownersCount = 0;
-			readResult = dataBuffer.read(ownersCount);
-
-			while (ownersCount > 0) {
-				ownersCount--;
-				quint32 ownerID = 0;
-				readResult = dataBuffer.read(ownerID);
-				if (!folderItems.contains(ownerID)) {
-					WARNING("Could not find note by ID");
-					continue;
-				}
-				Note* note = dynamic_cast<Note*>(folderItems.value(ownerID));
-				if (!note) {
-					WARNING("Casting error");
-					continue;
-				}
-				note->Tags.Add(tag);
-			}
-		}
-	}
-
-	// Read visual settings
-	{
-		quint32 activeNavigationTab = 0;
-		dataBuffer.read(activeNavigationTab);
-		doc->VisualSettings.ActiveNavigationTab = activeNavigationTab;
-
-		quint32 activeNoteID = 0;
-		dataBuffer.read(activeNoteID);
-		if (folderItems.contains(activeNoteID)) {
-			doc->VisualSettings.ActiveNote = dynamic_cast<Note*>(folderItems.value(activeNoteID));
-		} else {
-			doc->VisualSettings.ActiveNote = 0;
-		}
-
-		quint32 openedNotesListSize = 0;
-		dataBuffer.read(openedNotesListSize);
-
-		for (quint32 i = 0; i < openedNotesListSize; i++) {
-			quint32 noteID = 0;
-			quint32 position = 0;
-			dataBuffer.read(noteID);
-			dataBuffer.read(position);
-
-			if (folderItems.contains(noteID)) {
-				Note* note = dynamic_cast<Note*>(folderItems.value(noteID));
-				doc->VisualSettings.OpenedNotes.append(QPair<Note*, int>(note, position));
-			}
-		}
-	}
-
-	dataBuffer.close();
-
-	doc->isChanged = false;
-	return doc;
+void Document::Open(QString fileName) {
+	DocumentWorker* w = new DocumentWorker();
+	QThread* t = new QThread();
+	w->moveToThread(t);
+	this->moveToThread(t);
+
+	QObject::connect(w, SIGNAL(sg_LoadingAborted()), this, SIGNAL(sg_LoadingAborted()));
+	QObject::connect(w, SIGNAL(sg_LoadingFailed(QString)), this, SIGNAL(sg_LoadingFailed(QString)));
+	QObject::connect(w, SIGNAL(sg_LoadingFinished()), this, SIGNAL(sg_LoadingFinished()));
+	QObject::connect(w, SIGNAL(sg_LoadingProgress(int)), this, SIGNAL(sg_LoadingProgress(int)));
+	QObject::connect(w, SIGNAL(sg_LoadingStarted()), this, SIGNAL(sg_LoadingStarted()));
+	QObject::connect(w, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)));
+	QObject::connect(w, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)), this, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)));
+	QObject::connect(w, SIGNAL(sg_Message(QString)), this, SIGNAL(sg_Message(QString)));
+
+	QObject::connect(t, SIGNAL(started()), w, SLOT(sl_start()));
+	QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(quit()));
+	QObject::connect(w, SIGNAL(sg_finished()), w, SLOT(deleteLater()));
+	QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(deleteLater()));
+	QObject::connect(w, SIGNAL(sg_finished()), this, SLOT(sl_returnSelfToMainThread()), Qt::DirectConnection);
+
+	w->Load(this, fileName);
+	t->start();
 }
 
 void Document::Save(QString name, quint16 version) {
-	if (version != 0) {
-		fileVersion = version;
+	if (name.isEmpty() && this->fileName.isEmpty()) {
+		WARNING("No filename specified");
+		return;
 	}
 
-	if (!name.isEmpty()) {
-		fileName = name;
-	}
+	DocumentWorker* w = new DocumentWorker();
+	QThread* t = new QThread();
+	w->moveToThread(t);
+	this->moveToThread(t);
 
-	if (fileName.isEmpty()) {
-		throw InvalidDataException("Specify valid filename to save", "Filename argument is empty", WHERE);
-	}
+	QObject::connect(w, SIGNAL(sg_SavingAborted()), this, SIGNAL(sg_SavingAborted()));
+	QObject::connect(w, SIGNAL(sg_SavingFailed(QString)), this, SIGNAL(sg_SavingFailed(QString)));
+	QObject::connect(w, SIGNAL(sg_SavingFinished()), this, SIGNAL(sg_SavingFinished()));
+	QObject::connect(w, SIGNAL(sg_SavingProgress(int)), this, SIGNAL(sg_SavingProgress(int)));
+	QObject::connect(w, SIGNAL(sg_SavingStarted()), this, SIGNAL(sg_SavingStarted()));
+	QObject::connect(w, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)));
+	QObject::connect(w, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)), this, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)));
+	QObject::connect(w, SIGNAL(sg_Message(QString)), this, SIGNAL(sg_Message(QString)));
 
+	QObject::connect(t, SIGNAL(started()), w, SLOT(sl_start()));
+	QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(quit()));
+	QObject::connect(w, SIGNAL(sg_finished()), w, SLOT(deleteLater()));
+	QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(deleteLater()));
+	QObject::connect(w, SIGNAL(sg_finished()), this, SLOT(sl_returnSelfToMainThread()), Qt::DirectConnection);
 
-	QByteArray fileDataArray;
+	quint16 newVersion = version > 0 ? version : this->fileVersion;
+	QString newName = name.isEmpty() ? this->fileName : name;
 
-	BOIBuffer fileDataBuffer(&fileDataArray);
-	fileDataBuffer.open(QIODevice::WriteOnly);
-
-	qint64 writeResult = 0;
-
-	const char fileSignature[9] = {0x89, 0x51, 0x4E, 0x4D,
-							   0x53, 0x0D, 0x0A, 0x1A, 0x0A};
-
-	writeResult = fileDataBuffer.write(fileSignature, 9);
-
-	writeResult = fileDataBuffer.write(fileVersion);
-	writeResult = fileDataBuffer.write(compressionLevel);
-	writeResult = fileDataBuffer.write(cipherID);
-
-
-	QByteArray encryptionKey;
-	if (cipherID > 0) {
-		Cipherer c;
-
-		quint8 r_hashID = c.DefaultHashID;
-		fileDataBuffer.write(r_hashID);
-
-		quint8 r_secureHashID = c.DefaultSecureHashID;
-		fileDataBuffer.write(r_secureHashID);
+	w->Save(this, newName, newVersion);
+	t->start();
 
 
-		encryptionKey = c.GetHash(password, r_hashID);
-
-		const QByteArray passwordHash = c.GetSecureHash(password, r_secureHashID);
-
-		const quint32 passwordHashSize = passwordHash.size();
-		writeResult = fileDataBuffer.write(passwordHashSize);
-		writeResult = fileDataBuffer.write(passwordHash.constData(), passwordHashSize);
-	}
-
-	quint32 dataBlockSize = 0;
-	const qint64 dataBlockSizePosition = fileDataBuffer.pos();
-	writeResult = fileDataBuffer.write(dataBlockSize);
-
-	QByteArray dataArray;
-	BOIBuffer dataBuffer(&dataArray);
-	dataBuffer.open(QIODevice::WriteOnly);
-
-	// Write document data block
-	{
-		quint32 dtBlockSize = 0;
-		const qint64 dtBlockSizePosition = dataBuffer.pos();
-		dataBuffer.write(dtBlockSize);
-		const quint32 docCreationDate = creationDate.toTime_t();
-		const quint32 docModificationDate = modificationDate.toTime_t();
-		dataBuffer.write(docCreationDate);
-		dataBuffer.write(docModificationDate);
-
-		const QByteArray defFolderIcon = DefaultFolderIcon.toAscii();
-		const quint32 defFolderIconLength = defFolderIcon.length();
-		dataBuffer.write(defFolderIconLength);
-		dataBuffer.write(defFolderIcon.constData(), defFolderIconLength);
-
-		const QByteArray defNoteIcon = DefaultNoteIcon.toAscii();
-		const quint32 defNoteIconLength = defNoteIcon.length();
-		dataBuffer.write(defNoteIconLength);
-		dataBuffer.write(defNoteIcon.constData(), defNoteIconLength);
-
-		dtBlockSize =	sizeof(docCreationDate) +
-						sizeof(docModificationDate) +
-						sizeof (defFolderIconLength) +
-						defFolderIconLength +
-						sizeof (defNoteIconLength) +
-						defNoteIconLength;
-
-		const qint64 currentPos = dataBuffer.pos();
-		dataBuffer.seek(dtBlockSizePosition);
-		dataBuffer.write(dtBlockSize);
-		dataBuffer.seek(currentPos);
-	}
-
-	// Write user icons
-	{
-		quint32 iconsBlockSize = 0;
-		const qint64 iconsBlockSizePosition = dataBuffer.pos();
-		dataBuffer.write(iconsBlockSize);
-
-		qint64 blockStart = dataBuffer.pos();
-
-		foreach(QString name, customIcons.keys()) {
-			CachedImageFile* image = customIcons.value(name);
-
-			const QByteArray nameArray = image->FileName.toUtf8();
-			const quint32 nameArraySize = nameArray.size();
-			dataBuffer.write(nameArraySize);
-			dataBuffer.write(nameArray.constData(), nameArraySize);
-
-			const quint32 imageDataSize = image->Data.size();
-			dataBuffer.write(imageDataSize);
-			dataBuffer.write(image->Data.constData(), imageDataSize);
-		}
-
-		const qint64 lastPos = dataBuffer.pos();
-		iconsBlockSize = lastPos - blockStart;
-		dataBuffer.seek(iconsBlockSizePosition);
-		dataBuffer.write(iconsBlockSize);
-		dataBuffer.seek(lastPos);
-	}
-
-	// Write tags
-	QHash<const Tag*, quint32> tagsIDs;
-	{
-		quint32 blockSize = 0;
-		const qint64 blockSizePosition = dataBuffer.pos();
-		dataBuffer.write(blockSize);
-
-		const qint64 blockStartPosition = dataBuffer.pos();
-		quint32 tagID = 1;
-		for (int i = 0; i < allTags.size(); ++i) {
-			const Tag* tag = allTags.value(i);
-			dataBuffer.write(tagID);
-			tagsIDs.insert(tag, tagID);
-			tagID++;
-			tag->Serialize(version, dataBuffer);
-		}
-		const qint64 blockEndPosition = dataBuffer.pos();
-		blockSize = blockEndPosition - blockStartPosition;
-		dataBuffer.seek(blockSizePosition);
-		dataBuffer.write(blockSize);
-		dataBuffer.seek(blockEndPosition);
-	}
-
-	// Write notes
-	quint32 folderOrNoteID = 10; // Reserve 0-9 for system folders and for future use
-	QHash<const AbstractFolderItem*, quint32> folderItemsIDs;
-	{
-		quint32 blockSize = 0;
-		const qint64 blockSizePosition = dataBuffer.pos();
-		dataBuffer.write(blockSize);
-		const qint64 blockStartPosition = dataBuffer.pos();
-		for (int i = 0; i < allNotes.size(); ++i) {
-			const Note* note = allNotes.value(i);
-			dataBuffer.write(folderOrNoteID);
-			folderItemsIDs.insert(note, folderOrNoteID);
-			folderOrNoteID++;
-			note->Serialize(version, dataBuffer);
-		}
-		const qint64 blockEndPosition = dataBuffer.pos();
-		blockSize = blockEndPosition - blockStartPosition;
-		dataBuffer.seek(blockSizePosition);
-		dataBuffer.write(blockSize);
-		dataBuffer.seek(blockEndPosition);
-	}
-
-	// Write folders data
-	{
-		quint32 blockSize = 0;
-		const qint64 blockSizePosition = dataBuffer.pos();
-		dataBuffer.write((char*)&blockSize, sizeof(blockSize));
-		const qint64 blockStartPosition = dataBuffer.pos();
-
-		// Reserve 0-2 for system folders
-		folderItemsIDs.insert(rootFolder, 0);
-		folderItemsIDs.insert(tempFolder, 1);
-		folderItemsIDs.insert(trashFolder, 2);
-
-		// Write user folders
-		for (int i = 0; i < allFolders.size(); ++i) {
-			const Folder* f = allFolders.value(i);
-			dataBuffer.write(folderOrNoteID);
-			folderItemsIDs.insert(f, folderOrNoteID);
-			folderOrNoteID++;
-			f->Serialize(version, dataBuffer);
-		}
-
-		const qint64 blockEndPosition = dataBuffer.pos();
-		blockSize = blockEndPosition - blockStartPosition;
-		dataBuffer.seek(blockSizePosition);
-		dataBuffer.write(blockSize);
-		dataBuffer.seek(blockEndPosition);
-	}
-
-	// Write hierarchy
-	{
-		quint32 blockSize = 0;
-		const qint64 blockSizePosition = dataBuffer.pos();
-		dataBuffer.write(blockSize);
-		const qint64 blockStartPosition = dataBuffer.pos();
-
-		QStack<const Folder*> foldersStack;
-		foldersStack.push(rootFolder);
-		foldersStack.push(tempFolder);
-		foldersStack.push(trashFolder);
-
-		while (!foldersStack.isEmpty()) {
-			const Folder* folder = foldersStack.pop();
-			const quint32 folderID = folderItemsIDs.value(folder);
-			const quint32 childrenCount = (quint32)folder->Items.Count();
-			dataBuffer.write(folderID);
-			dataBuffer.write(childrenCount);
-			for (int i = 0; i < folder->Items.Count(); ++i) {
-				const AbstractFolderItem* child = folder->Items.ItemAt(i);
-				const quint32 childID = folderItemsIDs.value(child);
-				dataBuffer.write(childID);
-				if (child->GetItemType() == AbstractFolderItem::Type_Folder) {
-					const Folder* f = dynamic_cast<const Folder*>(child);
-					foldersStack.push(f);
-				}
-			}
-		}
-
-		const qint64 blockEndPosition = dataBuffer.pos();
-		blockSize = blockEndPosition - blockStartPosition;
-		dataBuffer.seek(blockSizePosition);
-		dataBuffer.write(blockSize);
-		dataBuffer.seek(blockEndPosition);
-	}
-
-	// Write tags ownership data
-	{
-		quint32 blockSize = 0;
-		const qint64 blockSizePosition = dataBuffer.pos();
-		dataBuffer.write(blockSize);
-		const qint64 blockStartPosition = dataBuffer.pos();
-		{
-			foreach (const Tag* tag, allTags) {
-				const quint32 tagID = tagsIDs.value(tag);
-				const quint32 ownersCount = tag->Owners.Count();
-				dataBuffer.write(tagID);
-				dataBuffer.write(ownersCount);
-				for (int i = 0; i < (int)ownersCount; ++i) {
-					const Note* note = tag->Owners.ItemAt(i);
-					const quint32 ownerID = folderItemsIDs.value(note);
-					dataBuffer.write(ownerID);
-				}
-			}
-		}
-		const qint64 blockEndPosition = dataBuffer.pos();
-		blockSize = blockEndPosition - blockStartPosition;
-		dataBuffer.seek(blockSizePosition);
-		dataBuffer.write(blockSize);
-		dataBuffer.seek(blockEndPosition);
-	}
-
-	// Write visual settings
-	{
-		quint32 activeNavigationTab = VisualSettings.ActiveNavigationTab;
-		dataBuffer.write(activeNavigationTab);
-		quint32 activeNoteID = folderItemsIDs.value(VisualSettings.ActiveNote);
-		dataBuffer.write(activeNoteID);
-		quint32 openedNotesListSize = VisualSettings.OpenedNotes.size();
-		dataBuffer.write(openedNotesListSize);
-		for (quint32 i = 0; i < openedNotesListSize; i++) {
-			quint32 noteID = folderItemsIDs.value(VisualSettings.OpenedNotes.at(i).first);
-			quint32 position = VisualSettings.OpenedNotes.at(i).second;
-			dataBuffer.write(noteID);
-			dataBuffer.write(position);
-		}
-	}
-
-
-	dataBuffer.close();
-
-	if (compressionLevel > 0) {
-		Compressor c;
-		dataArray = c.Compress(dataArray, compressionLevel);
-	}
-	if (cipherID > 0) {
-		Cipherer c;
-		dataArray = c.Encrypt(dataArray, encryptionKey, cipherID);
-	}
-
-	fileDataBuffer.write(dataArray);
-	quint64 lastPos = fileDataBuffer.pos();
-
-	// Write data block size
-	dataBlockSize = dataArray.size();
-	fileDataBuffer.seek(dataBlockSizePosition);
-	fileDataBuffer.write(dataBlockSize);
-
-	// Write file crc
-	quint32 crc = crc32buf(fileDataArray.constData(), fileDataArray.size());
-	fileDataBuffer.seek(lastPos);
-	fileDataBuffer.write(crc);
-
-	fileDataBuffer.close();
-
-
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly)) {
-		throw IOException("", "Cannot open file for writing", WHERE);
-	}
-
-	writeResult = file.write(fileDataArray.constData(), fileDataArray.size());
-	file.close();
-	if (writeResult != fileDataArray.size()) {
-		if (file.exists()) {
-			file.remove();
-		}
-		throw IOException("", "Cannot write to file", WHERE);
-	}
-
-	isChanged = false;
 	emit sg_Changed();
+}
+
+void Document::sl_returnSelfToMainThread() {
+	// Called from different thread after loading
+	this->moveToThread(QCoreApplication::instance()->thread());
 }
 
 void Document::sl_Folder_ItemAdded(AbstractFolderItem* const item, int) {
@@ -862,6 +239,8 @@ void Document::sl_Folder_ItemRemoved(AbstractFolderItem* const item) {
 void Document::RegisterItem(AbstractFolderItem* const item) {
 	if (item->GetItemType() == AbstractFolderItem::Type_Folder) {
 		Folder* f = dynamic_cast<Folder*>(item);
+
+		f->setParent(this); // QObject parentship
 
 		if (f->GetIconID().isEmpty()) {
 			f->SetIconID(DefaultFolderIcon);
@@ -883,6 +262,9 @@ void Document::RegisterItem(AbstractFolderItem* const item) {
 
 	} else if (item->GetItemType() == AbstractFolderItem::Type_Note) {
 		Note* n = dynamic_cast<Note*>(item);
+
+		n->setParent(this);  // QObject parentship
+
 		if (n->GetIconID().isEmpty()) {
 			n->SetIconID(DefaultNoteIcon);
 		}
@@ -922,6 +304,7 @@ void Document::UnregisterItem(AbstractFolderItem* const item) {
 
 void Document::RegisterTag(Tag* tag) {
 	allTags.append(tag);
+	tag->setParent(this);
 	tagsByName.insert(tag->GetName(), tag);
 	QStandardItem* i = new QStandardItem(QIcon(QPixmap("./tag")), tag->GetName());
 	tagsListModel->appendRow(i);
@@ -931,13 +314,14 @@ void Document::RegisterTag(Tag* tag) {
 
 void Document::UnregisterTag(Tag* tag) {
 	allTags.removeAll(tag);
+	tag->setParent(0);
 	tagsByName.remove(tag->GetName());
 	QList<QStandardItem*> itemsList = tagsListModel->findItems(tag->GetName(), Qt::MatchExactly, 0);
 	QStandardItem* item = tagsListModel->takeItem(itemsList.at(0)->row());
 	delete item;
 
 	emit sg_ItemUnregistered(tag);
-	delete tag; // ?
+	delete tag;
 }
 
 void Document::sl_Note_TagAdded(Tag* tag) {
