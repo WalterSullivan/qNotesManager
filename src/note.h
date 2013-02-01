@@ -26,6 +26,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QDateTime>
 #include <QIcon>
 #include <QReadWriteLock>
+#include <QTimer>
 
 
 namespace qNotesManager {
@@ -38,7 +39,7 @@ namespace qNotesManager {
 	Q_OBJECT
 	private:
 		QString					name;
-		QString					text;
+		QString					text;				// Note's plain text (for text search)
 		QDateTime				creationDate;
 		QDateTime				modificationDate;
 		QDateTime				textDate;
@@ -53,6 +54,8 @@ namespace qNotesManager {
 		bool					locked;
 		TextDocument* const		document;
 		mutable QReadWriteLock	lock;
+		QTimer textUpdateTimer;
+
 
 		void onChange();
 
@@ -125,6 +128,7 @@ namespace qNotesManager {
 	private slots:
 		void sl_DocumentChanged();
 		void sl_TagsCollectionModified(Tag*);
+		void sl_TextUpdateTimer_Timeout();
 
 	};
 }

@@ -47,6 +47,7 @@ Note::Note(QString _name) :
 		nameBackColor(defaultBackColor),
 		locked(false),
 		document(new TextDocument(this)),
+		textUpdateTimer(this),
 		Tags(this) {
 	QObject::connect(&Tags, SIGNAL(sg_ItemAboutToBeAdded(Tag*)),
 					 this, SIGNAL(sg_TagAboutToBeAdded(Tag*)));
@@ -65,7 +66,10 @@ Note::Note(QString _name) :
 
 	QObject::connect(document, SIGNAL(contentsChanged()), this, SLOT(sl_DocumentChanged()));
 
-
+	// textUpdateTimer updates cached text in 'text' variable after 2 secs since document've been edited
+	textUpdateTimer.setInterval(2000);
+	textUpdateTimer.setSingleShot(true);
+	QObject::connect(&textUpdateTimer, SIGNAL(timeout()), this, SLOT(sl_TextUpdateTimer_Timeout()));
 
 	if (name.isEmpty()) {name = "New note";}
 }
@@ -296,9 +300,7 @@ void Note::SetComment(QString c) {
 }
 
 void Note::sl_DocumentChanged() {
-	//lock.lockForWrite();
-	//text = document->toPlainText();
-	//lock.unlock();
+	textUpdateTimer.start();
 
 	onChange();
 }
@@ -518,6 +520,7 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 	note->document->blockSignals(true);
 	note->document->setHtml(r_textArray);
 	note->document->blockSignals(false);
+	note->text = note->document->toPlainText();
 
 	return note;
 }
@@ -537,3 +540,10 @@ void Note::sl_TagsCollectionModified(Tag*) {
 	emit sg_PropertyChanged();
 	onChange();
 }
+
+void Note::sl_TextUpdateTimer_Timeout() {
+	lock.lockForWrite();
+	text = document->toPlainText();
+	lock.unlock();
+}
+
