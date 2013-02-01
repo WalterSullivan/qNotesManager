@@ -818,6 +818,8 @@ void DocumentWorker::save_v1() {
 	}
 
 	doc->hasUnsavedData = false;
+	if (doc->fileName != filename) {doc->fileName = filename;}
+	if (doc->fileVersion != version) {doc->fileVersion = version;}
 	emit sg_SavingFinished();
 }
 
