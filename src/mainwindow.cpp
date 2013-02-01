@@ -358,7 +358,8 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 	QString fileName = QString();
 
 	while(fileName.isEmpty()) {
-		fileName = QFileDialog::getOpenFileName(this, "Select a file to load");
+		fileName = QFileDialog::getOpenFileName(this, "Select a file to load", QString(),
+												"qNotesManager save file (*.nms)");
 		if (fileName.isNull()) {return;}
 
 		QFile file(fileName);
@@ -407,7 +408,8 @@ void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 
 	QString filename = QString();
 	if (doc->GetFilename().isEmpty()) {
-		filename = QFileDialog::getSaveFileName(this, "Select a name");
+		filename = QFileDialog::getSaveFileName(this, "Select a name", QString(),
+												"qNotesManager save file (*.nms)");
 		if (filename.isNull() || filename.isEmpty()) {
 			if (actionCancelled) {*actionCancelled = true;}
 			return;
@@ -425,9 +427,9 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 	}
 
 	saveDocumentVisualSettings();
-	QString filename = QFileDialog::getSaveFileName(this, "Select a name");
+	QString filename = QFileDialog::getSaveFileName(this, "Select a name", QString(),
+		"qNotesManager save file (*.nms)");
 	if (filename.isNull()) {return;}
-
 
 	doc->Save(filename);
 }
