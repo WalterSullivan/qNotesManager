@@ -43,6 +43,9 @@ namespace qNotesManager {
 
 	public:
 		explicit SearchWidget(DocumentSearchEngine*, QWidget *parent = 0);
+	protected:
+		virtual void showEvent (QShowEvent* event);
+		virtual void keyPressEvent (QKeyEvent* event);
 
 	private slots:
 		void sl_SearchButton_Clicked();

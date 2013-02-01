@@ -23,6 +23,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QHBoxLayout>
 #include <QToolTip>
 #include <QDebug>
+#include <QKeyEvent>
+#include <QApplication>
+#include <QDesktopWidget>
 
 using namespace qNotesManager;
 
@@ -30,6 +33,10 @@ SearchWidget::SearchWidget(DocumentSearchEngine* eng, QWidget *parent) : QWidget
 	searchLabel = new QLabel("Search text:", this);
 
 	searchEdit = new QLineEdit(this);
+
+	useRegexp = new QCheckBox("Use regexp", this);
+	matchCase = new QCheckBox("Match case", this);
+	matchWholeWord = new QCheckBox("Match whole word", this);
 
 	searchButton = new QPushButton("Start", this);
 	QObject::connect(searchButton, SIGNAL(clicked()),
@@ -43,10 +50,6 @@ SearchWidget::SearchWidget(DocumentSearchEngine* eng, QWidget *parent) : QWidget
 	progressBar->setMinimum(0);
 	progressBar->setMaximum(100);
 	progressBar->setTextVisible(false);
-
-	useRegexp = new QCheckBox("Use regexp", this);
-	matchCase = new QCheckBox("Match case", this);
-	matchWholeWord = new QCheckBox("Match whole word", this);
 
 	QHBoxLayout* hl = new QHBoxLayout();
 	hl->addWidget(searchLabel);
@@ -79,6 +82,8 @@ SearchWidget::SearchWidget(DocumentSearchEngine* eng, QWidget *parent) : QWidget
 
 	setWindowTitle("Search");
 	setWindowIcon(QIcon(":/gui/magnifier"));
+	adjustSize();
+	move(QApplication::desktop()->screen()->rect().center() - this->rect().center());
 }
 
 void SearchWidget::sl_SearchButton_Clicked() {
@@ -125,4 +130,21 @@ void SearchWidget::sl_SearchError(QString error) {
 
 void SearchWidget::sl_CancelButton_Clicked() {
 	close();
+}
+
+void SearchWidget::showEvent (QShowEvent* event) {
+	QWidget::showEvent(event);
+
+	searchEdit->selectAll();
+	searchEdit->setFocus();
+}
+
+void SearchWidget::keyPressEvent (QKeyEvent* event) {
+	QWidget::keyPressEvent(event);
+
+	if (event->key() == Qt::Key_Escape) {
+		close();
+	} else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+		sl_SearchButton_Clicked();
+	}
 }
