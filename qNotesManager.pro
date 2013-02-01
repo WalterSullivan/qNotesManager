@@ -108,10 +108,6 @@ HEADERS += src/tag.h \
     src/aboutprogramwidget.h \
     src/applicationsettingswidget.h \
     src/documentvisualsettings.h \
-    src/exceptions/exception.h \
-    src/exceptions/invaliddataexception.h \
-    src/exceptions/ioexception.h \
-    src/exceptions/operationabortedexception.h \
     src/documentsearchengine.h \
     src/global.h \
     src/boibuffer.h \
