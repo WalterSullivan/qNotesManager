@@ -38,9 +38,6 @@ namespace qNotesManager {
 		QLabel* creationDateLabel;
 		QLabel* modificationDateCaptionLabel;
 		QLabel* modificationDateLabel;
-		QCheckBox* useCompressionCheckbox;
-		QLabel* compressionLevelLabel;
-		QComboBox* compressionLevel;
 		QGroupBox* encryptionGroupBox;
 		QCheckBox* useEncryptionCheckbox;
 		QLabel* passwordLabel;
@@ -58,7 +55,6 @@ namespace qNotesManager {
 		void SetDocument(Document* d);
 
 	private slots:
-		void sl_UseCompressionCB_StateChanged(int = 0);
 		void sl_UseEncryptionCB_StateChanged(int = 0);
 		void sl_OKButton_Clicked();
 		void sl_CancelButton_Clicked();

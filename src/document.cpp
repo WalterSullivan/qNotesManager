@@ -95,7 +95,7 @@ Document::Document() : QObject(0) {
 
 	fileName = QString();
 	fileVersion = currentFileVersion;
-	compressionLevel = 0;
+	compressionLevel = Compressor::MaximumLevel;
 	cipherID = 0;
 	password = QByteArray();
 	creationDate = QDateTime::currentDateTime();

@@ -35,19 +35,6 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 	creationDateLabel = new QLabel(this);
 	modificationDateCaptionLabel = new QLabel("Modification date:", this);
 	modificationDateLabel = new QLabel(this);
-	useCompressionCheckbox = new QCheckBox("Compress document file", this);
-	QObject::connect(useCompressionCheckbox, SIGNAL(stateChanged(int)),
-					 this, SLOT(sl_UseCompressionCB_StateChanged(int)));
-	compressionLevelLabel = new QLabel("Compression level:", this);
-	compressionLevelLabel->setEnabled(false);
-	compressionLevel = new QComboBox(this);
-	compressionLevel->setToolTip("Set compression level for document. "
-								 "The more level is the less file size will be.");
-	compressionLevel->setEnabled(false);
-
-	for (quint8 level = Compressor::MinimumLevel; level <= Compressor::MaximumLevel; level++) {
-		compressionLevel->addItem(QString::number(level), level);
-	}
 
 	encryptionGroupBox = new QGroupBox("Encryption", this);
 	encryptionGroupBox->setEnabled(false);
@@ -91,11 +78,8 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 	gridLayout->addWidget(creationDateLabel, 1, 1);
 	gridLayout->addWidget(modificationDateCaptionLabel, 2, 0);
 	gridLayout->addWidget(modificationDateLabel, 2, 1);
-	gridLayout->addWidget(useCompressionCheckbox, 3, 0);
-	gridLayout->addWidget(compressionLevelLabel, 3, 1);
-	gridLayout->addWidget(compressionLevel, 4, 1);
-	gridLayout->addWidget(useEncryptionCheckbox, 5, 0);
-	gridLayout->addWidget(encryptionGroupBox, 5, 1, 2, 1);
+	gridLayout->addWidget(useEncryptionCheckbox, 3, 0);
+	gridLayout->addWidget(encryptionGroupBox, 3, 1, 2, 1);
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout();
 	buttonsLayout->addStretch();
@@ -121,20 +105,6 @@ void DocumentPropertiesWidget::SetDocument(Document* d) {
 	filenameLabel->setText(fname);
 	creationDateLabel->setText(d->GetCreationDate().toString(Qt::SystemLocaleLongDate));
 	modificationDateLabel->setText(d->GetModificationDate().toString(Qt::SystemLocaleLongDate));
-	quint8 compLevel = d->GetCompressionLevel();
-	if (compLevel == 0) {
-		useCompressionCheckbox->setChecked(false);
-		compressionLevel->setCurrentIndex(-1);
-	} else {
-		useCompressionCheckbox->setChecked(true);
-		int index = compressionLevel->findData(compLevel, Qt::UserRole);
-		if (index == -1) {
-			WARNING("Situable index not found");
-			compressionLevel->setCurrentIndex(0);
-		} else {
-			compressionLevel->setCurrentIndex(index);
-		}
-	}
 
 	quint8 cipherID = d->GetCipherID();
 	if (cipherID == 0) {
@@ -157,13 +127,6 @@ void DocumentPropertiesWidget::SetDocument(Document* d) {
 	currentDocument = d;
 }
 
-void DocumentPropertiesWidget::sl_UseCompressionCB_StateChanged(int) {
-	bool enabled = useCompressionCheckbox->isChecked();
-	compressionLevel->setEnabled(enabled);
-	compressionLevelLabel->setEnabled(enabled);
-	if (compressionLevel->currentIndex() == -1) {compressionLevel->setCurrentIndex(0);}
-}
-
 void DocumentPropertiesWidget::sl_UseEncryptionCB_StateChanged(int) {
 	bool enabled = useEncryptionCheckbox->isChecked();
 	encryptionGroupBox->setEnabled(enabled);
@@ -171,14 +134,6 @@ void DocumentPropertiesWidget::sl_UseEncryptionCB_StateChanged(int) {
 }
 
 void DocumentPropertiesWidget::sl_OKButton_Clicked() {
-	if (useCompressionCheckbox->isChecked() &&
-		compressionLevel->currentIndex() == -1) {
-		compressionLevel->setFocus(Qt::OtherFocusReason);
-		compressionLevel->showPopup();
-		QToolTip::showText(compressionLevel->mapToGlobal(QPoint(0,0)),
-						   "Select compression level", compressionLevel);
-		return;
-	}
 	if (useEncryptionCheckbox->isChecked()) {
 		if (encryptionAlg->currentIndex() == -1) {
 			encryptionAlg->setFocus(Qt::OtherFocusReason);
@@ -193,15 +148,6 @@ void DocumentPropertiesWidget::sl_OKButton_Clicked() {
 							   "Enter password", passwordLineEdit);
 			return;
 		}
-	}
-
-	quint8 compLevel = 0;
-	if (useCompressionCheckbox->isChecked()) {
-		QVariant data = compressionLevel->itemData(compressionLevel->currentIndex(), Qt::UserRole);
-		compLevel = qVariantValue<quint8>(data);
-	}
-	if (currentDocument->GetCompressionLevel() != compLevel) {
-		currentDocument->SetCompressionLevel(compLevel);
 	}
 
 	quint8 cipherID = 0;
