@@ -22,6 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "global.h"
 
 #include <QBoxLayout>
+#include <QApplication>
 
 using namespace qNotesManager;
 
@@ -71,7 +72,14 @@ void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 		return;
 	}
 
+	bool showWaitCursor = !note->TextDocumentInitialized();
+	if (showWaitCursor) {
+		QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	}
 	NoteEditWidget* w = new NoteEditWidget(note);
+	if (showWaitCursor) {
+		QApplication::restoreOverrideCursor();
+	}
 	hash.insert(note, w);
 	QObject::connect(note, SIGNAL(sg_VisualPropertiesChanged()),
 					 this, SLOT(sl_Note_PropertiesChanged()));
