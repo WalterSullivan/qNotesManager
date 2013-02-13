@@ -33,7 +33,7 @@ using namespace qNotesManager;
 Note::Note(QString _name) :
 		AbstractFolderItem(AbstractFolderItem::Type_Note),
 		name(_name),
-		text(QString("")),
+		text(QString()),
 		creationDate(QDateTime::currentDateTime()),
 		modificationDate(QDateTime::currentDateTime()),
 		textDate(QDateTime()),
@@ -48,6 +48,8 @@ Note::Note(QString _name) :
 		locked(false),
 		document(new TextDocument(this)),
 		textUpdateTimer(this),
+		cachedHtml(QString()),
+		textDocumentInitialized(true),
 		Tags(this) {
 	QObject::connect(&Tags, SIGNAL(sg_ItemAboutToBeAdded(Tag*)),
 					 this, SIGNAL(sg_TagAboutToBeAdded(Tag*)));
@@ -64,14 +66,14 @@ Note::Note(QString _name) :
 					 this, SLOT(sl_TagsCollectionModified(Tag*)));
 
 
-	QObject::connect(document, SIGNAL(contentsChanged()), this, SLOT(sl_DocumentChanged()));
-
-	// textUpdateTimer updates cached text in 'text' variable after 2 secs since document've been edited
+	// textUpdateTimer updates cached text in 'text' variable in 2 after document've been edited
 	textUpdateTimer.setInterval(2000);
 	textUpdateTimer.setSingleShot(true);
 	QObject::connect(&textUpdateTimer, SIGNAL(timeout()), this, SLOT(sl_TextUpdateTimer_Timeout()));
 
 	if (name.isEmpty()) {name = "New note";}
+
+	QObject::connect(document, SIGNAL(contentsChanged()), this, SLOT(sl_DocumentChanged()));
 }
 
 Note::~Note() {
@@ -133,7 +135,12 @@ QString Note::GetIconID() const {
 }
 
 QString Note::GetText() const {
+	if (!cachedHtml.isNull()) {
+		initTextDocument();
+	}
+
 	QReadLocker locker(&lock);
+
 	return text;
 }
 
@@ -142,17 +149,15 @@ void Note::SetText(QString t) {
 		return;
 	}
 
-	document->setPlainText(t);
+	GetTextDocument()->setPlainText(t);
 
 	emit sg_TextChanged();
-	onChange();
 }
 
 void Note::SetHtml(QString t) {
-	document->setHtml(t);
+	GetTextDocument()->setHtml(t);
 
 	emit sg_TextChanged();
-	onChange();
 }
 
 QColor Note::GetNameForeColor() const {
@@ -305,17 +310,24 @@ void Note::sl_DocumentChanged() {
 	onChange();
 }
 
-TextDocument* Note::GetTextDocument() const {
+TextDocument* Note::GetTextDocument() {
+	if (!cachedHtml.isNull()) {
+		initTextDocument();
+	}
+
 	return document;
 }
 
-// NOT thread-safe
+bool Note::TextDocumentInitialized() const {
+	return textDocumentInitialized;
+}
+
 void Note::Serialize(const int version, BOIBuffer& stream) const {
 	(void)version;
 
 	const QByteArray w_captionArray = name.toUtf8();
 	const quint32 w_captionSize = w_captionArray.size();
-	const QByteArray w_textArray = document->toHtml().toUtf8();
+	const QByteArray w_textArray = cachedHtml.isNull() ? document->toHtml().toUtf8() : cachedHtml.toUtf8();
 	const quint32 w_textSize = w_textArray.size();
 	const quint32 w_creationDate = creationDate.toTime_t();
 	const quint32 w_modificationDate = modificationDate.toTime_t();
@@ -410,8 +422,6 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 	result = stream.write(imagesArray);
 }
 
-/* static */
-// NOT thread-safe
 Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 	(void)version;
 
@@ -501,7 +511,6 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 		stream.seek(stream.pos() + bytesToSkip);
 	}
 
-
 	Note* note = new Note("");
 	note->name = r_captionArray;
 	note->creationDate = QDateTime::fromTime_t(r_creationDate);
@@ -514,13 +523,11 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 	note->nameBackColor.setRgba(r_backColor);
 	note->nameForeColor.setRgba(r_foreColor);
 	note->locked = (bool)r_locked;
+	note->cachedHtml = r_textArray;
+	note->textDocumentInitialized = false;
 	foreach(QString name, images.keys()) {
 		note->document->AddResourceImage(images.value(name));
 	}
-	note->document->blockSignals(true);
-	note->document->setHtml(r_textArray);
-	note->document->blockSignals(false);
-	note->text = note->document->toPlainText();
 
 	return note;
 }
@@ -542,8 +549,20 @@ void Note::sl_TagsCollectionModified(Tag*) {
 }
 
 void Note::sl_TextUpdateTimer_Timeout() {
-	lock.lockForWrite();
+	QWriteLocker locker(&lock);
 	text = document->toPlainText();
-	lock.unlock();
 }
 
+void Note::initTextDocument() const {
+	QWriteLocker locker(&lock);
+
+	document->blockSignals(true);
+		if (!cachedHtml.isNull()) {
+			document->setHtml(cachedHtml);
+		}
+		text = document->toPlainText();
+	document->blockSignals(false);
+	textDocumentInitialized = true;
+
+	cachedHtml = QString();
+}

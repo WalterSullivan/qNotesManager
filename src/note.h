@@ -27,19 +27,21 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QIcon>
 #include <QReadWriteLock>
 #include <QTimer>
+#include <QHash>
 
 
 namespace qNotesManager {
 	class Tag;
 	class TextDocument;
 	class BOIBuffer;
+	class CachedImageFile;
 
 
 	class Note : public AbstractFolderItem {
 	Q_OBJECT
 	private:
 		QString					name;
-		QString					text;				// Note's plain text (for text search)
+		mutable QString			text;				// Note's plain text (for text search)
 		QDateTime				creationDate;
 		QDateTime				modificationDate;
 		QDateTime				textDate;
@@ -52,12 +54,15 @@ namespace qNotesManager {
 		QColor					nameForeColor;
 		QColor					nameBackColor;
 		bool					locked;
-		TextDocument* const		document;
+		mutable TextDocument*	document;
 		mutable QReadWriteLock	lock;
-		QTimer textUpdateTimer;
 
+		QTimer textUpdateTimer;
+		mutable QString cachedHtml;
+		mutable bool textDocumentInitialized;
 
 		void onChange();
+		void initTextDocument() const;
 
 	public:
 		explicit Note(QString name = QString());
@@ -101,11 +106,11 @@ namespace qNotesManager {
 		QString GetComment() const;
 		void SetComment(QString c);
 
-		TextDocument* GetTextDocument() const;
+		TextDocument* GetTextDocument();
+		bool TextDocumentInitialized() const;
 
 		void Serialize(const int version, BOIBuffer& stream) const;
 		static Note* Deserialize(const int version, BOIBuffer& stream);
-
 
 		NoteTagsCollection Tags;
 
