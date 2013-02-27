@@ -100,9 +100,10 @@ TextEdit::TextEdit(QWidget *parent) :
 	QObject::connect(InsertPlainTextAction, SIGNAL(triggered()),
 					 this, SLOT(sl_InsertPlainTextAction_Triggered()));
 
+	/*
 	addAction(InsertLineAction);
 	QObject::connect(InsertLineAction, SIGNAL(triggered()),
-					 this, SLOT(sl_InsertLineAction_Triggered()));
+					 this, SLOT(sl_InsertLineAction_Triggered()));*/
 
 	addAction(InsertDateTimeAction);
 	QObject::connect(InsertDateTimeAction, SIGNAL(triggered()),
@@ -122,7 +123,7 @@ TextEdit::TextEdit(QWidget *parent) :
 	insertMenu->addAction(InsertImageFromFileAction);
 	insertMenu->addAction(InsertImageFromUrlAction);
 	insertMenu->addAction(InsertPlainTextAction);
-	insertMenu->addAction(InsertLineAction);
+	//insertMenu->addAction(InsertLineAction);
 	insertMenu->addAction(InsertDateTimeAction);
 
 	imagePropertiesMenu = new QMenu("Image", this);
@@ -135,11 +136,10 @@ TextEdit::TextEdit(QWidget *parent) :
 	resizeImageCanvasAction = new QAction("Resize image canvas", this);
 	QObject::connect(resizeImageCanvasAction, SIGNAL(triggered()),
 					 this, SLOT(sl_ResizeImageCanvasAction_Triggered()));
+
 	imagePropertiesMenu->addAction(saveImageAction);
 	imagePropertiesMenu->addAction(resizeImageAction);
 	imagePropertiesMenu->addAction(resizeImageCanvasAction);
-
-
 }
 
 void TextEdit::SetDocument(TextDocument* newDocument) {
@@ -238,6 +238,7 @@ bool TextEdit::canInsertFromMimeData(const QMimeData* source) const {
 void TextEdit::keyPressEvent (QKeyEvent* e) {
 	QTextEdit::keyPressEvent(e);
 
+#ifdef DEBUG
 	if (e->key() == Qt::Key_F5) {
 		AnalyzeText();
 	}
@@ -333,6 +334,7 @@ void TextEdit::keyPressEvent (QKeyEvent* e) {
 			qDebug() << "\t" << source->data(s) << "\n";
 		}
 	}
+#endif
 
 
 	QString href = anchorAt(mapFromGlobal(QCursor::pos()));
@@ -402,6 +404,7 @@ void TextEdit::contextMenuEvent (QContextMenuEvent* event) {
 		menu->addMenu(tableAlignMenu);
 	}
 
+	/* NOT IMPLEMENTED YET
 	QTextFragment fragment = findFragmentAtPos(event->pos());
 	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
 		menu->addSeparator();
@@ -409,7 +412,7 @@ void TextEdit::contextMenuEvent (QContextMenuEvent* event) {
 		saveImageAction->setData(event->pos());
 		resizeImageAction->setData(event->pos());
 		resizeImageCanvasAction->setData(event->pos());
-	}
+	}*/
 
 	menu->exec(event->globalPos());
 	menu->deleteLater();

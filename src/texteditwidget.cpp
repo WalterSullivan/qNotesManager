@@ -49,9 +49,6 @@ void TextEditWidget::CreateControls() {
 	textField->setCurrentFont(c);
 	textField->installEventFilter(this);
 
-	//TextDocument* d = new TextDocument(textField);
-	//textField->SetDocument(d);
-
 	QObject::connect(textField, SIGNAL(textChanged()),
 					 this, SIGNAL(sg_TextChanged()));
 	QObject::connect(textField, SIGNAL(textChanged()),
@@ -568,81 +565,36 @@ void TextEditWidget::sl_fontSizeComboBoxCurrentIndexChanged (int) {
 }
 
 void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
-	if (this->textField->fontWeight() == QFont::Bold){
-		ACTBold->setChecked(true);
-	} else {
-		ACTBold->setChecked(false);
-	}
-
-	if (this->textField->fontItalic()){
-		this->ACTItalic->setChecked(true);
-	} else {
-		this->ACTItalic->setChecked(false);
-	}
-
-	if (this->textField->fontUnderline()){
-		this->ACTUnderline->setChecked(true);
-	} else {
-		this->ACTUnderline->setChecked(false);
-	}
-
-	if (this->textField->StrikedOut()){
-		this->strikeOutAction->setChecked(true);
-	} else {
-		this->strikeOutAction->setChecked(false);
-	}
-
-	if (textField->GetAlignment() == Qt::AlignLeft) {
-		ACTAlignLeft->setChecked(true);
-	} else {
-		ACTAlignLeft->setChecked(false);
-	}
-
-	if (textField->GetAlignment() == Qt::AlignHCenter) {
-		ACTAlignCenter->setChecked(true);
-	} else {
-		ACTAlignCenter->setChecked(false);
-	}
-
-	if (textField->GetAlignment() == Qt::AlignRight) {
-		ACTAlignRight->setChecked(true);
-	} else {
-		ACTAlignRight->setChecked(false);
-	}
-
-	if (textField->GetAlignment() == Qt::AlignJustify) {
-		alignJustifyAction->setChecked(true);
-	} else {
-		alignJustifyAction->setChecked(false);
-	}
+	ACTBold->setChecked(textField->fontWeight() == QFont::Bold);
+	ACTItalic->setChecked(textField->fontItalic());
+	ACTUnderline->setChecked(textField->fontUnderline());
+	strikeOutAction->setChecked(textField->StrikedOut());
+	ACTAlignLeft->setChecked(textField->GetAlignment() == Qt::AlignLeft);
+	ACTAlignCenter->setChecked(textField->GetAlignment() == Qt::AlignHCenter);
+	ACTAlignRight->setChecked(textField->GetAlignment() == Qt::AlignRight);
+	alignJustifyAction->setChecked(textField->GetAlignment() == Qt::AlignJustify);
 
 
 	listButton->blockSignals(true);
-	QTextCursor cursor = textField->textCursor();
-	QTextList *textList = cursor.currentList();
-	if (textList) {
-		listButton->setChecked(true);
-		increaseListIndentAction->setVisible(true);
-		decreaseListIndentAction->setVisible(true);
-	} else {
-		listButton->setChecked(false);
-		increaseListIndentAction->setVisible(false);
-		decreaseListIndentAction->setVisible(false);
-	}
+		QTextCursor cursor = textField->textCursor();
+		QTextList *textList = cursor.currentList();
+		listButton->setChecked(textList != 0);
+		increaseListIndentAction->setVisible(textList != 0);
+		decreaseListIndentAction->setVisible(textList != 0);
 	listButton->blockSignals(false);
 
 
 	fontComboBox->blockSignals(true);
-	QFont temp = this->textField->currentFont();
-	fontComboBox->setCurrentFont(temp);
+		QFont temp = textField->currentFont();
+		fontComboBox->setCurrentFont(temp);
 	fontComboBox->blockSignals(false);
 
 	fontSizeComboBox->blockSignals(true);
-	int size = this->textField->currentFont().pointSize();
-	int index = fontSizeComboBox->findData(size);
-	if (index != -1) {
-		fontSizeComboBox->setCurrentIndex(index);
-	}
+		int size = this->textField->currentFont().pointSize();
+		int index = fontSizeComboBox->findData(size);
+		if (index != -1) {
+			fontSizeComboBox->setCurrentIndex(index);
+		}
 	fontSizeComboBox->blockSignals(false);
 
 	QTextTable* table = textField->textCursor().currentTable();
@@ -717,8 +669,6 @@ void TextEditWidget::continueSearch() {
 		searchText.prepend("\\b");
 		searchText.append("\\b");
 	}
-
-	qDebug() << searchText;
 
 	int searchPos = textField->textCursor().selectionEnd();
 
