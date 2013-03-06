@@ -906,8 +906,6 @@ void FolderNavigationWidget::sl_View_doubleClicked (const QModelIndex& index) {
 }
 
 void FolderNavigationWidget::sl_View_SelectionChanged(const QItemSelection&, const QItemSelection&) {
-	qDebug() << "Selection changed";
-
 	emit sg_SelectedItemsActionsListChanged();
 }
 
