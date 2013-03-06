@@ -38,7 +38,7 @@ QVariant TagModelItem::data(int role) const {
 	}
 
 	if (role == Qt::DecorationRole) {
-		return QPixmap(":/standard/tag");
+		return QPixmap(":/gui/tag");
 	} else if (role == Qt::DisplayRole) {
 		QString childrenCount = QString(" (%1)").arg(QString::number(_tag->Owners.Count()));
 		QString returnValue = _tag->GetName();
