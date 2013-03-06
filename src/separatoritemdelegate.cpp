@@ -21,13 +21,11 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "global.h"
 
 #include <QPainter>
-#include <QDebug>
 #include <QItemEditorFactory>
 
 using namespace qNotesManager;
 
 SeparatorItemDelegate::SeparatorItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {
-	setItemEditorFactory(new QItemEditorFactory());
 }
 
 /*virtual*/
