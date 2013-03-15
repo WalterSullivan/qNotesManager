@@ -103,8 +103,6 @@ namespace qNotesManager {
 
 		DocumentPropertiesWidget* docProperties;
 
-		void saveDocumentVisualSettings() const;
-		void restoreDocumentVisualSettings();
 		void createActions();
 		void createControls();
 		void updateWindowTitle();

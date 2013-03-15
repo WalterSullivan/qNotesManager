@@ -458,36 +458,6 @@ void DocumentWorker::load_v1(BOIBuffer& buffer) {
 		}
 	}
 
-	// Read visual settings
-	{
-		quint32 activeNavigationTab = 0;
-		dataBuffer.read(activeNavigationTab);
-		doc->VisualSettings.ActiveNavigationTab = activeNavigationTab;
-
-		quint32 activeNoteID = 0;
-		dataBuffer.read(activeNoteID);
-		if (folderItems.contains(activeNoteID)) {
-			doc->VisualSettings.ActiveNote = dynamic_cast<Note*>(folderItems.value(activeNoteID));
-		} else {
-			doc->VisualSettings.ActiveNote = 0;
-		}
-
-		quint32 openedNotesListSize = 0;
-		dataBuffer.read(openedNotesListSize);
-
-		for (quint32 i = 0; i < openedNotesListSize; i++) {
-			quint32 noteID = 0;
-			quint32 position = 0;
-			dataBuffer.read(noteID);
-			dataBuffer.read(position);
-
-			if (folderItems.contains(noteID)) {
-				Note* note = dynamic_cast<Note*>(folderItems.value(noteID));
-				doc->VisualSettings.OpenedNotes.append(QPair<Note*, int>(note, position));
-			}
-		}
-	}
-
 	dataBuffer.close();
 
 	doc->hasUnsavedData = false;
@@ -749,22 +719,6 @@ void DocumentWorker::save_v1() {
 		dataBuffer.seek(blockSizePosition);
 		dataBuffer.write(blockSize);
 		dataBuffer.seek(blockEndPosition);
-	}
-
-	// Write visual settings
-	{
-		quint32 activeNavigationTab = doc->VisualSettings.ActiveNavigationTab;
-		dataBuffer.write(activeNavigationTab);
-		quint32 activeNoteID = folderItemsIDs.value(doc->VisualSettings.ActiveNote);
-		dataBuffer.write(activeNoteID);
-		quint32 openedNotesListSize = doc->VisualSettings.OpenedNotes.size();
-		dataBuffer.write(openedNotesListSize);
-		for (quint32 i = 0; i < openedNotesListSize; i++) {
-			quint32 noteID = folderItemsIDs.value(doc->VisualSettings.OpenedNotes.at(i).first);
-			quint32 position = doc->VisualSettings.OpenedNotes.at(i).second;
-			dataBuffer.write(noteID);
-			dataBuffer.write(position);
-		}
 	}
 
 

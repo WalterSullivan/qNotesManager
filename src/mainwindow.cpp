@@ -404,8 +404,6 @@ void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 		return;
 	}
 
-	saveDocumentVisualSettings();
-
 	QString filename = QString();
 	if (doc->GetFilename().isEmpty()) {
 		filename = QFileDialog::getSaveFileName(this, "Select a name", QString(),
@@ -426,7 +424,6 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 		return;
 	}
 
-	saveDocumentVisualSettings();
 	QString filename = QFileDialog::getSaveFileName(this, "Select a name", QString(),
 		"qNotesManager save file (*.nms)");
 	if (filename.isNull()) {return;}
@@ -580,8 +577,6 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 
 		Application::I()->Settings.LastDocumentName = doc->GetFilename();
 
-		restoreDocumentVisualSettings();
-
 		sl_EditMenuContentChanged();
 	}
 
@@ -614,40 +609,6 @@ void MainWindow::updateWindowTitle() {
 void MainWindow::sl_Application_NoteDeleted(Note* n) {
 	if (notesTabWidget->DisplayedNotes().contains(n)) {
 		notesTabWidget->CloseNote(n);
-	}
-}
-
-void MainWindow::saveDocumentVisualSettings() const {
-	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
-		WARNING("Current document not set");
-		return;
-	}
-
-	doc->VisualSettings.ActiveNavigationTab = navigationPanel->CurrentTabIndex();
-	doc->VisualSettings.ActiveNote = notesTabWidget->CurrentNote();
-	doc->VisualSettings.OpenedNotes = notesTabWidget->GetState();
-}
-
-void MainWindow::restoreDocumentVisualSettings() {
-	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
-		WARNING("Current document not set");
-		return;
-	}
-
-	navigationPanel->SetCurrentTab(doc->VisualSettings.ActiveNavigationTab);
-	const QList<Note*> notes = doc->GetNotesList();
-
-	QPair<Note*, int> pair;
-	foreach (pair , doc->VisualSettings.OpenedNotes) {
-		if (notes.contains(pair.first)) {
-			notesTabWidget->OpenNote(pair.first, pair.second, true);
-		}
-	}
-
-	if (notes.contains(doc->VisualSettings.ActiveNote)) {
-		notesTabWidget->SetCurrentNote(doc->VisualSettings.ActiveNote);
 	}
 }
 
