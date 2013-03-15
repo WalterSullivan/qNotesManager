@@ -83,15 +83,6 @@ Document::Document() : QObject(0) {
 
 	LockFolderItems = true;
 
-	// Fill customIconsModel with stock icons
-	customIconsModel = new QStandardItemModel(this);
-	QHash<QString, QPixmap> iconsList = Application::I()->GetStandardIcons();
-	foreach (QString key, iconsList.keys()) {
-		QStandardItem* iconItem = new QStandardItem(iconsList.value(key), QString());
-		iconItem->setData(key, Qt::UserRole + 1);
-		iconItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-		customIconsModel->appendRow(iconItem);
-	}
 
 	fileName = QString();
 	fileVersion = currentFileVersion;
@@ -112,6 +103,11 @@ Document::~Document() {
 	delete rootFolder;
 	delete trashFolder;
 	delete tempFolder;
+
+	// Remove custom icons from model
+	Application::I()->GetIconsModel()->removeRows(
+			Application::I()->GetStandardIconsCount(),
+			customIcons.count());
 
 	foreach (QString key, customIcons.keys()) {
 		delete customIcons[key];
@@ -407,8 +403,9 @@ void Document::AddCustomIcon(CachedImageFile* image) {
 
 	QStandardItem* i = new QStandardItem(image->GetPixmap(QSize(16, 16)), QString());
 	i->setData(name, Qt::UserRole + 1);
+	i->setData("Custom icons", Qt::UserRole + 2);
 	i->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-	customIconsModel->appendRow(i);
+	Application::I()->GetIconsModel()->appendRow(i);
 
 	onChange();
 }
@@ -427,15 +424,17 @@ void Document::RemoveCustomIcon(QString key) {
 		DefaultNoteIcon = Application::I()->DefaultNoteIcon;
 	}
 
-	QList<QStandardItem*> itemsList = customIconsModel->findItems(key, Qt::MatchExactly, 0);
+	QList<QStandardItem*> itemsList = Application::I()->GetIconsModel()->findItems(key, Qt::MatchExactly, 0);
 	if (itemsList.size() != 1) {
 		WARNING("A few icons with the same key found");
 	}
-	QStandardItem* item = customIconsModel->takeItem(itemsList.at(0)->row());
+	QStandardItem* item = Application::I()->GetIconsModel()->takeItem(itemsList.at(0)->row());
 	if (item == 0) {
 		WARNING("Error retrieving icon model item");
 		return;
 	}
+
+
 	for (int i = 0; i < allNotes.size(); ++i) {
 		if (allNotes.at(i)->GetIconID() == key) {
 			allNotes.at(i)->SetIconID(DefaultNoteIcon);
@@ -463,12 +462,11 @@ QPixmap Document::GetItemIcon(const QString key) const {
 	}
 
 	if (key.mid(0, 1) == ":") {
-		if (Application::I()->GetStandardIcons().contains(key)) {
-			return Application::I()->GetStandardIcons().value(key);
-		} else {
+		QPixmap p = Application::I()->GetStandardIcon(key);
+		if (p.isNull()) {
 			WARNING(qPrintable("Icon with passed key not found: " + key));
-			return QPixmap();
 		}
+		return p;
 	} else {
 		if (customIcons.contains(key)) {
 			return customIcons.value(key)->GetPixmap(QSize(16, 16));

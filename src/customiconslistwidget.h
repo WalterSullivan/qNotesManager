@@ -21,6 +21,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QDialog>
 #include <QListView>
 #include <QPushButton>
+#include <QSortFilterProxyModel>
+#include <QButtonGroup>
 
 namespace qNotesManager {
 	class Document;
@@ -28,16 +30,22 @@ namespace qNotesManager {
 	class CustomIconsListWidget : public QDialog {
 	Q_OBJECT
 	private:
+		QButtonGroup*	buttonGroup;
 		QListView*		listView;
 		QPushButton*	okButton;
 		QPushButton*	cancelButton;
 		QPushButton*	addIconButton;
 
+		QAbstractItemModel* iconsModel;
+		QSortFilterProxyModel* filterModel;
+
+		int FindButtonIndexByName(const QString& name) const;
+
 	public:
 		explicit CustomIconsListWidget(QWidget *parent = 0);
 		QString SelectedIconKey;
 
-		void SelectIcon(QString key);
+		void SelectIcon(const QString& key);
 
 	signals:
 
@@ -47,8 +55,7 @@ namespace qNotesManager {
 		void sl_CancelButton_Clicked();
 		void sl_AddIconButton_Clicked();
 		void sl_ListView_DoubleClicked (const QModelIndex& index);
-		void sl_Application_DocumentChanged();
-
+		void sl_ButtonGroup_ButtonClicked(QAbstractButton* button);
 	};
 }
 

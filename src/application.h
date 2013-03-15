@@ -22,6 +22,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QHash>
 #include <QPixmap>
 
+#include <QList>
+#include <QStandardItemModel>
+
 #include "applicationsettings.h"
 
 namespace qNotesManager {
@@ -35,7 +38,10 @@ namespace qNotesManager {
 
 		Document*		_currentDocument;
 		QHash<QString, QPixmap> standardIcons;
+		QList<QString> iconGroups;
+		QStandardItemModel* standardIconsModel;
 
+		void LoadIconsFromDir(const QString&);
 
 	public:
 		static Application* I();
@@ -45,7 +51,11 @@ namespace qNotesManager {
 
 		ApplicationSettings Settings;
 
-		QHash<QString, QPixmap> GetStandardIcons() const;
+		QList<QString> GetStandardIconGroups() ;
+		int GetStandardIconsCount() ;
+		QPixmap GetStandardIcon(const QString& name) ;
+		QStandardItemModel* GetIconsModel() ;
+
 
 		const QString DefaultNoteIcon;
 		const QString DefaultFolderIcon;

@@ -125,7 +125,6 @@ namespace qNotesManager {
 
 		bool LockFolderItems;
 
-		QStandardItemModel*		customIconsModel;
 		void AddCustomIcon(CachedImageFile*);
 		void RemoveCustomIcon(QString);
 		QPixmap GetItemIcon(const QString) const;

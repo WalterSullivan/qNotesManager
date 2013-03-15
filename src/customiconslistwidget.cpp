@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "document.h"
 #include "global.h"
 #include "cachedimagefile.h"
+#include "iconitemdelegate.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -31,13 +32,57 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) {
+	iconsModel = Application::I()->GetIconsModel();
+
+	filterModel = new QSortFilterProxyModel(this);
+	filterModel->setSourceModel(iconsModel);
+	filterModel->setFilterRole(Qt::UserRole + 2);
+
+	buttonGroup = new QButtonGroup(this);
+	QObject::connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+					 this, SLOT(sl_ButtonGroup_ButtonClicked(QAbstractButton*)));
+
+	QVBoxLayout* buttonsLayout = new QVBoxLayout();
+
+	QPushButton* b = 0;
+	foreach (QString groupName, Application::I()->GetStandardIconGroups()) {
+		b = new QPushButton(groupName, this);
+		b->setCheckable(true);
+		b->setFlat(true);
+		b->setFocusPolicy(Qt::NoFocus);
+
+		buttonGroup->addButton(b);
+		buttonsLayout->addWidget(b);
+	}
+
+	b = new QPushButton("Custom icons", this);
+	b->setCheckable(true);
+	b->setFlat(true);
+	b->setFocusPolicy(Qt::NoFocus);
+
+	buttonGroup->addButton(b);
+	buttonsLayout->addWidget(b);
+	buttonsLayout->addStretch();
+
+
 	listView = new QListView();
 	listView->setViewMode(QListView::IconMode);
 	listView->setDragEnabled(false);
 	listView->setSelectionMode(QAbstractItemView::SingleSelection);
 	listView->setResizeMode(QListView::Adjust);
-	// myListWidget->setStyleSheet( "QListWidget::item { border-bottom: 1px solid black; }" );
-	listView->setModel(Application::I()->CurrentDocument()->customIconsModel);
+	listView->setUniformItemSizes(true);
+	listView->setWrapping(true);
+#if QT_VERSION >= 0x040700
+	listView->setSpacing(10); // There is a bug with setSpacing, fixed in 4.7
+#else
+	listView->setGridSize(QSize(30, 30));
+#endif
+	listView->setModel(filterModel);
+
+	QStyledItemDelegate* delegate = new IconItemDelegate(this);
+	listView->setItemDelegate(delegate);
+
+
 	QObject::connect(listView, SIGNAL(doubleClicked(QModelIndex)),
 					 this, SLOT(sl_ListView_DoubleClicked(QModelIndex)));
 
@@ -56,8 +101,12 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 	hl->addWidget(okButton);
 	hl->addWidget(cancelButton);
 
+	QHBoxLayout* hl2 = new QHBoxLayout();
+	hl2->addLayout(buttonsLayout);
+	hl2->addWidget(listView);
+
 	QVBoxLayout* vl = new QVBoxLayout();
-	vl->addWidget(listView);
+	vl->addLayout(hl2);
 	vl->addLayout(hl);
 
 	setLayout(vl);
@@ -65,9 +114,6 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 	setWindowTitle("Pick icon");
 
 	SelectedIconKey = "";
-
-	QObject::connect(Application::I(), SIGNAL(sg_CurrentDocumentChanged(Document*)),
-					 this, SLOT(sl_Application_DocumentChanged()));
 }
 
 void CustomIconsListWidget::sl_OKButton_Clicked() {
@@ -92,9 +138,9 @@ void CustomIconsListWidget::sl_AddIconButton_Clicked() {
 	QString filter = "Images (*.png)";
 	QStringList list = QFileDialog::getOpenFileNames (0, "Select icons to add", QString(),
 													  filter);
+	if (list.isEmpty()) {return;}
 
 	foreach (QString fileName, list) {
-
 		QFileInfo info(fileName);
 		if (!info.exists()) {continue;}
 
@@ -107,41 +153,69 @@ void CustomIconsListWidget::sl_AddIconButton_Clicked() {
 
 		Application::I()->CurrentDocument()->AddCustomIcon(image);
 	}
+
+	int newIndex = FindButtonIndexByName("Custom icons");
+	if (newIndex == -1) {
+		return;
+	}
+	QAbstractButton* b = buttonGroup->button(newIndex);
+	b->click();
 }
 
-void CustomIconsListWidget::SelectIcon(QString key) {
+void CustomIconsListWidget::SelectIcon(const QString& key) {
 	if (key.isEmpty()) {
 		WARNING("Selected icon key is empty");
 		return;
 	}
 
-	for (int i = 0; i < listView->model()->rowCount(); ++i) {
-		QModelIndex index = listView->model()->index(i, 0);
-		if (!index.isValid()) {return;}
+	QModelIndex start = iconsModel->index(0, 0);
 
-		QString itemKey = index.data(Qt::UserRole + 1).toString();
-		if (itemKey.isEmpty()) {
-			WARNING("Model item key field is empty");
-			continue;
-		}
-		if (itemKey == key) {
-			listView->scrollTo(index, QAbstractItemView::PositionAtCenter);
-			listView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
-			break;
-		}
+	QModelIndexList list = iconsModel->match(start, Qt::UserRole + 1, key,
+												1, Qt::MatchFixedString);
+
+	if (list.isEmpty()) {
+		WARNING("NO ICON FOUND");
+		return;
 	}
+
+	QModelIndex index = list[0];
+	QString group = index.data(Qt::UserRole + 2).toString();
+	int newIndex = FindButtonIndexByName(group);
+
+	if (newIndex == -1) {
+		WARNING("Button not found");
+		return;
+	}
+
+	QAbstractButton* b = buttonGroup->button(newIndex);
+	b->click();
+
+	index = filterModel->mapFromSource(index);
+
+	if (!index.isValid()) {
+		WARNING("Mapped index is invalid");
+		return;
+	}
+
+	listView->scrollTo(index, QAbstractItemView::PositionAtCenter);
+	listView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
 }
 
 void CustomIconsListWidget::sl_ListView_DoubleClicked (const QModelIndex& index) {
 	sl_OKButton_Clicked();
 }
 
-void CustomIconsListWidget::sl_Application_DocumentChanged() {
-	QStandardItemModel* model = 0;
+void CustomIconsListWidget::sl_ButtonGroup_ButtonClicked(QAbstractButton*) {
+	QString group = buttonGroup->checkedButton()->text();
+	filterModel->setFilterRegExp(QRegExp(group, Qt::CaseInsensitive, QRegExp::FixedString));
+}
 
-	if (Application::I()->CurrentDocument()) {
-		model = Application::I()->CurrentDocument()->customIconsModel;
+int CustomIconsListWidget::FindButtonIndexByName(const QString& name) const {
+	QList<QAbstractButton*> buttons = buttonGroup->buttons();
+	for (int i = 0; i < buttons.count(); i++) {
+		if (buttons.at(i)->text() == name) {
+			return buttonGroup->id(buttons.at(i));
+		}
 	}
-
-	listView->setModel(model);
+	return -1;
 }

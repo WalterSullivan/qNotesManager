@@ -34,15 +34,29 @@ Application* Application::I() {
 
 Application::Application() :
 		QObject(0),
-		DefaultNoteIcon(":/standard/note"),
-		DefaultFolderIcon(":/standard/folder") {
+		DefaultNoteIcon(":/icons/standard/Document/document.png"),
+		DefaultFolderIcon(":/icons/standard/Folder/folder.png") {
 	_currentDocument = 0;
+	standardIconsModel = new QStandardItemModel(this);
 
-	QDir icons(":/standard");
-	QFileInfoList list = icons.entryInfoList();
+	LoadIconsFromDir(":/icons/standard/Document");
+	LoadIconsFromDir(":/icons/standard/Folder");
+	LoadIconsFromDir(":/icons/standard/Misc");
+}
+
+void Application::LoadIconsFromDir(const QString& dirName) {
+	QDir dir(dirName);
+	iconGroups.append(dir.dirName());
+	QFileInfoList list = dir.entryInfoList();
 	foreach (QFileInfo info, list) {
 		QPixmap p(info.absoluteFilePath(), info.suffix().toStdString().c_str());
 		standardIcons.insert(info.absoluteFilePath(), p);
+
+		QStandardItem* iconItem = new QStandardItem(p, QString());
+		iconItem->setData(info.absoluteFilePath(), Qt::UserRole + 1); // id
+		iconItem->setData(dir.dirName(), Qt::UserRole + 2); // filter group
+		iconItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+		standardIconsModel->appendRow(iconItem);
 	}
 }
 
@@ -58,6 +72,18 @@ Document* Application::CurrentDocument() const {
 	return _currentDocument;
 }
 
-QHash<QString, QPixmap> Application::GetStandardIcons() const {
-	return standardIcons;
+QList<QString> Application::GetStandardIconGroups()  {
+	return iconGroups;
+}
+
+QStandardItemModel* Application::GetIconsModel()  {
+	return standardIconsModel;
+}
+
+int Application::GetStandardIconsCount()  {
+	return standardIcons.count();
+}
+
+QPixmap Application::GetStandardIcon(const QString& name)  {
+	return standardIcons.value(name);
 }
