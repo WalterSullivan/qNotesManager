@@ -35,7 +35,7 @@ else {
     # Release
     DEFINES -= DEBUG
     DEFINES += RELEASE
-    CONFIG += console
+	CONFIG -= console
     DESTDIR = $${BUILD_PATH}/release
     unix:OBJECTS_DIR = $${BUILD_PATH}/release/.obj/unix
     win32:OBJECTS_DIR = $${BUILD_PATH}/release/.obj/win32
@@ -118,7 +118,8 @@ HEADERS += src/tag.h \
     src/imageloader.h \
     src/localimageloader.h \
     src/httpimagedownloader.h \
-    src/documentworker.h
+    src/documentworker.h \
+    src/iconitemdelegate.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -178,5 +179,6 @@ SOURCES += src/tagownerscollection.cpp \
     src/localimageloader.cpp \
     src/imageloader.cpp \
     src/httpimagedownloader.cpp \
-    src/documentworker.cpp
+    src/documentworker.cpp \
+    src/iconitemdelegate.cpp
 RESOURCES += icons.qrc
