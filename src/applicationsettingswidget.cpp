@@ -37,10 +37,8 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	moveItemsToBinCheckbox = new QCheckBox("Move items to bin on delete", this);
 
 	showAsterixInTitleCheckbox = new QCheckBox("Show asterix in modified items' title", this);
-	showAsterixInTitleCheckbox->setEnabled(false);
 
 	createBackupsCheckbox = new QCheckBox("Backup save file", this);
-	createBackupsCheckbox->setEnabled(false);
 
 	showWindowOnStartCheckbox = new QCheckBox("Show main window on start", this);
 	openLastDocumentOnStartCheckbox = new QCheckBox("Open last document on start", this);
@@ -70,6 +68,9 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	mainLayout->addWidget(openLastDocumentOnStartCheckbox);
 	mainLayout->addLayout(buttonsLayout);
 
+	preserveDocVisSettingsCheckbox->setVisible(false);
+	showAsterixInTitleCheckbox->setVisible(false);
+	createBackupsCheckbox->setVisible(false);
 
 	setLayout(mainLayout);
 	setWindowTitle("Settings");
