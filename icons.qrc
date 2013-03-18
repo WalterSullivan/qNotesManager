@@ -184,7 +184,6 @@
         <file>icons/standard/Document/receipts-text.png</file>
         <file>icons/standard/Document/receipt-sticky-note.png</file>
         <file>icons/standard/Document/receipt-text.png</file>
-        <file>icons/standard/Document/remote-control.png</file>
         <file>icons/standard/Document/report.png</file>
         <file>icons/standard/Document/report-excel.png</file>
         <file>icons/standard/Document/report-image.png</file>
@@ -862,6 +861,7 @@
         <file>icons/standard/Misc/wooden-box.png</file>
         <file>icons/standard/Misc/wrench.png</file>
         <file>icons/standard/Misc/yin-yang.png</file>
+        <file>icons/standard/Misc/remote-control.png</file>
     </qresource>
     <qresource prefix="/gui">
         <file alias="underline-color">icons/gui/border-color.png</file>
