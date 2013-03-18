@@ -1,19 +1,19 @@
-# QMAKE_CXXFLAGS += -Weffc++
 TARGET = qnotesmanager
 TEMPLATE = app
-VERSION = 0.9.0
+VERSION = 0.9.1
 RC_FILE = qnm.rc
 QT += network
-QMAKE_CXXFLAGS += -Wall \
-    -O0
+QMAKE_CXXFLAGS += -Wall
 QMAKE_CXXFLAGS += -isystem \
     $(QTDIR)\include
 DEFINES += ENABLE_LOG_TRACE
 BUILD_PATH = ./build
 DEFINES += APPNAME=\\\"qNotesManager\\\"
-DEFINES += VERSION=\\\"0.9.0\\\"
+DEFINES += VERSION=\\\"0.9.1\\\"
 CONFIG(debug, debug|release) { 
     # Debug
+	QMAKE_CXXFLAGS += -O0
+	#QMAKE_CXXFLAGS += -Weffc++
     DEFINES += DEBUG
     DEFINES -= RELEASE
     CONFIG += console
@@ -33,6 +33,7 @@ CONFIG(debug, debug|release) {
 }
 else { 
     # Release
+	QMAKE_CXXFLAGS += -O2
     DEFINES -= DEBUG
     DEFINES += RELEASE
 	CONFIG -= console
