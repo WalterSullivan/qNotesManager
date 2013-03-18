@@ -232,25 +232,11 @@ quint32 TextDocument::CalculateImageCRC(const QImage& image) const {
 	b.close();
 
 	return crc32buf(a.constData(), a.length());
-
-	/*const char* data = a.constData();
-	quint32 hash, i;
-	quint32 size = a.size();
-	for(hash = i = 0; i < size; ++i) {
-		hash += data[i];
-		hash += (hash << 10);
-		hash ^= (hash >> 6);
-	}
-	hash += (hash << 3);
-	hash ^= (hash >> 11);
-	hash += (hash << 15);
-
-	return hash;*/
 }
 
 void TextDocument::InsertImage(QImage image, QTextCursor cursor) {
 	if (image.isNull()) {
-		qWarning("Image is null");
+		WARNING("Image is null");
 		return;
 	}
 	quint32 crc = CalculateImageCRC(image);
