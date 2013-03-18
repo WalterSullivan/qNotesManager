@@ -45,9 +45,9 @@ ColorPickerButton::ColorPickerButton(AffectedObject type, QWidget *parent) :
 			break;
 	};
 
-	avaliableColors.append(ColorEntry(Qt::red));
-	avaliableColors.append(ColorEntry(Qt::green));
-	avaliableColors.append(ColorEntry(Qt::blue));
+	avaliableColors.append(ColorEntry(Qt::red, "Red"));
+	avaliableColors.append(ColorEntry(Qt::green, "Green"));
+	avaliableColors.append(ColorEntry(Qt::blue, "Blue"));
 
 	pickCustomColorAction = new QAction(tr("Custom color..."), this);
 	defaultColorAction = new QAction("Default color", this);
@@ -95,7 +95,7 @@ void ColorPickerButton::FillColorsList() {
 			painter.end();
 		QIcon icon(pixmap);
 
-		QAction* action = new QAction(icon, color.name(), menu);
+		QAction* action = new QAction(icon, entry.name, menu);
 		action->setData(color);
 
 		menu->addAction(action);
@@ -164,10 +164,10 @@ void ColorPickerButton::sl_ActionTriggered(QAction* action) {
 			}
 		}
 		if (!newColorInList) {
-			ColorEntry entry(c, 1);
+			ColorEntry entry(c, "Custom");
 			avaliableColors.append(entry);
-
 		}
+
 		FillColorsList();
 	}
 

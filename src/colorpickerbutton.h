@@ -44,10 +44,10 @@ namespace qNotesManager {
 
 	private:
 		struct ColorEntry {
-				ColorEntry(QColor c, int w) : color(c), weight(w) {}
-				ColorEntry(QColor c) : color(c), weight(1) {}
+				ColorEntry(QColor c, QString n) : color(c), weight(1), name(n) {}
 				QColor color;
 				int weight;
+				QString name;
 		};
 
 		const AffectedObject	colorType;
