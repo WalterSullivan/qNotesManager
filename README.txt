@@ -4,17 +4,28 @@
        qNotesManager is an advanced note-taking software.
        What you can do (basic features):
        - Format note text in WYSIWYG-editor;
-	   - Insert images in your notes;
+	   - Insert images;
 	   - Assign tags to your notes;
 	   - Group yout notes in categories (folders);
+	   - Filter notes by their creation / modification time;
 	   - Save file may be encrypted if you want to keep your information in
 	   secret;
 	   - Quick note function: create a new note with text from clipboard with
 	   just one click;
 	   - And more.
 
-       Copyright (C) 2012  Yury Hamenkov
+       Copyright (C) 2012  Yury Khamenkov
        waltersullivan.11121@gmail.com
+	   
+	   qNotesManager is free and opensource software. Please, feel free to 
+	   report bugs or even contribute at 
+	   http://github.com/WalterSullivan/qNotesManager .
+	   
+	   Icons: Fugue Icons pack
+	   (C) 2012 Yusuke Kamiyamane. All rights reserved.
+	   These icons are licensed under a Creative Commons 
+	   Attribution 3.0 License.
+	   <http://creativecommons.org/licenses/by/3.0/>
 
      2. License
 

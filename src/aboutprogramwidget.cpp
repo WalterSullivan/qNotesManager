@@ -26,14 +26,20 @@ AboutProgramWidget::AboutProgramWidget(QWidget *parent) : QDialog(parent) {
 	logoLabel->setPixmap(QPixmap(":/main"));
 
 	descriptionLabel = new QLabel();
+	descriptionLabel->setTextFormat(Qt::RichText);
+	descriptionLabel->setOpenExternalLinks(true);
 	descriptionLabel->setText(
-	"qNotesManager is note taking software. Keep all your notes, important data."
-	"\n\nCode by: Yury Hamenkov"
-	"\nIcons:"
-	"\nFugue Icons pack. Copyright (C) 2010 Yusuke Kamiyamane (p@yusukekamiyamane.com). "
+	"qNotesManager is note-taking software."
+	"<br>Code by: Yury Khamenkov"
+	"<br><br>qNotesManager is free and opensource software."
+	"<br>Please, feel free to report bugs or even contribute at "
+	"<a href=\"http://github.com/WalterSullivan/qNotesManager\">GitHub page</a>."
+	"<br><br>Icons:"
+	"<br>Fugue Icons pack. Copyright (C) 2010 Yusuke Kamiyamane. "
 	"All rights reserved."
-	"\nThe icons are licensed under a Creative Commons Attribution  3.0 license. "
-	"<http://creativecommons.org/licenses/by/3.0/>"
+	"<br>The icons are licensed under a "
+	"<a href=\"http://creativecommons.org/licenses/by/3.0/\">"
+	"Creative Commons Attribution  3.0 license</a>. "
 	);
 
 	versionLabel = new QLabel();
