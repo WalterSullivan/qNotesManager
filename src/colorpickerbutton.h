@@ -42,9 +42,6 @@ namespace qNotesManager {
 		int GetListSize() const;
 		void SetListSize(int size);
 
-	protected:
-		virtual void paintEvent (QPaintEvent* event);
-
 	private:
 		struct ColorEntry {
 				ColorEntry(QColor c, int w) : color(c), weight(w) {}
@@ -66,7 +63,6 @@ namespace qNotesManager {
 
 		void SortColorsList();
 		void FillColorsList();
-		QIcon GenerateNewIcon();
 
 	signals:
 		void sg_ColorSelected(QColor);
