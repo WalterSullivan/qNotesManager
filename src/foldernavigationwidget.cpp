@@ -588,9 +588,28 @@ void FolderNavigationWidget::sl_CustomForeColor_Triggered() {
 		WARNING("Wrong selection for this operation");
 		return;
 	}
-	Document* doc = Application::I()->CurrentDocument();
 
-	QColor newColor = QColorDialog::getColor();
+	QColor oldColor = QColor();
+	if (indexesList.size() == 1) {
+		BaseModelItem* modelItemToEdit =
+				static_cast<BaseModelItem*>(indexesList.value(0).internalPointer());
+
+		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
+			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
+			if (f) {
+				oldColor = f->GetNameForeColor();
+			}
+
+		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
+			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
+			if (n) {
+				oldColor = n->GetNameForeColor();
+			}
+
+		}
+	}
+
+	QColor newColor = QColorDialog::getColor(oldColor);
 	if (!newColor.isValid()) {return;}
 
 	for (int i = 0; i < indexesList.size(); ++i) {
@@ -637,9 +656,27 @@ void FolderNavigationWidget::sl_CustomBackColor_Triggered() {
 		WARNING("Wrong selection for this operation");
 		return;
 	}
-	Document* doc = Application::I()->CurrentDocument();
 
-	QColor newColor = QColorDialog::getColor();
+	QColor oldColor = QColor();
+	if (indexesList.size() == 1) {
+		BaseModelItem* modelItemToEdit =
+				static_cast<BaseModelItem*>(indexesList.value(0).internalPointer());
+
+		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
+			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
+			if (f) {
+				oldColor = f->GetNameBackColor();
+			}
+
+		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
+			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
+			if (n) {
+				oldColor = n->GetNameBackColor();
+			}
+		}
+	}
+
+	QColor newColor = QColorDialog::getColor(oldColor);
 	if (!newColor.isValid()) {return;}
 
 	for (int i = 0; i < indexesList.size(); ++i) {
