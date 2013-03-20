@@ -1,11 +1,11 @@
     qNotesManager
 
      1. About
-       qNotesManager is an advanced note-taking software.
+       qNotesManager is an simple note-taking software.
        What you can do (basic features):
        - Format note text in WYSIWYG-editor;
-	   - Insert images;
-	   - Assign tags to your notes;
+	   - Insert images, lists, tables;
+	   - Add tags to your notes;
 	   - Group yout notes in categories (folders);
 	   - Filter notes by their creation / modification time;
 	   - Save file may be encrypted if you want to keep your information in
