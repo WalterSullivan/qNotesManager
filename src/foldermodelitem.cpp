@@ -57,7 +57,7 @@ QVariant FolderModelItem::data(int role) const {
 	} else if (role == Qt::DisplayRole) {
 		QString childrenCount = QString(" (%1)").arg(QString::number(folder->Items.Count()));
 		QString returnValue = folder->GetName();
-		if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+		if (Application::I()->Settings.GetShowNumberOfItems()) {
 			returnValue.append(childrenCount);
 		}
 		return returnValue;

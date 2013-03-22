@@ -113,16 +113,16 @@ QList<QAction*> NavigationPanelWidget::GetSelectedItemsActions() const {
 
 void NavigationPanelWidget::UpdateViewsVisibility() {
 	int tagsWidgetIndex = tabWidget->indexOf(tagsWidget);
-	if (tagsWidgetIndex >= 0 && !Application::I()->Settings.showTagsTreeView) {
+	if (tagsWidgetIndex >= 0 && !Application::I()->Settings.GetShowTagsTreeView()) {
 		tabWidget->removeTab(tagsWidgetIndex);
-	} else if (tagsWidgetIndex == -1 && Application::I()->Settings.showTagsTreeView) {
+	} else if (tagsWidgetIndex == -1 && Application::I()->Settings.GetShowTagsTreeView()) {
 		tabWidget->insertTab(1, tagsWidget, QIcon(":/gui/tag"), "Tags");
 	}
 
 	int datesWidgetIndex = tabWidget->indexOf(datesWidget);
-	if (datesWidgetIndex >=0 && !Application::I()->Settings.showDatesTreeView) {
+	if (datesWidgetIndex >=0 && !Application::I()->Settings.GetShowDatesTreeView()) {
 		tabWidget->removeTab(datesWidgetIndex);
-	} else if (datesWidgetIndex == -1 && Application::I()->Settings.showDatesTreeView) {
+	} else if (datesWidgetIndex == -1 && Application::I()->Settings.GetShowDatesTreeView()) {
 		tabWidget->insertTab(2, datesWidget, QIcon(":/gui/date"), "Dates");
 	}
 }

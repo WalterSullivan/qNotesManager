@@ -439,7 +439,7 @@ void FolderNavigationWidget::sl_AddFolderAction_Triggered() {
 
 void FolderNavigationWidget::sl_DeleteItemAction_Triggered() {
 	QModelIndexList list = treeView->selectionModel()->selectedIndexes();
-	deleteItems(list, !Application::I()->Settings.moveItemsToBin);
+	deleteItems(list, !Application::I()->Settings.GetMoveItemsToBin());
 }
 
 void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
@@ -765,7 +765,7 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 		bool permanently = false;
 		if ((keyEvent->modifiers() & Qt::ShiftModifier)
 			||
-			!Application::I()->Settings.moveItemsToBin) {
+			!Application::I()->Settings.GetMoveItemsToBin()) {
 			permanently = true;
 		}
 		QModelIndexList list = treeView->selectionModel()->selectedIndexes();

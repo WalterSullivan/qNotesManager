@@ -49,11 +49,11 @@ using namespace qNotesManager;
 MainWindow::MainWindow() : QMainWindow(0) {
 	createControls();
 
-	showToolbarAction->setChecked(Application::I()->Settings.showToolbar);
-	toolbar->setVisible(Application::I()->Settings.showToolbar);
+	showToolbarAction->setChecked(Application::I()->Settings.GetShowToolbar());
+	toolbar->setVisible(Application::I()->Settings.GetShowToolbar());
 
-	showStatusBarAction->setChecked(Application::I()->Settings.showStausBar);
-	statusBar->setVisible(Application::I()->Settings.showStausBar);
+	showStatusBarAction->setChecked(Application::I()->Settings.GetShowStausBar());
+	statusBar->setVisible(Application::I()->Settings.GetShowStausBar());
 
 
 	// Clipboard
@@ -70,9 +70,9 @@ MainWindow::MainWindow() : QMainWindow(0) {
 
 	setWindowTitle(APPNAME);
 
-	resize(Application::I()->Settings.windowSize);
-	move(Application::I()->Settings.windowPosition);
-	setWindowState(Application::I()->Settings.windowState);
+	resize(Application::I()->Settings.GetWindowSize());
+	move(Application::I()->Settings.GetWindowPos());
+	setWindowState(Application::I()->Settings.GetWindowState());
 }
 
 void MainWindow::createActions() {
@@ -276,7 +276,7 @@ void MainWindow::createControls() {
 	QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
 					 this, SLOT(sl_Tray_Activated(QSystemTrayIcon::ActivationReason)));
 	trayIcon->setContextMenu(trayIconMenu);
-	if (Application::I()->Settings.showSystemTray) {
+	if (Application::I()->Settings.GetShowSystemTray()) {
 		trayIcon->show();
 	}
 
@@ -291,7 +291,7 @@ bool MainWindow::eventFilter (QObject* watched, QEvent* event) {
 void MainWindow::closeEvent (QCloseEvent* event) {
 	event->ignore();
 
-	if (Application::I()->Settings.closeToTray) {
+	if (Application::I()->Settings.GetCloseToTray()) {
 		hide();
 	} else {
 		Document* doc = Application::I()->CurrentDocument();
@@ -311,7 +311,7 @@ void MainWindow::changeEvent (QEvent* event) {
 
 	if (event->type() == QEvent::WindowStateChange) {
 		if (isMinimized() &&
-			(Application::I()->Settings.minimizeToTray)) {
+			(Application::I()->Settings.GetMinimizeToTray())) {
 			QTimer::singleShot(0, this, SLOT(hide()));
 		}
 	}
@@ -320,13 +320,13 @@ void MainWindow::changeEvent (QEvent* event) {
 void MainWindow::resizeEvent (QResizeEvent* event) {
 	QMainWindow::resizeEvent(event);
 
-	if (!isMaximized()) {Application::I()->Settings.windowSize = size();}
+	if (!isMaximized()) {Application::I()->Settings.SetWindowSize(size());}
 }
 
 void MainWindow::moveEvent (QMoveEvent* event) {
 	QMainWindow::moveEvent(event);
 
-	if (!isMaximized()) {Application::I()->Settings.windowPosition = pos();}
+	if (!isMaximized()) {Application::I()->Settings.SetWindowPos(pos());}
 }
 
 void MainWindow::sl_NoteDoubleClicked(Note* note) {
@@ -516,19 +516,19 @@ void MainWindow::sl_ExitAction_Triggered() {
 }
 
 void MainWindow::sl_ShowToolbarAction_Triggered() {
-	Application::I()->Settings.showToolbar = showToolbarAction->isChecked();
+	Application::I()->Settings.SetShowToolbar(showToolbarAction->isChecked());
 	toolbar->setVisible(showToolbarAction->isChecked());
 }
 
 void MainWindow::sl_ShowStatusbarAction_Triggered() {
-	Application::I()->Settings.showToolbar = showToolbarAction->isChecked();
+	Application::I()->Settings.SetShowToolbar(showToolbarAction->isChecked());
 	statusBar->setVisible(showStatusBarAction->isChecked());
 }
 
 void MainWindow::sl_ApplicationSettingsAction_Triggered() {
 	ApplicationSettingsWidget w;
 	if (w.exec() == QDialog::Accepted) {
-		trayIcon->setVisible(Application::I()->Settings.showSystemTray);
+		trayIcon->setVisible(Application::I()->Settings.GetShowSystemTray());
 		navigationPanel->UpdateViewsVisibility();
 	}
 }
@@ -575,7 +575,7 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 		QObject::connect(doc, SIGNAL(sg_SavingStarted()),
 						 this, SLOT(sl_Document_SavingStarted()));
 
-		Application::I()->Settings.LastDocumentName = doc->GetFilename();
+		Application::I()->Settings.SetLastDocumentName(doc->GetFilename());
 
 		sl_EditMenuContentChanged();
 	}
@@ -717,7 +717,7 @@ void MainWindow::sl_EditMenuContentChanged() {
 }
 
 void MainWindow::sl_QApplication_AboutToQuit() {
-	Application::I()->Settings.windowState = windowState();
+	Application::I()->Settings.SetWindowState(windowState());
 
 	Application::I()->Settings.Save();
 }

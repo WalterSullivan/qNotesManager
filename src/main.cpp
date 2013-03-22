@@ -74,14 +74,14 @@ int main(int argc, char** argv) {
 	QObject::connect(&app, SIGNAL(aboutToQuit()), &w, SLOT(sl_QApplication_AboutToQuit()));
 
 
-	if (Application::I()->Settings.ShowWindowOnStart) {
+	if (Application::I()->Settings.GetShowWindowOnStart()) {
 		w.show();
 	}
 
-	if (Application::I()->Settings.OpenLastDocumentOnStart &&
-		!Application::I()->Settings.LastDocumentName.isEmpty() &&
-		QFileInfo(Application::I()->Settings.LastDocumentName).exists()) {
-		w.OpenDocument(Application::I()->Settings.LastDocumentName);
+	if (Application::I()->Settings.GetOpenLastDocumentOnStart() &&
+		!Application::I()->Settings.GetLastDocumentName().isEmpty() &&
+		QFileInfo(Application::I()->Settings.GetLastDocumentName()).exists()) {
+		w.OpenDocument(Application::I()->Settings.GetLastDocumentName());
 	}
 
 	return app.exec();

@@ -26,10 +26,66 @@ namespace qNotesManager {
 	class BOIBuffer;
 
 	class ApplicationSettings {
+
 	public:
 		ApplicationSettings();
+		~ApplicationSettings();
+
 		void Load();
 		void Save();
+
+		QPoint GetWindowPos() const;
+		void SetWindowPos(const QPoint&);
+
+		QSize GetWindowSize() const;
+		void SetWindowSize(const QSize&);
+
+		Qt::WindowStates GetWindowState() const;
+		void SetWindowState(Qt::WindowStates state);
+
+		bool GetShowNumberOfItems() const;
+		void SetShowNumberOfItems(bool v);
+
+		bool GetShowTagsTreeView() const;
+		void SetShowTagsTreeView(bool v);
+
+		bool GetShowDatesTreeView() const;
+		void SetShowDatesTreeView(bool v);
+
+		bool GetShowSystemTray() const;
+		void SetShowSystemTray(bool v);
+
+		bool GetCloseToTray() const;
+		void SetCloseToTray(bool v);
+
+		bool GetMinimizeToTray() const;
+		void SetMinimizeToTray(bool v);
+
+		bool GetMoveItemsToBin() const;
+		void SetMoveItemsToBin(bool v);
+
+		bool GetShowAsterix() const;
+		void SetShowAsterix(bool v);
+
+		bool GetCreateBackups() const;
+		void SetCreateBackups(bool v);
+
+		bool GetShowToolbar() const;
+		void SetShowToolbar(bool v);
+
+		bool GetShowStausBar() const;
+		void SetShowStausBar(bool v);
+
+		bool GetShowWindowOnStart() const;
+		void SetShowWindowOnStart(bool v);
+
+		bool GetOpenLastDocumentOnStart() const;
+		void SetOpenLastDocumentOnStart(bool v);
+
+		QString GetLastDocumentName() const;
+		void SetLastDocumentName(const QString&);
+
+	private:
 
 		QPoint windowPosition;
 		QSize windowSize;
@@ -50,7 +106,6 @@ namespace qNotesManager {
 		bool OpenLastDocumentOnStart;
 		QString LastDocumentName;
 
-	private:
 		void loadDefaultValues();
 		void loadVersion_0(BOIBuffer*);
 		const quint8 currentVersion;

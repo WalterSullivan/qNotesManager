@@ -43,7 +43,7 @@ QVariant DateModelItem::data(int role) const {
 		switch (component) {
 			case Year:
 				returnValue =  QString::number(value);
-				if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+				if (Application::I()->Settings.GetShowNumberOfItems()) {
 					returnValue.append(childrenCount);
 				}
 				break;
@@ -51,14 +51,14 @@ QVariant DateModelItem::data(int role) const {
 				{
 					QDate month(2000, value, 1);
 					returnValue = month.toString("MMMM");
-					if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+					if (Application::I()->Settings.GetShowNumberOfItems()) {
 						returnValue.append(childrenCount);
 					}
 				}
 				break;
 			case Day:
 				returnValue = QString::number(value).rightJustified(2, '0');
-				if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+				if (Application::I()->Settings.GetShowNumberOfItems()) {
 					returnValue.append(childrenCount);
 				}
 				break;

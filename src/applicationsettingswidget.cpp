@@ -73,31 +73,31 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	setWindowTitle("Settings");
 
 	// Load settings
-	showNumberOfItemsCheckbox->setChecked(Application::I()->Settings.showNumberOfItemsInParentItemTitle);
-	showTagsTreeViewCheckbox->setChecked(Application::I()->Settings.showTagsTreeView);
-	showDatesTreeViewCheckbox->setChecked(Application::I()->Settings.showDatesTreeView);
-	showSystemTrayCheckbox->setChecked(Application::I()->Settings.showSystemTray);
-	closeToTrayCheckbox->setChecked(Application::I()->Settings.closeToTray);
-	minimizeToTrayCheckbox->setChecked(Application::I()->Settings.minimizeToTray);
-	moveItemsToBinCheckbox->setChecked(Application::I()->Settings.moveItemsToBin);
-	showAsterixInTitleCheckbox->setChecked(Application::I()->Settings.showAsterixInChangedItemTitle);
-	createBackupsCheckbox->setChecked(Application::I()->Settings.createBackups);
-	showWindowOnStartCheckbox->setChecked(Application::I()->Settings.ShowWindowOnStart);
-	openLastDocumentOnStartCheckbox->setChecked(Application::I()->Settings.OpenLastDocumentOnStart);
+	showNumberOfItemsCheckbox->setChecked(Application::I()->Settings.GetShowNumberOfItems());
+	showTagsTreeViewCheckbox->setChecked(Application::I()->Settings.GetShowTagsTreeView());
+	showDatesTreeViewCheckbox->setChecked(Application::I()->Settings.GetShowDatesTreeView());
+	showSystemTrayCheckbox->setChecked(Application::I()->Settings.GetShowSystemTray());
+	closeToTrayCheckbox->setChecked(Application::I()->Settings.GetCloseToTray());
+	minimizeToTrayCheckbox->setChecked(Application::I()->Settings.GetMinimizeToTray());
+	moveItemsToBinCheckbox->setChecked(Application::I()->Settings.GetMoveItemsToBin());
+	showAsterixInTitleCheckbox->setChecked(Application::I()->Settings.GetShowAsterix());
+	createBackupsCheckbox->setChecked(Application::I()->Settings.GetCreateBackups());
+	showWindowOnStartCheckbox->setChecked(Application::I()->Settings.GetShowWindowOnStart());
+	openLastDocumentOnStartCheckbox->setChecked(Application::I()->Settings.GetOpenLastDocumentOnStart());
 }
 
 void ApplicationSettingsWidget::sl_OKButton_Clicked() {
-	Application::I()->Settings.showNumberOfItemsInParentItemTitle = showNumberOfItemsCheckbox->isChecked();
-	Application::I()->Settings.showTagsTreeView = showTagsTreeViewCheckbox->isChecked();
-	Application::I()->Settings.showDatesTreeView = showDatesTreeViewCheckbox->isChecked();
-	Application::I()->Settings.showSystemTray = showSystemTrayCheckbox->isChecked();
-	Application::I()->Settings.closeToTray = closeToTrayCheckbox->isChecked();
-	Application::I()->Settings.minimizeToTray = minimizeToTrayCheckbox->isChecked();
-	Application::I()->Settings.moveItemsToBin = moveItemsToBinCheckbox->isChecked();
-	Application::I()->Settings.showAsterixInChangedItemTitle = showAsterixInTitleCheckbox->isChecked();
-	Application::I()->Settings.createBackups = createBackupsCheckbox->isChecked();
-	Application::I()->Settings.ShowWindowOnStart = showWindowOnStartCheckbox->isChecked();
-	Application::I()->Settings.OpenLastDocumentOnStart = openLastDocumentOnStartCheckbox->isChecked();
+	Application::I()->Settings.SetShowNumberOfItems(showNumberOfItemsCheckbox->isChecked());
+	Application::I()->Settings.SetShowTagsTreeView(showTagsTreeViewCheckbox->isChecked());
+	Application::I()->Settings.SetShowDatesTreeView(showDatesTreeViewCheckbox->isChecked());
+	Application::I()->Settings.SetShowSystemTray(showSystemTrayCheckbox->isChecked());
+	Application::I()->Settings.SetCloseToTray(closeToTrayCheckbox->isChecked());
+	Application::I()->Settings.SetMinimizeToTray(minimizeToTrayCheckbox->isChecked());
+	Application::I()->Settings.SetMoveItemsToBin(moveItemsToBinCheckbox->isChecked());
+	Application::I()->Settings.SetShowAsterix(showAsterixInTitleCheckbox->isChecked());
+	Application::I()->Settings.SetCreateBackups(createBackupsCheckbox->isChecked());
+	Application::I()->Settings.SetShowWindowOnStart(showWindowOnStartCheckbox->isChecked());
+	Application::I()->Settings.SetOpenLastDocumentOnStart(openLastDocumentOnStartCheckbox->isChecked());
 
 	accept();
 }

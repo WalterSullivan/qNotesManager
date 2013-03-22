@@ -28,6 +28,9 @@ ApplicationSettings::ApplicationSettings() : currentVersion(0) {
 	loadDefaultValues();
 }
 
+ApplicationSettings::~ApplicationSettings() {
+}
+
 void ApplicationSettings::Load() {
 	QFile f("settings");
 	if (!f.exists()) {
@@ -179,3 +182,142 @@ void ApplicationSettings::loadDefaultValues() {
 	OpenLastDocumentOnStart = false;
 	LastDocumentName = "";
 }
+
+QPoint ApplicationSettings::GetWindowPos() const {
+	return windowPosition;
+}
+
+void ApplicationSettings::SetWindowPos(const QPoint& p) {
+	windowPosition = p;
+}
+
+
+QSize ApplicationSettings::GetWindowSize() const {
+	return windowSize;
+}
+
+void ApplicationSettings::SetWindowSize(const QSize& s) {
+	windowSize = s;
+}
+
+Qt::WindowStates ApplicationSettings::GetWindowState() const {
+	return windowState;
+}
+
+void ApplicationSettings::SetWindowState(Qt::WindowStates state) {
+	windowState = state;
+}
+
+bool ApplicationSettings::GetShowNumberOfItems() const {
+	return showNumberOfItemsInParentItemTitle;
+}
+
+void ApplicationSettings::SetShowNumberOfItems(bool v) {
+	showNumberOfItemsInParentItemTitle = v;
+}
+
+bool ApplicationSettings::GetShowTagsTreeView() const {
+	return showTagsTreeView;
+}
+
+void ApplicationSettings::SetShowTagsTreeView(bool v) {
+	showTagsTreeView = v;
+}
+
+bool ApplicationSettings::GetShowDatesTreeView() const {
+	return showDatesTreeView;
+}
+
+void ApplicationSettings::SetShowDatesTreeView(bool v) {
+	showDatesTreeView = v;
+}
+
+bool ApplicationSettings::GetShowSystemTray() const {
+	return showSystemTray;
+}
+
+void ApplicationSettings::SetShowSystemTray(bool v) {
+	showSystemTray = v;
+}
+
+bool ApplicationSettings::GetCloseToTray() const {
+	return closeToTray;
+}
+
+void ApplicationSettings::SetCloseToTray(bool v) {
+	closeToTray = v;
+}
+
+bool ApplicationSettings::GetMinimizeToTray() const {
+	return minimizeToTray;
+}
+
+void ApplicationSettings::SetMinimizeToTray(bool v) {
+	minimizeToTray = v;
+}
+
+bool ApplicationSettings::GetMoveItemsToBin() const {
+	return moveItemsToBin;
+}
+
+void ApplicationSettings::SetMoveItemsToBin(bool v) {
+	moveItemsToBin = v;
+}
+
+bool ApplicationSettings::GetShowAsterix() const {
+	return showAsterixInChangedItemTitle;
+}
+
+void ApplicationSettings::SetShowAsterix(bool v) {
+	showAsterixInChangedItemTitle = v;
+}
+
+bool ApplicationSettings::GetCreateBackups() const {
+	return createBackups;
+}
+
+void ApplicationSettings::SetCreateBackups(bool v) {
+	createBackups = v;
+}
+
+bool ApplicationSettings::GetShowToolbar() const {
+	return showToolbar;
+}
+
+void ApplicationSettings::SetShowToolbar(bool v) {
+	showToolbar = v;
+}
+
+bool ApplicationSettings::GetShowStausBar() const {
+	return showStausBar;
+}
+
+void ApplicationSettings::SetShowStausBar(bool v) {
+	showStausBar = v;
+}
+
+bool ApplicationSettings::GetShowWindowOnStart() const {
+	return ShowWindowOnStart;
+}
+
+void ApplicationSettings::SetShowWindowOnStart(bool v) {
+	ShowWindowOnStart = v;
+}
+
+bool ApplicationSettings::GetOpenLastDocumentOnStart() const {
+	return OpenLastDocumentOnStart;
+}
+
+void ApplicationSettings::SetOpenLastDocumentOnStart(bool v) {
+	OpenLastDocumentOnStart = v;
+}
+
+QString ApplicationSettings::GetLastDocumentName() const {
+	return LastDocumentName;
+}
+
+void ApplicationSettings::SetLastDocumentName(const QString& n) {
+	LastDocumentName = n;
+}
+
+

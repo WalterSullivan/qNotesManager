@@ -42,7 +42,7 @@ QVariant TagModelItem::data(int role) const {
 	} else if (role == Qt::DisplayRole) {
 		QString childrenCount = QString(" (%1)").arg(QString::number(_tag->Owners.Count()));
 		QString returnValue = _tag->GetName();
-		if (Application::I()->Settings.showNumberOfItemsInParentItemTitle) {
+		if (Application::I()->Settings.GetShowNumberOfItems()) {
 			returnValue.append(childrenCount);
 		}
 		return returnValue;
