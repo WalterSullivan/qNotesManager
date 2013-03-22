@@ -93,7 +93,6 @@ void ApplicationSettings::loadVersion_0(BOIBuffer* buffer) {
 	buffer->read(s);
 	windowState = (Qt::WindowStates)s;
 
-	buffer->read(preserveDocumentVisualSettings);
 	buffer->read(showNumberOfItemsInParentItemTitle);
 	buffer->read(showTagsTreeView);
 	buffer->read(showDatesTreeView);
@@ -130,7 +129,6 @@ void ApplicationSettings::Save() {
 
 	buffer.write((qint32)windowState);
 
-	buffer.write(preserveDocumentVisualSettings);
 	buffer.write(showNumberOfItemsInParentItemTitle);
 	buffer.write(showTagsTreeView);
 	buffer.write(showDatesTreeView);
@@ -166,7 +164,6 @@ void ApplicationSettings::loadDefaultValues() {
 	windowSize = QSize(600, 400);
 	windowState = Qt::WindowNoState;
 
-	preserveDocumentVisualSettings = false;
 	showNumberOfItemsInParentItemTitle = true;
 	showTagsTreeView = true;
 	showDatesTreeView = true;

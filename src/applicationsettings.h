@@ -35,7 +35,6 @@ namespace qNotesManager {
 		QSize windowSize;
 		Qt::WindowStates windowState;
 
-		bool preserveDocumentVisualSettings;
 		bool showNumberOfItemsInParentItemTitle;
 		bool showTagsTreeView;
 		bool showDatesTreeView;

@@ -25,7 +25,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(parent) {
-	preserveDocVisSettingsCheckbox = new QCheckBox("Save document's visual settings in document itself", this);
 	showNumberOfItemsCheckbox = new QCheckBox("Show number of child items in folder's title", this);
 	showTagsTreeViewCheckbox = new QCheckBox("Show 'Tags' tree", this);
 	showDatesTreeViewCheckbox = new QCheckBox("Show 'Dates' tree", this);
@@ -54,7 +53,6 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	buttonsLayout->setAlignment(Qt::AlignRight);
 
 	QVBoxLayout* mainLayout = new QVBoxLayout();
-	mainLayout->addWidget(preserveDocVisSettingsCheckbox);
 	mainLayout->addWidget(showNumberOfItemsCheckbox);
 	mainLayout->addWidget(showTagsTreeViewCheckbox);
 	mainLayout->addWidget(showDatesTreeViewCheckbox);
@@ -68,7 +66,6 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	mainLayout->addWidget(openLastDocumentOnStartCheckbox);
 	mainLayout->addLayout(buttonsLayout);
 
-	preserveDocVisSettingsCheckbox->setVisible(false);
 	showAsterixInTitleCheckbox->setVisible(false);
 	createBackupsCheckbox->setVisible(false);
 
@@ -76,7 +73,6 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	setWindowTitle("Settings");
 
 	// Load settings
-	preserveDocVisSettingsCheckbox->setChecked(Application::I()->Settings.preserveDocumentVisualSettings);
 	showNumberOfItemsCheckbox->setChecked(Application::I()->Settings.showNumberOfItemsInParentItemTitle);
 	showTagsTreeViewCheckbox->setChecked(Application::I()->Settings.showTagsTreeView);
 	showDatesTreeViewCheckbox->setChecked(Application::I()->Settings.showDatesTreeView);
@@ -91,7 +87,6 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 }
 
 void ApplicationSettingsWidget::sl_OKButton_Clicked() {
-	Application::I()->Settings.preserveDocumentVisualSettings = preserveDocVisSettingsCheckbox->isChecked();
 	Application::I()->Settings.showNumberOfItemsInParentItemTitle = showNumberOfItemsCheckbox->isChecked();
 	Application::I()->Settings.showTagsTreeView = showTagsTreeViewCheckbox->isChecked();
 	Application::I()->Settings.showDatesTreeView = showDatesTreeViewCheckbox->isChecked();

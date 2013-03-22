@@ -26,7 +26,6 @@ namespace qNotesManager {
 	class ApplicationSettingsWidget : public QDialog {
 	Q_OBJECT
 	private:
-		QCheckBox* preserveDocVisSettingsCheckbox;
 		QCheckBox* showNumberOfItemsCheckbox;
 		QCheckBox* showTagsTreeViewCheckbox;
 		QCheckBox* showDatesTreeViewCheckbox;
