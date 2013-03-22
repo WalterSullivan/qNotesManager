@@ -543,7 +543,7 @@ void MainWindow::sl_AboutQtAction_Triggered() {
 }
 
 void MainWindow::sl_CurrentDocument_Changed() {
-	setWindowModified(Application::I()->CurrentDocument()->HasUnsavedData());
+	updateWindowTitle();
 }
 
 void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
