@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QPoint>
 #include <QSize>
 #include <QString>
+#include <QSettings>
 
 namespace qNotesManager {
 	class BOIBuffer;
@@ -30,9 +31,6 @@ namespace qNotesManager {
 	public:
 		ApplicationSettings();
 		~ApplicationSettings();
-
-		void Load();
-		void Save();
 
 		QPoint GetWindowPos() const;
 		void SetWindowPos(const QPoint&);
@@ -64,8 +62,8 @@ namespace qNotesManager {
 		bool GetMoveItemsToBin() const;
 		void SetMoveItemsToBin(bool v);
 
-		bool GetShowAsterix() const;
-		void SetShowAsterix(bool v);
+		bool GetStarChangedNotes() const;
+		void SetStarChangedNotes(bool v);
 
 		bool GetCreateBackups() const;
 		void SetCreateBackups(bool v);
@@ -86,29 +84,7 @@ namespace qNotesManager {
 		void SetLastDocumentName(const QString&);
 
 	private:
-
-		QPoint windowPosition;
-		QSize windowSize;
-		Qt::WindowStates windowState;
-
-		bool showNumberOfItemsInParentItemTitle;
-		bool showTagsTreeView;
-		bool showDatesTreeView;
-		bool showSystemTray;
-		bool closeToTray;
-		bool minimizeToTray;
-		bool moveItemsToBin;
-		bool showAsterixInChangedItemTitle;
-		bool createBackups;
-		bool showToolbar;
-		bool showStausBar;
-		bool ShowWindowOnStart;
-		bool OpenLastDocumentOnStart;
-		QString LastDocumentName;
-
-		void loadDefaultValues();
-		void loadVersion_0(BOIBuffer*);
-		const quint8 currentVersion;
+		QSettings* settings;
 	};
 }
 

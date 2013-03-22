@@ -25,299 +25,148 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 ApplicationSettings::ApplicationSettings() : currentVersion(0) {
-	loadDefaultValues();
+	settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "MyOrg", "qNotesManager");
 }
 
 ApplicationSettings::~ApplicationSettings() {
-}
-
-void ApplicationSettings::Load() {
-	QFile f("settings");
-	if (!f.exists()) {
-		loadDefaultValues();
-		return;
-	}
-
-	if (!f.open(QIODevice::ReadOnly)) {
-		loadDefaultValues();
-		WARNING("Could not open settings file for reading");
-		return;
-	}
-
-	QByteArray fileDataArray(f.size(), 0x0);
-	f.read(fileDataArray.data(), f.size());
-	f.close();
-
-	BOIBuffer buffer(&fileDataArray);
-	buffer.open(QIODevice::ReadOnly);
-
-	quint8 version = -1;
-	buffer.read(version);
-
-	if (version > 0) {
-		WARNING("Wrong settings file version");
-		loadDefaultValues();
-		return;
-	}
-
-	switch (version) {
-	case 0:
-		loadVersion_0(&buffer);
-		break;
-	default:
-		WARNING("Wrong settings file version");
-		loadDefaultValues();
-		return;
-	}
-
-	buffer.close();
-}
-
-void ApplicationSettings::loadVersion_0(BOIBuffer* buffer) {
-	qint32 x = 0;
-	qint32 y = 0;
-	qint32 w = 0;
-	qint32 h = 0;
-	qint32 s = 0;
-
-
-	buffer->read(x);
-	buffer->read(y);
-
-	windowPosition.setX(x);
-	windowPosition.setY(y);
-
-	buffer->read(w);
-	buffer->read(h);
-
-	windowSize.setWidth(w);
-	windowSize.setHeight(h);
-
-	buffer->read(s);
-	windowState = (Qt::WindowStates)s;
-
-	buffer->read(showNumberOfItemsInParentItemTitle);
-	buffer->read(showTagsTreeView);
-	buffer->read(showDatesTreeView);
-	buffer->read(showSystemTray);
-	buffer->read(closeToTray);
-	buffer->read(minimizeToTray);
-	buffer->read(moveItemsToBin);
-	buffer->read(showAsterixInChangedItemTitle);
-	buffer->read(createBackups);
-	buffer->read(showToolbar);
-	buffer->read(showStausBar);
-	buffer->read(ShowWindowOnStart);
-	buffer->read(OpenLastDocumentOnStart);
-	quint32 lastDocNameSize = 0;
-	buffer->read(lastDocNameSize);
-	QByteArray lastDocName(lastDocNameSize, 0x0);
-	buffer->read(lastDocName.data(), lastDocNameSize);
-	LastDocumentName = lastDocName;
-}
-
-void ApplicationSettings::Save() {
-	QByteArray fileDataArray;
-
-	BOIBuffer buffer(&fileDataArray);
-	buffer.open(QIODevice::WriteOnly);
-
-	buffer.write(currentVersion);
-
-	buffer.write((qint32)windowPosition.x());
-	buffer.write((qint32)windowPosition.y());
-
-	buffer.write((qint32)windowSize.width());
-	buffer.write((qint32)windowSize.height());
-
-	buffer.write((qint32)windowState);
-
-	buffer.write(showNumberOfItemsInParentItemTitle);
-	buffer.write(showTagsTreeView);
-	buffer.write(showDatesTreeView);
-	buffer.write(showSystemTray);
-	buffer.write(closeToTray);
-	buffer.write(minimizeToTray);
-	buffer.write(moveItemsToBin);
-	buffer.write(showAsterixInChangedItemTitle);
-	buffer.write(createBackups);
-	buffer.write(showToolbar);
-	buffer.write(showStausBar);
-	buffer.write(ShowWindowOnStart);
-	buffer.write(OpenLastDocumentOnStart);
-	QByteArray lastDocArray = LastDocumentName.toUtf8();
-	buffer.write((quint32)lastDocArray.size());
-	buffer.write(lastDocArray);
-
-	buffer.close();
-
-	QFile f("settings");
-
-	if (!f.open(QIODevice::WriteOnly)) {
-		WARNING("Could not write settings file. Check your permissions");
-		return;
-	}
-
-	f.write(fileDataArray.constData(), fileDataArray.size());
-	f.close();
-}
-
-void ApplicationSettings::loadDefaultValues() {
-	windowPosition = QPoint(0, 0);
-	windowSize = QSize(600, 400);
-	windowState = Qt::WindowNoState;
-
-	showNumberOfItemsInParentItemTitle = true;
-	showTagsTreeView = true;
-	showDatesTreeView = true;
-	showSystemTray = true;
-	closeToTray = false;
-	minimizeToTray = false;
-	moveItemsToBin = false;
-	showAsterixInChangedItemTitle = false;
-	createBackups = false;
-	showToolbar = true;
-	showStausBar = true;
-	ShowWindowOnStart = true;
-	OpenLastDocumentOnStart = false;
-	LastDocumentName = "";
+	settings->sync();
+	delete settings;
 }
 
 QPoint ApplicationSettings::GetWindowPos() const {
-	return windowPosition;
+	return settings->value("mainwindow/pos", QPoint(0, 0)).toPoint();
 }
 
 void ApplicationSettings::SetWindowPos(const QPoint& p) {
-	windowPosition = p;
+	settings->setValue("mainwindow/pos", p);
 }
 
-
 QSize ApplicationSettings::GetWindowSize() const {
-	return windowSize;
+	return settings->value("mainwindow/size", QSize(800, 600)).toSize();
 }
 
 void ApplicationSettings::SetWindowSize(const QSize& s) {
-	windowSize = s;
+	settings->setValue("mainwindow/size", s);
 }
 
 Qt::WindowStates ApplicationSettings::GetWindowState() const {
-	return windowState;
+	return (Qt::WindowStates)settings->value("mainwindow/state", Qt::WindowNoState).toInt();
 }
 
 void ApplicationSettings::SetWindowState(Qt::WindowStates state) {
-	windowState = state;
+	settings->setValue("mainwindow/state", (int)state);
 }
 
 bool ApplicationSettings::GetShowNumberOfItems() const {
-	return showNumberOfItemsInParentItemTitle;
+	return settings->value("mainwindow/showitemscount", true).toBool();
 }
 
 void ApplicationSettings::SetShowNumberOfItems(bool v) {
-	showNumberOfItemsInParentItemTitle = v;
+	settings->setValue("mainwindow/showitemscount", v);
 }
 
 bool ApplicationSettings::GetShowTagsTreeView() const {
-	return showTagsTreeView;
+	return settings->value("mainwindow/showtagstree", true).toBool();
 }
 
 void ApplicationSettings::SetShowTagsTreeView(bool v) {
-	showTagsTreeView = v;
+	settings->setValue("mainwindow/showtagstree", v);
 }
 
 bool ApplicationSettings::GetShowDatesTreeView() const {
-	return showDatesTreeView;
+	return settings->value("mainwindow/showdatestree", true).toBool();
 }
 
 void ApplicationSettings::SetShowDatesTreeView(bool v) {
-	showDatesTreeView = v;
+	settings->setValue("mainwindow/showdatestree", v);
 }
 
 bool ApplicationSettings::GetShowSystemTray() const {
-	return showSystemTray;
+	return settings->value("app/showtrayicon", true).toBool();
 }
 
 void ApplicationSettings::SetShowSystemTray(bool v) {
-	showSystemTray = v;
+	settings->setValue("app/showtrayicon", v);
 }
 
 bool ApplicationSettings::GetCloseToTray() const {
-	return closeToTray;
+	return settings->value("app/closetotray", false).toBool();
 }
 
 void ApplicationSettings::SetCloseToTray(bool v) {
-	closeToTray = v;
+	settings->setValue("app/closetotray", v);
 }
 
 bool ApplicationSettings::GetMinimizeToTray() const {
-	return minimizeToTray;
+	return settings->value("app/minimizetotray", false).toBool();
 }
 
 void ApplicationSettings::SetMinimizeToTray(bool v) {
-	minimizeToTray = v;
+	settings->setValue("app/minimizetotray", v);
 }
 
 bool ApplicationSettings::GetMoveItemsToBin() const {
-	return moveItemsToBin;
+	return settings->value("app/movetobin", true).toBool();
 }
 
 void ApplicationSettings::SetMoveItemsToBin(bool v) {
-	moveItemsToBin = v;
+	settings->setValue("app/movetobin", v);
 }
 
-bool ApplicationSettings::GetShowAsterix() const {
-	return showAsterixInChangedItemTitle;
+bool ApplicationSettings::GetStarChangedNotes() const {
+	return settings->value("app/starchangednotes", false).toBool();
 }
 
-void ApplicationSettings::SetShowAsterix(bool v) {
-	showAsterixInChangedItemTitle = v;
+void ApplicationSettings::SetStarChangedNotes(bool v) {
+	settings->setValue("app/starchangednotes", v);
 }
 
 bool ApplicationSettings::GetCreateBackups() const {
-	return createBackups;
+	return settings->value("app/createbackups", false).toBool();
 }
 
 void ApplicationSettings::SetCreateBackups(bool v) {
-	createBackups = v;
+	settings->setValue("app/createbackups", v);
 }
 
 bool ApplicationSettings::GetShowToolbar() const {
-	return showToolbar;
+	return settings->value("mainwindow/showtoolbar", true).toBool();
 }
 
 void ApplicationSettings::SetShowToolbar(bool v) {
-	showToolbar = v;
+	settings->setValue("mainwindow/showtoolbar", v);
 }
 
 bool ApplicationSettings::GetShowStausBar() const {
-	return showStausBar;
+	return settings->value("mainwindow/showstatusbar", true).toBool();
 }
 
 void ApplicationSettings::SetShowStausBar(bool v) {
-	showStausBar = v;
+	settings->setValue("mainwindow/showstatusbar", v);
 }
 
 bool ApplicationSettings::GetShowWindowOnStart() const {
-	return ShowWindowOnStart;
+	return settings->value("app/showwindowonstart", true).toBool();
 }
 
 void ApplicationSettings::SetShowWindowOnStart(bool v) {
-	ShowWindowOnStart = v;
+	settings->setValue("app/showwindowonstart", v);
 }
 
 bool ApplicationSettings::GetOpenLastDocumentOnStart() const {
-	return OpenLastDocumentOnStart;
+	return settings->value("app/openlastdocument", false).toBool();
 }
 
 void ApplicationSettings::SetOpenLastDocumentOnStart(bool v) {
-	OpenLastDocumentOnStart = v;
+	settings->setValue("app/openlastdocument", v);
 }
 
 QString ApplicationSettings::GetLastDocumentName() const {
-	return LastDocumentName;
+	return settings->value("app/lastdocument", QString()).toString();
 }
 
 void ApplicationSettings::SetLastDocumentName(const QString& n) {
-	LastDocumentName = n;
+	settings->setValue("app/lastdocument", n);
 }
 
 

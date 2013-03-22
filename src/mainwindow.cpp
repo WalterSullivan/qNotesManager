@@ -718,8 +718,6 @@ void MainWindow::sl_EditMenuContentChanged() {
 
 void MainWindow::sl_QApplication_AboutToQuit() {
 	Application::I()->Settings.SetWindowState(windowState());
-
-	Application::I()->Settings.Save();
 }
 
 void MainWindow::sl_Document_LoadingStarted() {

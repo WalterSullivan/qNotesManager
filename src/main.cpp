@@ -69,7 +69,6 @@ int main(int argc, char** argv) {
 
 	qInstallMsgHandler(myMessageOutput);
 
-	Application::I()->Settings.Load();
 	MainWindow w;
 	QObject::connect(&app, SIGNAL(aboutToQuit()), &w, SLOT(sl_QApplication_AboutToQuit()));
 

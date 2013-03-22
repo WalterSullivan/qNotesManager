@@ -80,7 +80,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	closeToTrayCheckbox->setChecked(Application::I()->Settings.GetCloseToTray());
 	minimizeToTrayCheckbox->setChecked(Application::I()->Settings.GetMinimizeToTray());
 	moveItemsToBinCheckbox->setChecked(Application::I()->Settings.GetMoveItemsToBin());
-	showAsterixInTitleCheckbox->setChecked(Application::I()->Settings.GetShowAsterix());
+	showAsterixInTitleCheckbox->setChecked(Application::I()->Settings.GetStarChangedNotes());
 	createBackupsCheckbox->setChecked(Application::I()->Settings.GetCreateBackups());
 	showWindowOnStartCheckbox->setChecked(Application::I()->Settings.GetShowWindowOnStart());
 	openLastDocumentOnStartCheckbox->setChecked(Application::I()->Settings.GetOpenLastDocumentOnStart());
@@ -94,7 +94,7 @@ void ApplicationSettingsWidget::sl_OKButton_Clicked() {
 	Application::I()->Settings.SetCloseToTray(closeToTrayCheckbox->isChecked());
 	Application::I()->Settings.SetMinimizeToTray(minimizeToTrayCheckbox->isChecked());
 	Application::I()->Settings.SetMoveItemsToBin(moveItemsToBinCheckbox->isChecked());
-	Application::I()->Settings.SetShowAsterix(showAsterixInTitleCheckbox->isChecked());
+	Application::I()->Settings.SetStarChangedNotes(showAsterixInTitleCheckbox->isChecked());
 	Application::I()->Settings.SetCreateBackups(createBackupsCheckbox->isChecked());
 	Application::I()->Settings.SetShowWindowOnStart(showWindowOnStartCheckbox->isChecked());
 	Application::I()->Settings.SetOpenLastDocumentOnStart(openLastDocumentOnStartCheckbox->isChecked());
