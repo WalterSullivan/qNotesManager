@@ -17,11 +17,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "applicationsettings.h"
 
-#include "boibuffer.h"
-#include "global.h"
-
-#include <QFile>
-
 using namespace qNotesManager;
 
 ApplicationSettings::ApplicationSettings() {
