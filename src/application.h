@@ -34,7 +34,9 @@ namespace qNotesManager {
 	Q_OBJECT
 	private:
 		explicit Application();
-		static Application* _instance;
+		Application(const Application&) : QObject(0) {} // Prevent construction by copying
+		Application& operator=(const Application&){return *this;} // Prevent assignment
+		~Application(){} // Prevent unwanted destruction
 
 		Document*		_currentDocument;
 		QHash<QString, QPixmap> standardIcons;

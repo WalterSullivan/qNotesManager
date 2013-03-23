@@ -22,14 +22,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 /*static*/
-Application* Application::_instance = 0;
-
-/*static*/
 Application* Application::I() {
-	if (Application::_instance == 0) {
-		Application::_instance = new Application();
-	}
-	return Application::_instance;
+	static Application instance;
+	return &instance;
 }
 
 Application::Application() :
