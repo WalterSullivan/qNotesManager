@@ -207,12 +207,14 @@ void DocumentWorker::load_v1(BOIBuffer& buffer) {
 		QByteArray passwordHash(passwordHashSize, 0x0);
 		buffer.read(passwordHash.data(), passwordHashSize);
 
+		bool wrongPassword = false;
+
 		while (true) {
 			QString password;
 			QSemaphore s;
 
-			emit sg_PasswordRequired(&s, &password);
-			s.acquire();
+			emit sg_PasswordRequired(&s, &password, wrongPassword);
+			s.acquire(); // wait user action
 
 			if (password.isEmpty()) {
 				emit sg_LoadingAborted();
@@ -223,7 +225,7 @@ void DocumentWorker::load_v1(BOIBuffer& buffer) {
 					r_cipherKey = password.toAscii();
 					break;
 				} else {
-					emit sg_Message("Password is wrong");
+					wrongPassword = true;
 				}
 			}
 		}

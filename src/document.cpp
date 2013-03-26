@@ -168,7 +168,7 @@ void Document::Open(QString fileName) {
 	QObject::connect(w, SIGNAL(sg_LoadingProgress(int)), this, SIGNAL(sg_LoadingProgress(int)));
 	QObject::connect(w, SIGNAL(sg_LoadingStarted()), this, SIGNAL(sg_LoadingStarted()));
 	QObject::connect(w, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)));
-	QObject::connect(w, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)), this, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)));
+	QObject::connect(w, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*, bool)), this, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*, bool)));
 	QObject::connect(w, SIGNAL(sg_Message(QString)), this, SIGNAL(sg_Message(QString)));
 
 	QObject::connect(t, SIGNAL(started()), w, SLOT(sl_start()));
@@ -198,7 +198,6 @@ void Document::Save(QString name, quint16 version) {
 	QObject::connect(w, SIGNAL(sg_SavingProgress(int)), this, SIGNAL(sg_SavingProgress(int)));
 	QObject::connect(w, SIGNAL(sg_SavingStarted()), this, SIGNAL(sg_SavingStarted()));
 	QObject::connect(w, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)));
-	QObject::connect(w, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)), this, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)));
 	QObject::connect(w, SIGNAL(sg_Message(QString)), this, SIGNAL(sg_Message(QString)));
 
 	QObject::connect(t, SIGNAL(started()), w, SLOT(sl_start()));

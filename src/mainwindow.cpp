@@ -391,7 +391,7 @@ void MainWindow::OpenDocument(QString fileName) {
 	QObject::connect(tempDocument, SIGNAL(sg_LoadingStarted()), this, SLOT(sl_Document_LoadingStarted()));
 	QObject::connect(tempDocument, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this, SLOT(sl_Document_ConfirmationRequest(QSemaphore*,QString,bool*)));
 	QObject::connect(tempDocument, SIGNAL(sg_Message(QString)), this, SLOT(sl_Document_Message(QString)));
-	QObject::connect(tempDocument, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*)), this, SLOT(sl_Document_PasswordRequired(QSemaphore*,QString*)));
+	QObject::connect(tempDocument, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*,bool)), this, SLOT(sl_Document_PasswordRequired(QSemaphore*,QString*,bool)));
 
 
 	tempDocument->Open(fileName);
@@ -751,14 +751,16 @@ void MainWindow::sl_Document_LoadingFinished() {
 	menuBar->setEnabled(true);
 }
 
-void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p) {
+void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p, bool lastTryFailed) {
 	bool ok = false;
 
 	QString password;
+	QString message = lastTryFailed ? "Incorrect. Try again" :
+					  "This document is protected. Enter password";
 
 	while (password.isEmpty()) {
 		password = QInputDialog::getText(0, "Enter password",
-										 "This document is protected. Enter password",
+										 message,
 										 QLineEdit::Password, "", &ok);
 		if (!ok) {
 			break;

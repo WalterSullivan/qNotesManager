@@ -63,7 +63,7 @@ namespace qNotesManager {
 		void sg_SavingAborted();
 
 
-		void sg_PasswordRequired(QSemaphore*, QString*);
+		void sg_PasswordRequired(QSemaphore*, QString*, bool);
 		void sg_ConfirmationRequest(QSemaphore*, QString, bool*);
 		void sg_Message(QString);
 

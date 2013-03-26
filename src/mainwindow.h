@@ -175,7 +175,7 @@ namespace qNotesManager {
 		void sl_Document_SavingFinished();
 		void sl_Document_SavingFailed(QString errorString);
 		void sl_Document_SavingAborted();
-		void sl_Document_PasswordRequired(QSemaphore*, QString*);
+		void sl_Document_PasswordRequired(QSemaphore*, QString*, bool);
 		void sl_Document_ConfirmationRequest(QSemaphore*, QString, bool*);
 		void sl_Document_Message(QString);
 	};
