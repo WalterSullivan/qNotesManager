@@ -69,6 +69,7 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 	iconGroupBox->setLayout(iconLayout);
 
 	okButton = new QPushButton("OK", this);
+	okButton->setDefault(true);
 	QObject::connect(okButton, SIGNAL(clicked()),
 					 this, SLOT(sl_OKButton_Clicked()));
 

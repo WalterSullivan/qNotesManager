@@ -60,6 +60,7 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 	}
 
 	okButton = new QPushButton("OK", this);
+	okButton->setDefault(true);
 	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(sl_OKButton_Clicked()));
 	cancelButton = new QPushButton("Cancel", this);
 	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(sl_CancelButton_Clicked()));
