@@ -456,8 +456,6 @@ void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
 		return;
 	}
 
-	Document* doc = Application::I()->CurrentDocument();
-
 	BaseModelItem* modelItemToEdit =
 			static_cast<BaseModelItem*>(itemIndex.internalPointer());
 
@@ -495,7 +493,6 @@ void FolderNavigationWidget::sl_DefaultForeColor_Triggered() {
 		WARNING("Wrong selection for this operation");
 		return;
 	}
-	Document* doc = Application::I()->CurrentDocument();
 
 	for (int i = 0; i < indexesList.size(); ++i) {
 		if (!indexesList.value(i).isValid()) {
@@ -542,7 +539,6 @@ void FolderNavigationWidget::sl_DefaultBackColor_Triggered() {
 		WARNING("Wrong selection for this operation");
 		return;
 	}
-	Document* doc = Application::I()->CurrentDocument();
 
 	for (int i = 0; i < indexesList.size(); ++i) {
 		if (!indexesList.value(i).isValid()) {
