@@ -1,6 +1,6 @@
 build
 Makefile*
-*.pro.user
+*.pro.user*
 *.Debug
 *.Release
 Thumbs.db
