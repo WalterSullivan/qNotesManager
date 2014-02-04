@@ -30,19 +30,18 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 namespace qNotesManager {
 	class ImageLoader;
 	class CachedImageFile;
+	class IDummyImagesProvider;
 
 	class TextDocument : public QTextDocument {
 	Q_OBJECT
 	private:
 		ImageLoader* loader;
 
+
 		QList<QUrl> activeDownloads;
 		QList<QUrl> errorDownloads;
 		void replaceImageUrl(QUrl oldName, QString newName);
 
-		QPixmap loadingDummyImage;
-		QPixmap errorDummyImage;
-		void createDummyImages();
 		quint32 CalculateImageCRC(const QImage&) const;
 		QTimer restartDownloadsTimer;
 
@@ -59,6 +58,8 @@ namespace qNotesManager {
 
 		void InsertImage(QImage image, QTextCursor cursor);
 		void InsertImage(QUrl url, QTextCursor cursor);
+
+		IDummyImagesProvider* DummyImagesProvider;
 
 	protected:
 		//virtual

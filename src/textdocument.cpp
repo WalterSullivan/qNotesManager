@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "crc32.h"
 #include "global.h"
 #include "cachedimagefile.h"
+#include "idummyimagesprovider.h"
 
 #include <QFileInfo>
 #include <QDebug>
@@ -45,8 +46,6 @@ TextDocument::TextDocument(QObject *parent) : QTextDocument(parent) {
 	QObject::connect(loader, SIGNAL(sg_Progress(QUrl,int)),
 					 this, SLOT(sl_Downloader_Progress(QUrl,int)), Qt::DirectConnection);
 
-
-	createDummyImages();
 
 	restartDownloadsTimer.setInterval(60000); // restart in 1 minute
 	QObject::connect(&restartDownloadsTimer, SIGNAL(timeout()),
@@ -129,43 +128,20 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 
 		if (type == QTextDocument::ImageResource) {
 			if (errorDownloads.contains(url)) {
-				return errorDummyImage;
+				return DummyImagesProvider->GetErrorImage();
 			}
 			if (!activeDownloads.contains(url)) {
 				qDebug() << "Creating download task";
 				activeDownloads.append(url);
 				loader->Download(url);
-				return loadingDummyImage;
+				return DummyImagesProvider->GetLoadingImage();
 			} else {
 				qDebug() << "Url " << url << "is in active downloads list. Skipping";
-				return loadingDummyImage;
+				return DummyImagesProvider->GetLoadingImage();
 			}
 		}
 
 	return QVariant();
-}
-
-void TextDocument::createDummyImages() {
-	const QSize dummyImageSize = QSize(150, 150);
-	loadingDummyImage = QPixmap(dummyImageSize);
-	errorDummyImage = QPixmap(dummyImageSize);
-	QPainter painter;
-	const QString loadingDummyImageText = "Loading image...";
-	const QString errorDummyImageText = "Error loading image";
-	const QBrush backgroundBrush(Qt::lightGray);
-	const QRect rect(QPoint(0,0), dummyImageSize);
-
-	painter.begin(&loadingDummyImage);
-	painter.setBrush(backgroundBrush);
-	painter.drawRect(rect);
-	painter.drawText(rect, Qt::AlignCenter, loadingDummyImageText);
-	painter.end();
-
-	painter.begin(&errorDummyImage);
-	painter.setBrush(backgroundBrush);
-	painter.drawRect(rect);
-	painter.drawText(rect, Qt::AlignCenter, errorDummyImageText);
-	painter.end();
 }
 
 void TextDocument::replaceImageUrl(QUrl oldName, QString newName) {
@@ -209,8 +185,8 @@ QSet<QString> TextDocument::GetImagesList() const {
 
 			QVariant imageData = resource(QTextDocument::ImageResource, QUrl(imageName));
 			QImage image = imageData.value<QImage>();
-			if (image.cacheKey() == errorDummyImage.cacheKey() ||
-				image.cacheKey() == loadingDummyImage.cacheKey()) {
+			if (image.cacheKey() == DummyImagesProvider->GetErrorImage().cacheKey() ||
+				image.cacheKey() == DummyImagesProvider->GetLoadingImage().cacheKey()) {
 				qDebug() << "Image " << imageName << " not loaded. Skipping.";
 				continue;
 			}

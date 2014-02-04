@@ -120,7 +120,8 @@ HEADERS += src/tag.h \
     src/localimageloader.h \
     src/httpimagedownloader.h \
     src/documentworker.h \
-    src/iconitemdelegate.h
+    src/iconitemdelegate.h \
+    src/idummyimagesprovider.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \

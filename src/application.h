@@ -26,11 +26,12 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QStandardItemModel>
 
 #include "applicationsettings.h"
+#include "idummyimagesprovider.h"
 
 namespace qNotesManager {
 	class Document;
 
-	class Application : public QObject {
+	class Application : public QObject, public IDummyImagesProvider {
 	Q_OBJECT
 	private:
 		explicit Application();
@@ -45,6 +46,10 @@ namespace qNotesManager {
 
 		void LoadIconsFromDir(const QString&);
 
+		QPixmap loadingDummyImage;
+		QPixmap errorDummyImage;
+		void createDummyImages();
+
 	public:
 		static Application* I();
 
@@ -56,7 +61,10 @@ namespace qNotesManager {
 		QList<QString> GetStandardIconGroups() ;
 		int GetStandardIconsCount() ;
 		QPixmap GetStandardIcon(const QString& name) ;
-		QStandardItemModel* GetIconsModel() ;
+		QStandardItemModel* GetIconsModel();
+
+		QPixmap GetErrorImage() const;
+		QPixmap GetLoadingImage() const;
 
 
 		const QString DefaultNoteIcon;

@@ -18,6 +18,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "application.h"
 
 #include <QDir>
+#include <QPainter>
 
 using namespace qNotesManager;
 
@@ -37,6 +38,8 @@ Application::Application() :
 	LoadIconsFromDir(":/icons/standard/Document");
 	LoadIconsFromDir(":/icons/standard/Folder");
 	LoadIconsFromDir(":/icons/standard/Misc");
+
+	createDummyImages();
 }
 
 void Application::LoadIconsFromDir(const QString& dirName) {
@@ -81,4 +84,35 @@ int Application::GetStandardIconsCount()  {
 
 QPixmap Application::GetStandardIcon(const QString& name)  {
 	return standardIcons.value(name);
+}
+
+void Application::createDummyImages() {
+	const QSize dummyImageSize = QSize(150, 150);
+	loadingDummyImage = QPixmap(dummyImageSize);
+	errorDummyImage = QPixmap(dummyImageSize);
+	QPainter painter;
+	const QString loadingDummyImageText = "Loading image...";
+	const QString errorDummyImageText = "Error loading image";
+	const QBrush backgroundBrush(Qt::lightGray);
+	const QRect rect(QPoint(0,0), dummyImageSize);
+
+	painter.begin(&loadingDummyImage);
+	painter.setBrush(backgroundBrush);
+	painter.drawRect(rect);
+	painter.drawText(rect, Qt::AlignCenter, loadingDummyImageText);
+	painter.end();
+
+	painter.begin(&errorDummyImage);
+	painter.setBrush(backgroundBrush);
+	painter.drawRect(rect);
+	painter.drawText(rect, Qt::AlignCenter, errorDummyImageText);
+	painter.end();
+}
+
+QPixmap Application::GetErrorImage() const {
+	return errorDummyImage;
+}
+
+QPixmap Application::GetLoadingImage() const {
+	return loadingDummyImage;
 }

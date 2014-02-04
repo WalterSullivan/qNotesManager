@@ -74,6 +74,8 @@ Note::Note(QString _name) :
 	if (name.isEmpty()) {name = "New note";}
 
 	QObject::connect(document, SIGNAL(contentsChanged()), this, SLOT(sl_DocumentChanged()));
+
+	document->DummyImagesProvider = Application::I();
 }
 
 Note::~Note() {
