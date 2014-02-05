@@ -757,6 +757,7 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 
 	QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 	if (keyEvent->key() == Qt::Key_Delete) {
+		// Delete selected items by pressing 'Delete' button
 		if (treeView->selectionModel()->selectedIndexes().size() == 0) {return false;}
 		bool permanently = false;
 		if ((keyEvent->modifiers() & Qt::ShiftModifier)
@@ -766,6 +767,26 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 		}
 		QModelIndexList list = treeView->selectionModel()->selectedIndexes();
 		deleteItems(list, permanently);
+
+	} else if (keyEvent->key() == Qt::Key_Enter ||
+			   keyEvent->key() == Qt::Key_Return) {
+		// Open selected notes by pressing 'Enter' button
+		if (treeView->selectionModel()->selectedIndexes().size() == 0) {return false;}
+		QModelIndexList list = treeView->selectionModel()->selectedIndexes();
+
+		foreach (QModelIndex index, list) {
+			if (!index.isValid()) {continue;}
+
+			BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
+			if (item->DataType() == BaseModelItem::note) {
+				Note* note = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
+				if (!note) {
+					WARNING("Casting error");
+					continue;
+				}
+				emit sg_NoteDoubleClicked(note);
+			}
+		}
 	}
 	return false;
 }
