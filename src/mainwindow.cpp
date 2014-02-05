@@ -751,12 +751,13 @@ void MainWindow::sl_QuickNoteAction_Triggered() {
 	if (!(data->hasText() || data->hasHtml())) {return;}
 
 	Note* n = new Note("");
+	QString caption = data->text().mid(0, maxCaptionSize) + "...";
+	caption.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+	n->SetName(caption);
 
 	if (data->hasHtml()) {
-		n->SetName(data->text().mid(0, maxCaptionSize) + "...");
 		n->SetHtml(data->html());
 	} else if (data->hasText()) {
-		n->SetName(data->text().mid(0, maxCaptionSize) + "...");
 		n->SetText(data->text());
 	}
 
