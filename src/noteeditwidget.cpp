@@ -29,6 +29,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QEvent>
+#include <QKeyEvent>
 #include <QDebug>
 
 using namespace qNotesManager;
@@ -355,36 +356,35 @@ void NoteEditWidget::sl_Note_PropertyChanged() {
 
 // virtual
 bool NoteEditWidget::eventFilter (QObject* watched, QEvent* event) {
-	if (event->type() != QEvent::FocusOut) {return false;}
+	if (event->type() == QEvent::FocusOut) {
+		if (watched == captionEdit) {
+			currentNote->SetName(captionEdit->text());
+			qDebug() << "Caption changed";
 
-	if (watched == captionEdit) {
-		currentNote->SetName(captionEdit->text());
-		qDebug() << "Caption changed";
+		} else if (watched == authorEdit) {
+			currentNote->SetAuthor(authorEdit->text());
+			qDebug() << "Author changed";
 
-	} else if (watched == authorEdit) {
-		currentNote->SetAuthor(authorEdit->text());
-		qDebug() << "Author changed";
+		} else if (watched == sourceEdit) {
+			currentNote->SetSource(sourceEdit->text());
+			qDebug() << "Source changed";
 
-	} else if (watched == sourceEdit) {
-		currentNote->SetSource(sourceEdit->text());
-		qDebug() << "Source changed";
+		} else if (watched == commentEdit) {
+			currentNote->SetComment(commentEdit->text());
+			qDebug() << "Comment changed";
 
-	} else if (watched == commentEdit) {
-		currentNote->SetComment(commentEdit->text());
-		qDebug() << "Comment changed";
-
-	} else if (watched == textCreationCheckbox ||
-			   watched == textCreationDateEdit) {
-		if (!textCreationCheckbox->isChecked()) {
-			currentNote->SetTextCreationDate(QDateTime());
+		} else if (watched == textCreationCheckbox ||
+				   watched == textCreationDateEdit) {
+			if (!textCreationCheckbox->isChecked()) {
+				currentNote->SetTextCreationDate(QDateTime());
+			} else {
+				currentNote->SetTextCreationDate(textCreationDateEdit->dateTime());
+			}
+			qDebug() << "Text creation date changed";
 		} else {
-			currentNote->SetTextCreationDate(textCreationDateEdit->dateTime());
+			qDebug() << "Unhandled widget focus out event";
 		}
-		qDebug() << "Text creation date changed";
-	} else {
-		qDebug() << "Unhandled widget focus out event";
 	}
-
 	return false;
 }
 
