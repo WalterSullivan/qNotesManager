@@ -180,18 +180,15 @@ QSet<QString> TextDocument::GetImagesList() const {
 			if(!currentFragment.charFormat().isImageFormat()) {continue;}
 
 			QTextImageFormat format = currentFragment.charFormat().toImageFormat();
-			const QByteArray imageName = format.name().toUtf8();
-			if (returnSet.contains(QString(imageName))) {continue;}
+			const QString imageName = QString(format.name().toUtf8());
+			if (returnSet.contains(imageName)) {continue;}
 
-			QVariant imageData = resource(QTextDocument::ImageResource, QUrl(imageName));
-			QImage image = imageData.value<QImage>();
-			if (image.cacheKey() == DummyImagesProvider->GetErrorImage().cacheKey() ||
-				image.cacheKey() == DummyImagesProvider->GetLoadingImage().cacheKey()) {
+			if (!originalImages.contains(imageName)) {
 				qDebug() << "Image " << imageName << " not loaded. Skipping.";
 				continue;
 			}
 
-			returnSet.insert(QString(imageName));
+			returnSet.insert(imageName);
 
 		}
 		block = block.next();
