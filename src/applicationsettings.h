@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QPoint>
 #include <QSize>
 #include <QString>
+#include <QStringList>
 #include <QSettings>
 
 namespace qNotesManager {
@@ -82,6 +83,9 @@ namespace qNotesManager {
 
 		QString GetLastDocumentName() const;
 		void SetLastDocumentName(const QString&);
+
+		QStringList GetRecentFiles() const;
+		void SetRecentFiles(const QStringList&);
 
 	private:
 		QSettings* settings;

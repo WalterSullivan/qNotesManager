@@ -79,6 +79,7 @@ namespace qNotesManager {
 		QAction* documentPropertiesAction;
 		QAction* globalSearchAction;
 		QAction* exitAction;
+		QMenu* recentFilesMenu;
 
 		QMenu* editMenu;
 
@@ -106,6 +107,8 @@ namespace qNotesManager {
 		void createActions();
 		void createControls();
 		void updateWindowTitle();
+		void updateRecentFilesMenu();
+		void newRecentFile(const QString&);
 
 		Document* tempDocument;
 
@@ -144,6 +147,7 @@ namespace qNotesManager {
 		void sl_CloseDocumentAction_Triggered(bool* actionCancelled = 0);
 		void sl_DocumentPropertiesAction_Triggered();
 		void sl_GlobalSearchAction_Triggered();
+		void sl_OpenRecentFileAction_Triggered();
 		void sl_ExitAction_Triggered();
 
 		void sl_ShowToolbarAction_Triggered();

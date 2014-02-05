@@ -69,6 +69,7 @@ MainWindow::MainWindow() : QMainWindow(0) {
 
 
 	setWindowTitle(APPNAME);
+	updateRecentFilesMenu();
 
 	resize(Application::I()->Settings.GetWindowSize());
 	move(Application::I()->Settings.GetWindowPos());
@@ -228,6 +229,8 @@ void MainWindow::createControls() {
 	documentMenu = new QMenu("Document");
 	menuBar->addMenu(documentMenu);
 
+	recentFilesMenu = new QMenu("Recent files");
+
 	documentMenu->addAction(newDocumentAction);
 	documentMenu->addAction(openDocumentAction);
 	documentMenu->addAction(saveDocumentAction);
@@ -237,6 +240,8 @@ void MainWindow::createControls() {
 	documentMenu->addAction(documentPropertiesAction);
 	documentMenu->addSeparator();
 	documentMenu->addAction(globalSearchAction);
+	documentMenu->addSeparator();
+	documentMenu->addMenu(recentFilesMenu);
 	documentMenu->addSeparator();
 	documentMenu->addAction(exitAction);
 
@@ -395,6 +400,7 @@ void MainWindow::OpenDocument(QString fileName) {
 
 
 	tempDocument->Open(fileName);
+	newRecentFile(fileName);
 }
 
 void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
@@ -412,6 +418,7 @@ void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 			if (actionCancelled) {*actionCancelled = true;}
 			return;
 		}
+		newRecentFile(filename);
 	}
 
 	doc->Save(filename);
@@ -428,6 +435,7 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 		"qNotesManager save file (*.nms)");
 	if (filename.isNull()) {return;}
 
+	newRecentFile(filename);
 	doc->Save(filename);
 }
 
@@ -592,6 +600,46 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	updateWindowTitle();
 }
 
+void MainWindow::sl_OpenRecentFileAction_Triggered() {
+	// Find sender action
+	QObject* sender = QObject::sender();
+	if (sender == 0) {return;}
+
+	QAction* senderAction = 0;
+	senderAction = dynamic_cast<QAction*>(sender);
+	if (senderAction == 0) {return;}
+
+	QString fileName = senderAction->text();
+
+	// Chech if file exists
+	QFileInfo fileInfo(fileName);
+	if (!fileInfo.exists()) {
+		QMessageBox::StandardButton result = QMessageBox::question(this, "File not found",
+											"Selected file not found. Delete it from history?",
+											QMessageBox::Yes | QMessageBox::No,
+											QMessageBox::Yes);
+		if (result == QMessageBox::No) {
+			return;
+		}
+		if (result == QMessageBox::Yes) {
+			QStringList recentFilesList = Application::I()->Settings.GetRecentFiles();
+			recentFilesList.removeAll(fileName);
+			Application::I()->Settings.SetRecentFiles(recentFilesList);
+			updateRecentFilesMenu();
+			return;
+		}
+	}
+
+	Document* doc = Application::I()->CurrentDocument();
+	if (doc != 0) {
+		bool cancelled = false;
+		sl_CloseDocumentAction_Triggered(&cancelled);
+		if (cancelled) {return;}
+	}
+
+	OpenDocument(fileName);
+}
+
 void MainWindow::updateWindowTitle() {
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc == 0) {
@@ -604,6 +652,38 @@ void MainWindow::updateWindowTitle() {
 		setWindowModified(doc->HasUnsavedData());
 		setWindowTitle(title);
 	}
+}
+
+void MainWindow::updateRecentFilesMenu() {
+	recentFilesMenu->clear();
+	QStringList recentFilesList = Application::I()->Settings.GetRecentFiles();
+
+	foreach (QString file, recentFilesList) {
+		QAction* action = new QAction(file, recentFilesMenu);
+		QObject::connect(action, SIGNAL(triggered()),
+						 this, SLOT(sl_OpenRecentFileAction_Triggered()));
+		recentFilesMenu->addAction(action);
+	}
+
+	recentFilesMenu->setEnabled((recentFilesMenu->actions().count() != 0));
+}
+
+void MainWindow::newRecentFile(const QString& fileName) {
+	const int maxRecentFiles = 6;
+
+	QStringList recentFilesList = Application::I()->Settings.GetRecentFiles();
+	if (recentFilesList.contains(fileName)) {
+		recentFilesList.removeAll(fileName);
+	}
+	while (recentFilesList.count() >= maxRecentFiles) {
+		recentFilesList.removeLast();
+	}
+
+	recentFilesList.insert(0, fileName);
+
+	Application::I()->Settings.SetRecentFiles(recentFilesList);
+
+	updateRecentFilesMenu();
 }
 
 void MainWindow::sl_Application_NoteDeleted(Note* n) {

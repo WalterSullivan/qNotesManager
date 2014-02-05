@@ -164,4 +164,12 @@ void ApplicationSettings::SetLastDocumentName(const QString& n) {
 	settings->setValue("app/lastdocument", n);
 }
 
+QStringList ApplicationSettings::GetRecentFiles() const {
+	return settings->value("app/recentfiles", QStringList()).toStringList();
+}
+
+void ApplicationSettings::SetRecentFiles(const QStringList& list) {
+	settings->setValue("app/recentfiles", list);
+}
+
 
