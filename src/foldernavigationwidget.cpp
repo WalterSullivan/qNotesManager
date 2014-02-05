@@ -715,8 +715,8 @@ void FolderNavigationWidget::sl_CustomBackColor_Triggered() {
 
 void FolderNavigationWidget::sl_ClearTrashAction_Triggered() {
 	Folder* f = Application::I()->CurrentDocument()->GetTrashFolder();
-	for (int i = 0; i < f->Items.Count(); ++i) {
-		AbstractFolderItem* item = f->Items.ItemAt(i);
+	while (f->Items.Count() > 0) {
+		AbstractFolderItem* item = f->Items.ItemAt(0);
 		f->Items.Remove(item);
 		delete item;
 	}
