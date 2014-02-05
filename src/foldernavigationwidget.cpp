@@ -116,6 +116,8 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 					 this, SLOT(sl_DeleteItemAction_Triggered()));
 
 	itemPropertiesAction = new QAction(QIcon(":/gui/property"), "Properties", this);
+	itemPropertiesAction->setShortcut(QKeySequence(Qt::Key_F4));
+	itemPropertiesAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	QObject::connect(itemPropertiesAction, SIGNAL(triggered()),
 					 this, SLOT(sl_PropertiesAction_Triggered()));
 
@@ -787,6 +789,8 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 				emit sg_NoteDoubleClicked(note);
 			}
 		}
+	} else if (keyEvent->key() == Qt::Key_F4) {
+		sl_PropertiesAction_Triggered();
 	}
 	return false;
 }
