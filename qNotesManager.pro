@@ -1,6 +1,6 @@
 TARGET = qnotesmanager
 TEMPLATE = app
-VERSION = 0.9.1
+VERSION = 0.9.2
 RC_FILE = qnm.rc
 QT += network
 QMAKE_CXXFLAGS += -Wall
@@ -9,7 +9,7 @@ QMAKE_CXXFLAGS += -isystem \
 DEFINES += ENABLE_LOG_TRACE
 BUILD_PATH = ./build
 DEFINES += APPNAME=\\\"qNotesManager\\\"
-DEFINES += VERSION=\\\"0.9.1\\\"
+DEFINES += VERSION=\\\"0.9.2\\\"
 CONFIG(debug, debug|release) { 
     # Debug
 	QMAKE_CXXFLAGS += -O0
