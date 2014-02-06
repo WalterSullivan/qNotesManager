@@ -357,20 +357,33 @@ void NoteEditWidget::sl_Note_PropertyChanged() {
 // virtual
 bool NoteEditWidget::eventFilter (QObject* watched, QEvent* event) {
 	if (event->type() == QEvent::FocusOut) {
+		QString text;
 		if (watched == captionEdit) {
-			currentNote->SetName(captionEdit->text());
+			text = captionEdit->text();
+			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+			currentNote->SetName(text);
+			captionEdit->setText(text);
 			qDebug() << "Caption changed";
 
 		} else if (watched == authorEdit) {
-			currentNote->SetAuthor(authorEdit->text());
+			text = authorEdit->text();
+			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+			currentNote->SetAuthor(text);
+			authorEdit->setText(text);
 			qDebug() << "Author changed";
 
 		} else if (watched == sourceEdit) {
-			currentNote->SetSource(sourceEdit->text());
+			text = sourceEdit->text();
+			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+			currentNote->SetSource(text);
+			sourceEdit->setText(text);
 			qDebug() << "Source changed";
 
 		} else if (watched == commentEdit) {
-			currentNote->SetComment(commentEdit->text());
+			text = commentEdit->text();
+			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+			currentNote->SetComment(text);
+			commentEdit->setText(text);
 			qDebug() << "Comment changed";
 
 		} else if (watched == textCreationCheckbox ||
