@@ -48,6 +48,7 @@ namespace qNotesManager {
 	#endif
 
 		void closeTab(int);
+		QString cropStringForTabCaption(QString) const;
 
 	public:
 		explicit NotesTabWidget(QWidget *parent = 0);

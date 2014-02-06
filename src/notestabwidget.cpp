@@ -85,7 +85,7 @@ void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 					 this, SLOT(sl_Note_PropertiesChanged()));
 
 
-	tabWidget->addTab(w, note->GetIcon(), note->GetName());
+	tabWidget->addTab(w, note->GetIcon(), cropStringForTabCaption(note->GetName()));
 	tabWidget->setCurrentWidget(w);
 	w->ScrollTo(position);
 }
@@ -156,7 +156,7 @@ void NotesTabWidget::sl_Note_PropertiesChanged() {
 	}
 
 	tabWidget->setTabIcon(tabIndex, note->GetIcon());
-	tabWidget->setTabText(tabIndex, note->GetName());
+	tabWidget->setTabText(tabIndex, cropStringForTabCaption(note->GetName()));
 }
 
 QList<const Note*> NotesTabWidget::DisplayedNotes() const {
@@ -245,4 +245,14 @@ QList<QAction*> NotesTabWidget::GetCurrentEditActionsList() const {
 
 	NoteEditWidget* noteWidget = dynamic_cast<NoteEditWidget*>(tabWidget->currentWidget());
 	return noteWidget->EditActionsList();
+}
+
+QString NotesTabWidget::cropStringForTabCaption(QString text) const {
+	const int maxTabCaptionLength = 12;
+
+	if (text.length() > maxTabCaptionLength) {
+		text = text.mid(0, maxTabCaptionLength).append("...");
+	}
+
+	return text;
 }
