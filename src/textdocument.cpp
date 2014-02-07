@@ -50,6 +50,11 @@ TextDocument::TextDocument(QObject *parent) : QTextDocument(parent) {
 	restartDownloadsTimer.setInterval(60000); // restart in 1 minute
 	QObject::connect(&restartDownloadsTimer, SIGNAL(timeout()),
 					 this, SLOT(sl_RestartDownloadsTimer_Timeout()));
+
+	QFont f;
+	f.setFamily("Arial");
+	f.setPointSize(9);
+	setDefaultFont(f);
 }
 
 TextDocument::~TextDocument() {
