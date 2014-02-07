@@ -290,7 +290,9 @@ void TextEditWidget::CreateControls() {
 	publicActionsList.append(textField->InsertImageFromFileAction);
 	publicActionsList.append(textField->InsertImageFromUrlAction);
 	publicActionsList.append(textField->InsertPlainTextAction);
+	/* Not implemented yet
 	publicActionsList.append(textField->InsertLineAction);
+	*/
 	publicActionsList.append(textField->InsertDateTimeAction);
 
 	// Create search widget
