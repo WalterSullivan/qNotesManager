@@ -25,6 +25,7 @@ namespace qNotesManager {
 	public:
 		virtual QPixmap GetErrorImage() const = 0;
 		virtual QPixmap GetLoadingImage() const = 0;
+		virtual ~IDummyImagesProvider() {}
 	};
 }
 
