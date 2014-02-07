@@ -73,13 +73,20 @@ void TextEditWidget::CreateControls() {
 	TBRMainBar->addWidget(fontComboBox);
 
 	fontSizeComboBox = new QComboBox();
+	fontSizeComboBox->addItem("8", 8);
 	fontSizeComboBox->addItem("9", 9);
 	fontSizeComboBox->addItem("10", 10);
+	fontSizeComboBox->addItem("11", 11);
 	fontSizeComboBox->addItem("12", 12);
+	fontSizeComboBox->addItem("13", 13);
 	fontSizeComboBox->addItem("14", 14);
+	fontSizeComboBox->addItem("15", 15);
 	fontSizeComboBox->addItem("16", 16);
+	fontSizeComboBox->addItem("17", 17);
 	fontSizeComboBox->addItem("18", 18);
+	fontSizeComboBox->addItem("19", 19);
 	fontSizeComboBox->addItem("20", 20);
+	fontSizeComboBox->addItem("22", 22);
 	QObject::connect(fontSizeComboBox, SIGNAL(currentIndexChanged(int)),
 					 this, SLOT(sl_fontSizeComboBoxCurrentIndexChanged(int)));
 	TBRMainBar->addWidget(fontSizeComboBox);
