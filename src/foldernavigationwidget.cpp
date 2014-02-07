@@ -885,6 +885,9 @@ void FolderNavigationWidget::sl_Model_ApplySelection(const QModelIndexList& list
 	treeView->selectionModel()->clearSelection();
 
 	foreach(QModelIndex index, list) {
+		if (index.parent().isValid()) {
+			treeView->expand(index.parent());
+		}
 		treeView->selectionModel()->select(index, QItemSelectionModel::Select);
 	}
 }
