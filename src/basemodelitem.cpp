@@ -137,7 +137,7 @@ bool BaseModelItem::IsOffspringOf(const BaseModelItem* parent) const {
 
 	if (parent == this) {return false;}
 
-	const BaseModelItem* f = parent;
+	const BaseModelItem* f = this->parent();
 	while (f != 0) {
 		if (f == parent) {return true;}
 		f = f->parent();
