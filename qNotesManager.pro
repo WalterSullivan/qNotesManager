@@ -49,12 +49,10 @@ else {
         LIBS += -lqca2
     }
 }
-DEPENDPATH += src/qca/QtCrypto \
-    src/exceptions \
-    src/models
-INCLUDEPATH += src/qca/QtCrypto \
-    src/exceptions \
-    src/models
+DEPENDPATH += src/qca/QtCrypto
+
+INCLUDEPATH += src/qca/QtCrypto
+
 unix { 
     LIBS += -lqca
     LIBS += -L \
