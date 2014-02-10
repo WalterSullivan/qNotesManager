@@ -55,8 +55,6 @@ INCLUDEPATH += src/qca/QtCrypto
 
 unix { 
     LIBS += -lqca
-    LIBS += -L \
-        /usr/lib/
 }
 HEADERS += src/tag.h \
     src/notetagscollection.h \
