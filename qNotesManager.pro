@@ -5,7 +5,7 @@ RC_FILE = qnm.rc
 QT += network
 QMAKE_CXXFLAGS += -Wall
 QMAKE_CXXFLAGS += -isystem \
-    $(QTDIR)\include
+	$(QTDIR)/include
 DEFINES += ENABLE_LOG_TRACE
 BUILD_PATH = ./build
 DEFINES += APPNAME=\\\"qNotesManager\\\"
