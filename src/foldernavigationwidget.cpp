@@ -309,6 +309,16 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 }
 
 void FolderNavigationWidget::sl_PinFolderButton_Toggled(bool toggle) {
+	if (!model) {
+		currentRootLabel->setText("");
+		currentRootLabel->setToolTip("");
+
+		pinFolderButton->blockSignals(true);
+		pinFolderButton->setChecked(false);
+		pinFolderButton->blockSignals(false);
+		return;
+	}
+
 	if (!toggle) {
 		model->SetPinnedFolder(0);
 		currentRootLabel->setText("");
