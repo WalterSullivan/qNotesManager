@@ -299,14 +299,7 @@ void MainWindow::closeEvent (QCloseEvent* event) {
 	if (Application::I()->Settings.GetCloseToTray()) {
 		hide();
 	} else {
-		Document* doc = Application::I()->CurrentDocument();
-		if (doc != 0) {
-			bool cancelled = false;
-			sl_CloseDocumentAction_Triggered(&cancelled);
-			if (cancelled) {return;}
-		}
-
-		QCoreApplication::quit();
+		sl_ExitAction_Triggered();
 	}
 }
 
