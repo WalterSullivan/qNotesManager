@@ -47,6 +47,12 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 MainWindow::MainWindow() : QMainWindow(0) {
+	closeDocumentAfterSave = false;
+	exitAppAfterSave = false;
+	openDocumentAfterSave = false;
+	newDocumentAfterSave = false;
+	delayedDocumentToOpenFileName = "";
+
 	createControls();
 
 	showToolbarAction->setChecked(Application::I()->Settings.GetShowToolbar());
@@ -343,8 +349,12 @@ void MainWindow::sl_NewDocumentAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc != 0) {
 		bool cancelled = false;
-		sl_CloseDocumentAction_Triggered(&cancelled);
+		bool delayed = false;
+
+		sl_CloseDocumentAction_Triggered(&cancelled, &delayed);
+
 		if (cancelled) {return;}
+		if (delayed) {newDocumentAfterSave = true; return;}
 	}
 
 	Document* newDoc = new Document();
@@ -368,12 +378,22 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 		}
 	}
 
+
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc != 0) {
 		bool cancelled = false;
-		sl_CloseDocumentAction_Triggered(&cancelled);
+		bool delayed = false;
+
+		sl_CloseDocumentAction_Triggered(&cancelled, &delayed);
+
 		if (cancelled) {return;}
+		if (delayed) {
+			openDocumentAfterSave = true;
+			delayedDocumentToOpenFileName = fileName;
+			return;
+		}
 	}
+
 
 	OpenDocument(fileName);
 }
@@ -432,7 +452,7 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 	doc->Save(filename);
 }
 
-void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled) {
+void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled, bool* actionDelayed) {
 	Document* oldDoc = Application::I()->CurrentDocument();
 	if (oldDoc == 0) {
 		WARNING("No current document set");
@@ -455,6 +475,12 @@ void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled) {
 				if (actionCancelled) {*actionCancelled = saveCancelled;}
 				return;
 			}
+
+			closeDocumentAfterSave = true;
+			if (actionDelayed) {
+				*actionDelayed = true;
+			}
+			return;
 		}
 	}
 
@@ -509,8 +535,12 @@ void MainWindow::sl_ExitAction_Triggered() {
 
 	if (doc != 0) {
 		bool cancelled = false;
-		sl_CloseDocumentAction_Triggered(&cancelled);
+		bool delayed = false;
+
+		sl_CloseDocumentAction_Triggered(&cancelled, &delayed);
+
 		if (cancelled) {return;}
+		if (delayed) {exitAppAfterSave = true; return;}
 	}
 
 	QCoreApplication::quit();
@@ -626,8 +656,16 @@ void MainWindow::sl_OpenRecentFileAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc != 0) {
 		bool cancelled = false;
-		sl_CloseDocumentAction_Triggered(&cancelled);
+		bool delayed = false;
+
+		sl_CloseDocumentAction_Triggered(&cancelled, &delayed);
+
 		if (cancelled) {return;}
+		if (delayed) {
+			openDocumentAfterSave = true;
+			delayedDocumentToOpenFileName = fileName;
+			return;
+		}
 	}
 
 	OpenDocument(fileName);
@@ -805,7 +843,6 @@ void MainWindow::sl_Document_LoadingStarted() {
 }
 
 void MainWindow::sl_Document_LoadingProgress(int progress) {
-	//qDebug() << "MW: Progress:" << progress;
 	statusBarProgress->setValue(progress);
 }
 
@@ -902,6 +939,27 @@ void MainWindow::sl_Document_SavingFinished() {
 
 	setWindowModified(false);
 	updateWindowTitle();
+
+	if (closeDocumentAfterSave) {
+		closeDocumentAfterSave = false;
+		sl_CloseDocumentAction_Triggered();
+	}
+
+	if (openDocumentAfterSave) {
+		openDocumentAfterSave = false;
+		OpenDocument(delayedDocumentToOpenFileName);
+		delayedDocumentToOpenFileName = "";
+	}
+
+	if (newDocumentAfterSave) {
+		newDocumentAfterSave = false;
+		sl_NewDocumentAction_Triggered();
+	}
+
+	if (exitAppAfterSave) {
+		exitAppAfterSave = false;
+		sl_ExitAction_Triggered();
+	}
 }
 
 void MainWindow::sl_Document_SavingFailed(QString errorString) {
@@ -918,4 +976,10 @@ void MainWindow::sl_Document_SavingAborted() {
 	mainSplitter->setEnabled(true);
 	toolbar->setEnabled(true);
 	menuBar->setEnabled(true);
+
+	closeDocumentAfterSave = false;
+	exitAppAfterSave = false;
+	openDocumentAfterSave = false;
+	newDocumentAfterSave = false;
+	delayedDocumentToOpenFileName = "";
 }

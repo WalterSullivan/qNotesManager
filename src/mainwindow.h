@@ -112,6 +112,17 @@ namespace qNotesManager {
 
 		Document* tempDocument;
 
+		// Delayed actions
+		// this flag indicates whether current document should be closed after saving
+		bool closeDocumentAfterSave;
+		// this flag indicates whether file should be opened after saving
+		bool openDocumentAfterSave;
+		QString delayedDocumentToOpenFileName; //name of file to open
+		// this flag indicates whether new document should be created after saving
+		bool newDocumentAfterSave;
+		// this flag indicates whether application should be closed after saving
+		bool exitAppAfterSave;
+
 	public:
 		explicit MainWindow();
 		void OpenDocument(QString fileName);
@@ -144,7 +155,7 @@ namespace qNotesManager {
 		void sl_OpenDocumentAction_Triggered();
 		void sl_SaveDocumentAction_Triggered(bool* actionCancelled = 0);
 		void sl_SaveDocumentAsAction_Triggered();
-		void sl_CloseDocumentAction_Triggered(bool* actionCancelled = 0);
+		void sl_CloseDocumentAction_Triggered(bool* actionCancelled = 0, bool* actionDelayed = 0);
 		void sl_DocumentPropertiesAction_Triggered();
 		void sl_GlobalSearchAction_Triggered();
 		void sl_OpenRecentFileAction_Triggered();
