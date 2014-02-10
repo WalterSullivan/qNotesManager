@@ -49,9 +49,11 @@ else {
         LIBS += -lqca2
     }
 }
-DEPENDPATH += src/qca/QtCrypto
 
-INCLUDEPATH += src/qca/QtCrypto
+win32 {
+	DEPENDPATH += src/qca/QtCrypto
+	INCLUDEPATH += src/qca/QtCrypto
+}
 
 unix { 
     LIBS += -lqca
