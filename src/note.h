@@ -32,6 +32,7 @@ namespace qNotesManager {
 	class Tag;
 	class TextDocument;
 	class CachedImageFile;
+	class CachedFile;
 
 	class Note : public AbstractFolderItem {
 	Q_OBJECT
@@ -57,6 +58,8 @@ namespace qNotesManager {
 		QTimer textUpdateTimer;
 		mutable QString cachedHtml;
 		mutable bool textDocumentInitialized;
+
+		QList<CachedFile*> attachedFiles;
 
 		void onChange();
 		void initTextDocument() const;
@@ -105,6 +108,12 @@ namespace qNotesManager {
 
 		TextDocument* GetTextDocument();
 		bool TextDocumentInitialized() const;
+
+		int GetAttachedFilesCount() const;
+		void AttachFile(CachedFile*);
+		void RemoveAttachedFile(CachedFile*);
+		void RemoveAttachedFile(const int index);
+		CachedFile* GetAttachedFile(int index) const;
 
 		NoteTagsCollection Tags;
 		bool IsTagsListInitializationInProgress;

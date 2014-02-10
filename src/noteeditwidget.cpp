@@ -25,6 +25,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "document.h"
 #include "global.h"
 #include "notefragment.h"
+#include "attachedfileswidget.h"
 
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -87,6 +88,10 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(0) {
 	commentEdit = new QLineEdit();
 	commentEdit->installEventFilter(this);
 
+	attachedFilesWidget = new AttachedFilesWidget(n);
+	QObject::connect(attachedFilesWidget, SIGNAL(sg_OnResize()),
+					 this, SLOT(sl_AttachFilesPanel_OnResize()));
+
 
 	// Setting up properties widget's layout
 	QGridLayout* gridLayout = new QGridLayout();
@@ -111,12 +116,15 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(0) {
 	gridLayout->addWidget(commentLabel, 5, 0);
 	gridLayout->addWidget(commentEdit, 5, 1, 1, 4);
 
+	gridLayout->addWidget(attachedFilesWidget, 6, 0, 1, 5);
+
 	gridLayout->setVerticalSpacing(5);
 	gridLayout->setColumnStretch(0, 0);
 	gridLayout->setColumnStretch(3, 1);
 
 	propertiesWidget->setLayout(gridLayout);
 	propertiesWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
 
 	scrollArea = new QScrollArea();
 	scrollArea->setWidget(propertiesWidget);
@@ -125,6 +133,7 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(0) {
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	scrollArea->setFrameStyle(QFrame::Box);
 	scrollArea->setMinimumWidth(propertiesWidget->sizeHint().width());
+
 
 	// Setting up main layout
 	QVBoxLayout* mainLayout = new QVBoxLayout();
@@ -167,6 +176,7 @@ void NoteEditWidget::collapsePropertiesPanel() {
 	sourceEdit->setFocusPolicy(Qt::NoFocus);
 	tagsEdit->setFocusPolicy(Qt::NoFocus);
 	commentEdit->setFocusPolicy(Qt::NoFocus);
+	attachedFilesWidget->SetFocusPolicyCustom(Qt::NoFocus);
 
 	updateHeight();
 }
@@ -184,7 +194,12 @@ void NoteEditWidget::expandPropertiesPanel() {
 	sourceEdit->setFocusPolicy(Qt::StrongFocus);
 	tagsEdit->setFocusPolicy(Qt::StrongFocus);
 	commentEdit->setFocusPolicy(Qt::StrongFocus);
+	attachedFilesWidget->SetFocusPolicyCustom(Qt::StrongFocus);
 
+	updateHeight();
+}
+
+void NoteEditWidget::sl_AttachFilesPanel_OnResize() {
 	updateHeight();
 }
 

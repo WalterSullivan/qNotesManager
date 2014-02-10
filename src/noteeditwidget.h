@@ -32,11 +32,13 @@ namespace qNotesManager {
 	class Note;
 	class NoteFragment;
 	class TagsLineEdit;
+	class AttachedFilesWidget;
 
 	class NoteEditWidget : public QWidget {
 	Q_OBJECT
 	private:
 		TextEditWidget*		textEditWidget;
+		AttachedFilesWidget* attachedFilesWidget;
 
 		// Properties widget's controls
 		QWidget*			propertiesWidget;
@@ -87,6 +89,8 @@ namespace qNotesManager {
 		void sl_TagsEdit_CollectionChanged(QStringList);
 
 		void sl_Note_PropertyChanged();
+
+		void sl_AttachFilesPanel_OnResize();
 
 	};
 }

@@ -22,6 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "textdocument.h"
 #include "global.h"
 #include "cachedimagefile.h"
+#include "cachedfile.h"
 
 #include <QDebug>
 
@@ -79,6 +80,11 @@ Note::Note(QString _name) :
 Note::~Note() {
 	Tags.Clear();
 	delete document;
+
+	foreach (CachedFile* file, attachedFiles) {
+		delete file;
+	}
+	attachedFiles.clear();
 }
 
 QString Note::GetName() const {
@@ -323,6 +329,43 @@ TextDocument* Note::GetTextDocument() {
 
 bool Note::TextDocumentInitialized() const {
 	return textDocumentInitialized;
+}
+
+int Note::GetAttachedFilesCount() const {
+	return attachedFiles.count();
+}
+
+void Note::AttachFile(CachedFile* file) {
+	if (file == 0) {return;}
+	if (file->Size() == 0) {return;}
+	if (attachedFiles.contains(file)) {return;}
+
+	attachedFiles.append(file);
+	emit sg_PropertyChanged();
+	onChange();
+}
+
+void Note::RemoveAttachedFile(CachedFile* file) {
+	if (file == 0) {return;}
+	if (!attachedFiles.contains(file)) {return;}
+
+	attachedFiles.removeAll(file);
+	emit sg_PropertyChanged();
+	onChange();
+}
+
+void Note::RemoveAttachedFile(const int index) {
+	if (index < 0 || index >= attachedFiles.count()) {return;}
+
+	attachedFiles.removeAt(index);
+	emit sg_PropertyChanged();
+	onChange();
+}
+
+CachedFile* Note::GetAttachedFile(int index) const {
+	if (index < 0 || index >= attachedFiles.count()) {return 0;}
+
+	return attachedFiles[index];
 }
 
 void Note::onChange() {
