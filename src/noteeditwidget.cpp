@@ -247,15 +247,9 @@ void NoteEditWidget::updateControlsData() {
 
 	captionEdit->setText(currentNote->GetName());
 	authorEdit->setText(currentNote->GetAuthor());
-	if (currentNote->GetTextCreationDate().isValid()) {
-		textCreationCheckbox->setChecked(true);
-		textCreationDateEdit->setEnabled(true);
-		textCreationDateEdit->setDateTime(currentNote->GetTextCreationDate());
-	} else {
-		textCreationCheckbox->setChecked(false);
-		textCreationDateEdit->setEnabled(false);
-		textCreationDateEdit->setDateTime(currentNote->GetTextCreationDate());
-	}
+	textCreationCheckbox->setChecked(currentNote->GetTextCreationDate().isValid());
+	textCreationDateEdit->setEnabled(!currentNoteLocked && currentNote->GetTextCreationDate().isValid());
+	textCreationDateEdit->setDateTime(currentNote->GetTextCreationDate());
 	sourceEdit->setText(currentNote->GetSource());
 	QString tagsList;
 	for (int i = 0; i < currentNote->Tags.Count(); ++i) {
@@ -283,7 +277,7 @@ void NoteEditWidget::updateControlsStatus() {
 	captionEdit->setEnabled(!currentNoteLocked);
 	authorEdit->setEnabled(!currentNoteLocked);
 	textCreationCheckbox->setEnabled(!currentNoteLocked);
-	textCreationDateEdit->setEnabled(!currentNoteLocked);
+	textCreationDateEdit->setEnabled(!currentNoteLocked && currentNote->GetTextCreationDate().isValid());
 	sourceEdit->setEnabled(!currentNoteLocked);
 	tagsEdit->setEnabled(!currentNoteLocked);
 	commentEdit->setEnabled(!currentNoteLocked);
