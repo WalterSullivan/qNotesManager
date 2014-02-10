@@ -240,11 +240,11 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 					clearTrashAction->setEnabled(true);
 				}
 			} else if (folderItem == Application::I()->CurrentDocument()->GetTempFolder()) {
-
+				list.append(addNoteAction);
+				list.append(addFolderAction);
 			} else {
 				list.append(addNoteAction);
 				list.append(addFolderAction);
-				//list.append(renameItemAction);
 				list.append(deleteItemAction);
 				list.append(itemPropertiesAction);
 				list.append(lockItemAction);
@@ -256,7 +256,6 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 
 		} else if (modelitem->DataType() == BaseModelItem::note) {
 			list.append(openNoteAction);
-			//list.append(renameItemAction);
 			list.append(deleteItemAction);
 			list.append(itemPropertiesAction);
 			list.append(lockItemAction);
@@ -425,7 +424,7 @@ void FolderNavigationWidget::sl_AddFolderAction_Triggered() {
 			return;
 		}
 		parentFolder = dynamic_cast<FolderModelItem*>(modelitem)->GetStoredData();
-		if (parentFolder == doc->GetTrashFolder() || parentFolder == doc->GetTempFolder()) {
+		if (parentFolder == doc->GetTrashFolder()) {
 			WARNING("Cannot create new items in system folders");
 			return;
 		}
