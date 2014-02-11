@@ -206,6 +206,28 @@ void HierarchyModel::SetPinnedFolder(Folder* f) {
 	}
 }
 
+Folder* HierarchyModel::GetPinnedFolder() const {
+	const BaseModelItem* displayRootItem = GetDisplayRootItem();
+
+	// No folder pinned
+	if (displayRootItem == GetRootItem()) {
+		return 0;
+	}
+
+	if (displayRootItem == 0) {
+		WARNING("Display root is NULL");
+		return 0;
+	}
+
+	if (displayRootItem->DataType() != BaseModelItem::folder) {
+		WARNING("Display root is not a folder");
+		return 0;
+	}
+
+	const FolderModelItem* folderModelItem = dynamic_cast<const FolderModelItem*>(displayRootItem);
+	return folderModelItem->GetStoredData();
+}
+
 void HierarchyModel::sl_Folder_ItemAdded(AbstractFolderItem* const item, int) {
 	Folder* parent = static_cast<Folder*>(QObject::sender());
 	if (!_bridge.contains(parent)) {

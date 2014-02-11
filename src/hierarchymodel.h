@@ -52,6 +52,7 @@ namespace qNotesManager {
 		virtual QStringList mimeTypes () const;
 
 		void SetPinnedFolder(Folder*);
+		Folder* GetPinnedFolder() const;
 
 	private slots:
 		void sl_Folder_ItemAdded(AbstractFolderItem* const, int);
