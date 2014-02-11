@@ -207,14 +207,14 @@ void FolderNavigationWidget::sl_TreeView_ContextMenuRequested(const QPoint& p) {
 QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 	QList<QAction*> list;
 
-	const QItemSelectionModel* model = treeView->selectionModel();
-	if (!model) {return list;}
+	const QItemSelectionModel* selectionModel = treeView->selectionModel();
+	if (!selectionModel) {return list;}
 
 	list.append(addTopLevelNote);
 	list.append(addTopLevelFolder);
 	list.append(separatorAction);
 
-	const QModelIndexList indexesList = model->selectedIndexes();
+	const QModelIndexList indexesList = selectionModel->selectedIndexes();
 	bool locked = false;
 
 	// 0 items
