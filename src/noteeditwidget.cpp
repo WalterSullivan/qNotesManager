@@ -155,26 +155,36 @@ void NoteEditWidget::sl_OpenClosePropertiesButton_Clicked() {
 
 void NoteEditWidget::collapsePropertiesPanel() {
 	if (propertiesPanelCollapsed) {return;}
-	int newHeight =
-			captionEdit->height() +
-			propertiesWidget->layout()->contentsMargins().top() +
-			propertiesWidget->layout()->contentsMargins().bottom();
-
-	scrollArea->setFixedHeight(newHeight);
 
 	openClosePropertiesButton->setToolTip("Expand");
 	openClosePropertiesButton->setIcon(QIcon(":/gui/arrow-down"));
 	propertiesPanelCollapsed = true;
+
+	updateHeight();
 }
 
 void NoteEditWidget::expandPropertiesPanel() {
 	if (!propertiesPanelCollapsed) {return;}
 
-	int newHeight = propertiesWidget->height();
-	scrollArea->setFixedHeight(newHeight);
 	openClosePropertiesButton->setToolTip("Collapse");
 	openClosePropertiesButton->setIcon(QIcon(":/gui/arrow-up"));
 	propertiesPanelCollapsed = false;
+
+	updateHeight();
+}
+
+void NoteEditWidget::updateHeight() {
+	int newHeight = 0;
+	if (propertiesPanelCollapsed) {
+		newHeight =
+				captionEdit->height() +
+				propertiesWidget->layout()->contentsMargins().top() +
+				propertiesWidget->layout()->contentsMargins().bottom();
+	} else {
+		newHeight = propertiesWidget->height();
+
+	}
+	scrollArea->setFixedHeight(newHeight);
 }
 
 Note* NoteEditWidget::CurrentNote() const {

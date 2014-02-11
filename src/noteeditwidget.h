@@ -66,6 +66,7 @@ namespace qNotesManager {
 		void updateControlsStatus();
 		void fillControlsWithData();
 		void updateControlsData();
+		void updateHeight();
 
 	public:
 		explicit NoteEditWidget(Note* n = 0);
