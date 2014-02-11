@@ -207,14 +207,14 @@ void FolderNavigationWidget::sl_TreeView_ContextMenuRequested(const QPoint& p) {
 QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 	QList<QAction*> list;
 
-	QItemSelectionModel* model = treeView->selectionModel();
+	const QItemSelectionModel* model = treeView->selectionModel();
 	if (!model) {return list;}
 
 	list.append(addTopLevelNote);
 	list.append(addTopLevelFolder);
 	list.append(separatorAction);
 
-	QModelIndexList indexesList = model->selectedIndexes();
+	const QModelIndexList indexesList = model->selectedIndexes();
 	bool locked = false;
 
 	// 0 items
@@ -222,16 +222,16 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 		return list;
 
 	} else if (indexesList.size() == 1) { // 1 item
-		QModelIndex index = indexesList.first();
+		const QModelIndex index = indexesList.first();
 		if (!index.isValid()) {
 			return list;
 		}
 
-		BaseModelItem* modelitem = static_cast<BaseModelItem*>(index.internalPointer());
+		const BaseModelItem* modelitem = static_cast<BaseModelItem*>(index.internalPointer());
 
 		if (modelitem->DataType() == BaseModelItem::folder) {
-			FolderModelItem* folderModelItem = dynamic_cast<FolderModelItem*>(modelitem);
-			AbstractFolderItem* folderItem = folderModelItem->GetStoredData();
+			const FolderModelItem* folderModelItem = dynamic_cast<const FolderModelItem*>(modelitem);
+			const AbstractFolderItem* folderItem = folderModelItem->GetStoredData();
 			if (folderItem == Application::I()->CurrentDocument()->GetTrashFolder()) {
 				list.append(clearTrashAction);
 				if (Application::I()->CurrentDocument()->GetTrashFolder()->Items.Count() == 0) {
@@ -261,7 +261,7 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 			list.append(lockItemAction);
 			list.append(itemForeColorMenu->menuAction());
 			list.append(itemBackColorMenu->menuAction());
-			locked = dynamic_cast<NoteModelItem*>(modelitem)->GetStoredData()->IsLocked();
+			locked = dynamic_cast<const NoteModelItem*>(modelitem)->GetStoredData()->IsLocked();
 		} else {
 			WARNING("Wrong item type");
 		}
@@ -286,11 +286,11 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 		list.append(itemBackColorMenu->menuAction());
 
 		foreach (const QModelIndex index, indexesList) {
-			BaseModelItem* modelitem = static_cast<BaseModelItem*>(index.internalPointer());
+			const BaseModelItem* modelitem = static_cast<BaseModelItem*>(index.internalPointer());
 			if (modelitem->DataType() == BaseModelItem::folder) {
-				locked = dynamic_cast<FolderModelItem*>(modelitem)->GetStoredData()->IsLocked();
+				locked = dynamic_cast<const FolderModelItem*>(modelitem)->GetStoredData()->IsLocked();
 			} else if (modelitem->DataType() == BaseModelItem::note) {
-				locked = dynamic_cast<NoteModelItem*>(modelitem)->GetStoredData()->IsLocked();
+				locked = dynamic_cast<const NoteModelItem*>(modelitem)->GetStoredData()->IsLocked();
 			}
 			if (locked) break;
 		}
