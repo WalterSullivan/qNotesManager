@@ -501,6 +501,7 @@ void TextEditWidget::sl_CreateTableAction_Triggered() {
 	table = textField->textCursor().insertTable(2, 2);
 	QTextTableFormat format = table->format();
 	format.setCellSpacing(0);
+	format.setCellPadding(3);
 	table->setFormat(format);
 	QTextTableCell cell = table->cellAt(0, 0);
 	textField->setTextCursor(cell.firstCursorPosition());
