@@ -219,6 +219,30 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 
 	// 0 items
 	if (indexesList.isEmpty()) {
+		if (model->GetPinnedFolder() != 0) {
+			// Edd context menu items for pinned folder
+			if (model->GetPinnedFolder() == Application::I()->CurrentDocument()->GetTrashFolder()) {
+				list.append(clearTrashAction);
+				if (Application::I()->CurrentDocument()->GetTrashFolder()->Items.Count() == 0) {
+					clearTrashAction->setEnabled(false);
+				} else {
+					clearTrashAction->setEnabled(true);
+				}
+			} else if (model->GetPinnedFolder() == Application::I()->CurrentDocument()->GetTempFolder()) {
+				list.append(addNoteAction);
+				list.append(addFolderAction);
+			} else {
+				list.append(addNoteAction);
+				list.append(addFolderAction);
+				list.append(itemPropertiesAction);
+			}
+
+			locked = model->GetPinnedFolder()->IsLocked();
+
+			addNoteAction->setEnabled(!locked);
+			addFolderAction->setEnabled(!locked);
+			itemPropertiesAction->setEnabled(true);
+		}
 		return list;
 
 	} else if (indexesList.size() == 1) { // 1 item
@@ -389,7 +413,7 @@ void FolderNavigationWidget::sl_AddNoteAction_Triggered() {
 	Folder* parentFolder = 0;
 
 	if (indexesList.size() == 0) {
-		parentFolder = doc->GetRoot();
+		parentFolder = (model->GetPinnedFolder() == 0 ? doc->GetRoot() : model->GetPinnedFolder());
 	} else {
 		BaseModelItem* modelitem =
 				static_cast<BaseModelItem*>(indexesList.value(0).internalPointer());
@@ -424,7 +448,7 @@ void FolderNavigationWidget::sl_AddFolderAction_Triggered() {
 	Folder* parentFolder = 0;
 
 	if (indexesList.size() == 0) {
-		parentFolder = doc->GetRoot();
+		parentFolder = (model->GetPinnedFolder() == 0 ? doc->GetRoot() : model->GetPinnedFolder());
 	} else {
 		BaseModelItem* modelitem =
 				static_cast<BaseModelItem*>(indexesList.value(0).internalPointer());
@@ -456,42 +480,49 @@ void FolderNavigationWidget::sl_DeleteItemAction_Triggered() {
 void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
 	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
 
-	if (indexesList.size() != 1) {
+	if (indexesList.size() > 1) {
 		WARNING("Wrong selection for this operation");
 		return;
 	}
 
-	QModelIndex itemIndex = indexesList.at(0);
-	if (!itemIndex.isValid()) {
-		WARNING("Got invalid index");
-		return;
-	}
-
-	BaseModelItem* modelItemToEdit =
-			static_cast<BaseModelItem*>(itemIndex.internalPointer());
-
 	AbstractFolderItem* itemToEdit = 0;
-	if (modelItemToEdit->DataType() == BaseModelItem::folder) {
-		Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-		if (!f) {
-			WARNING("Casting error");
+
+	if (indexesList.size() == 0) {
+		itemToEdit = (model->GetPinnedFolder() == 0 ? Application::I()->CurrentDocument()->GetRoot() : model->GetPinnedFolder());
+	} else {
+		BaseModelItem* modelItemToEdit = 0;
+
+		QModelIndex itemIndex = indexesList.at(0);
+		if (!itemIndex.isValid()) {
+			WARNING("Got invalid index");
 			return;
 		}
 
-		if (f->GetType() != Folder::UserFolder) {
-			WARNING("Cannot perform action on system folder");
-			return;
-		}
+		modelItemToEdit =
+				static_cast<BaseModelItem*>(itemIndex.internalPointer());
 
-		itemToEdit = f;
-	} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
-		Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-		if (!n) {
-			WARNING("Casting error");
-			return;
-		}
+		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
+			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
+			if (!f) {
+				WARNING("Casting error");
+				return;
+			}
 
-		itemToEdit = n;
+			if (f->GetType() != Folder::UserFolder) {
+				WARNING("Cannot perform action on system folder");
+				return;
+			}
+
+			itemToEdit = f;
+		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
+			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
+			if (!n) {
+				WARNING("Casting error");
+				return;
+			}
+
+			itemToEdit = n;
+		}
 	}
 
 	propertiesWidget->SetFolderItem(itemToEdit);
@@ -979,6 +1010,10 @@ void FolderNavigationWidget::sl_View_SelectionChanged(const QItemSelection&, con
 	emit sg_SelectedItemsActionsListChanged();
 }
 
+void FolderNavigationWidget::sl_Model_DisplayRootItemChanged() {
+	emit sg_SelectedItemsActionsListChanged();
+}
+
 void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 	if (model) {
 		QObject::disconnect(model, 0, this, 0);
@@ -989,6 +1024,8 @@ void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 	if (model) {
 		QObject::connect(model, SIGNAL(sg_ApplySelection(QModelIndexList)),
 						 this, SLOT(sl_Model_ApplySelection(QModelIndexList)));
+		QObject::connect(model, SIGNAL(sg_DisplayRootItemChanged()),
+						 this, SLOT(sl_Model_DisplayRootItemChanged()));
 	}
 
 	treeView->setModel(model);

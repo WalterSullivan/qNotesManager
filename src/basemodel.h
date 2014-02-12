@@ -50,6 +50,7 @@ namespace qNotesManager {
 
 	signals:
 		void sg_ApplySelection(const QModelIndexList&);
+		void sg_DisplayRootItemChanged();
 
 	public slots:
 		void EmitDataChanged(QModelIndex&, QModelIndex&);

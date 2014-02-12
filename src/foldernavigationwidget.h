@@ -117,6 +117,7 @@ namespace qNotesManager {
 		void sl_RenameItemAction_Triggered();
 
 		void sl_Model_ApplySelection(const QModelIndexList&);
+		void sl_Model_DisplayRootItemChanged();
 
 
 	};

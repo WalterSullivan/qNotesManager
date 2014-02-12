@@ -59,6 +59,8 @@ void BaseModel::SetDisplayRootItem(BaseModelItem* item) {
 	} else {
 		displayRootItem = item;
 	}
+
+	emit sg_DisplayRootItemChanged();
 }
 
 BaseModelItem* const BaseModel::GetDisplayRootItem() const {
