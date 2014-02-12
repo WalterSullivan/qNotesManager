@@ -50,7 +50,8 @@ Note::Note(QString _name) :
 		textUpdateTimer(this),
 		cachedHtml(QString()),
 		textDocumentInitialized(true),
-		Tags(this) {
+		Tags(this),
+		IsTagsListInitializationInProgress(false){
 	QObject::connect(&Tags, SIGNAL(sg_ItemAboutToBeAdded(Tag*)),
 					 this, SIGNAL(sg_TagAboutToBeAdded(Tag*)));
 	QObject::connect(&Tags, SIGNAL(sg_ItemAdded(Tag*)),
@@ -546,6 +547,7 @@ void Note::onChange() {
 }
 
 void Note::sl_TagsCollectionModified(Tag*) {
+	if (IsTagsListInitializationInProgress) {return;}
 	emit sg_PropertyChanged();
 	onChange();
 }

@@ -453,7 +453,9 @@ void DocumentWorker::load_v1(BOIBuffer& buffer) {
 					WARNING("Casting error");
 					continue;
 				}
+				note->IsTagsListInitializationInProgress = true;
 				note->Tags.Add(tag);
+				note->IsTagsListInitializationInProgress = false;
 
 				sendProgressSignal(&dataBuffer);
 			}

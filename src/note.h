@@ -113,6 +113,7 @@ namespace qNotesManager {
 		static Note* Deserialize(const int version, BOIBuffer& stream);
 
 		NoteTagsCollection Tags;
+		bool IsTagsListInitializationInProgress;
 
 	signals:
 		void sg_VisualPropertiesChanged(); // emitted when name or icon or other properties has been changed
