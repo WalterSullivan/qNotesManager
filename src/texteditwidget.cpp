@@ -586,8 +586,8 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 
 
 	listButton->blockSignals(true);
-		QTextCursor cursor = textField->textCursor();
-		QTextList *textList = cursor.currentList();
+		const QTextCursor cursor = textField->textCursor();
+		const QTextList *textList = cursor.currentList();
 		listButton->setChecked(textList != 0);
 		increaseListIndentAction->setVisible(textList != 0);
 		decreaseListIndentAction->setVisible(textList != 0);
@@ -595,20 +595,21 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 
 
 	fontComboBox->blockSignals(true);
-		QFont temp = textField->currentFont();
+		const QFont temp = textField->currentFont();
 		fontComboBox->setCurrentFont(temp);
 	fontComboBox->blockSignals(false);
 
 	fontSizeComboBox->blockSignals(true);
-		int size = this->textField->currentFont().pointSize();
-		int index = fontSizeComboBox->findData(size);
+		const int size = this->textField->currentFont().pointSize();
+		const int index = fontSizeComboBox->findData(size);
 		if (index != -1) {
 			fontSizeComboBox->setCurrentIndex(index);
 		}
 	fontSizeComboBox->blockSignals(false);
 
-	QTextTable* table = textField->textCursor().currentTable();
-	bool tablePresent = (table != 0);
+	const QTextTable* table = textField->textCursor().currentTable();
+	const bool tablePresent = (table != 0);
+	createTableAction->setVisible(!tablePresent);
 	insertRowAction->setVisible(tablePresent);
 	insertColumnAction->setVisible(tablePresent);
 	removeRowAction->setVisible(tablePresent);
