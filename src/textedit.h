@@ -95,7 +95,6 @@ namespace qNotesManager {
 		QAction* tableAlignLeft;
 		QAction* tableAlignRight;
 		QAction* tableAlignCenter;
-		QAction* tableAlignJustify;
 
 		QMenu* insertMenu;
 

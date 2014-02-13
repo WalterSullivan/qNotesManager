@@ -74,13 +74,9 @@ TextEdit::TextEdit(QWidget *parent) :
 	tableAlignCenter = new QAction("Center", this);
 	QObject::connect(tableAlignCenter, SIGNAL(triggered()),
 					 this, SLOT(sl_TableAlignAction_Triggered()));
-	tableAlignJustify = new QAction("Justify", this);
-	QObject::connect(tableAlignJustify, SIGNAL(triggered()),
-					 this, SLOT(sl_TableAlignAction_Triggered()));
 	tableAlignMenu->addAction(tableAlignLeft);
 	tableAlignMenu->addAction(tableAlignRight);
 	tableAlignMenu->addAction(tableAlignCenter);
-	tableAlignMenu->addAction(tableAlignJustify);
 
 
 	addAction(InsertHyperlinkAction);
@@ -577,8 +573,6 @@ void TextEdit::sl_TableAlignAction_Triggered() {
 		a = Qt::AlignRight;
 	} else if (act == tableAlignCenter) {
 		a = Qt::AlignHCenter;
-	} else if (act == tableAlignJustify) {
-		a = Qt::AlignJustify;
 	} else {
 		WARNING("Unknown sender");
 		return;
