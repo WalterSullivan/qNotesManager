@@ -919,5 +919,6 @@
         <file alias="clipboard-arrow">icons/gui/clipboard--arrow.png</file>
         <file alias="power">icons/gui/control-power.png</file>
         <file alias="plus">icons/gui/plus.png</file>
+        <file alias="resize">icons/gui/arrow-resize.png</file>
     </qresource>
 </RCC>

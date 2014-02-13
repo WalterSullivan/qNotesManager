@@ -105,6 +105,8 @@ namespace qNotesManager {
 
 		QTextFormat formatToCopy;
 
+		QAction* editTableWidthConstraintsAction;
+
 		HyperlinkEditWidget* linkEditDialog;
 		QTimer	anchorTooltipTimer;
 
@@ -139,10 +141,9 @@ namespace qNotesManager {
 		void sl_ResizeImageAction_Triggered();
 		void sl_ResizeImageCanvasAction_Triggered();
 
-
 		void sl_AnchorTooltipTimer_Timeout();
 
-
+		void sl_EditTableWidthConstraintsAction_Triggered();
 
 	public slots:
 		void sl_CopyCurrentFormat(bool);

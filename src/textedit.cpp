@@ -20,6 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "textdocument.h"
 #include "hyperlinkeditwidget.h"
 #include "global.h"
+#include "edittablewidthconstraintswidget.h"
 
 #include <QMimeData>
 #include <QDebug>
@@ -136,6 +137,10 @@ TextEdit::TextEdit(QWidget *parent) :
 	imagePropertiesMenu->addAction(saveImageAction);
 	imagePropertiesMenu->addAction(resizeImageAction);
 	imagePropertiesMenu->addAction(resizeImageCanvasAction);
+
+	editTableWidthConstraintsAction = new QAction(QIcon(":gui/resize"), "Edit table width...", this);
+	QObject::connect(editTableWidthConstraintsAction, SIGNAL(triggered()),
+					 this, SLOT(sl_EditTableWidthConstraintsAction_Triggered()));
 }
 
 void TextEdit::SetDocument(TextDocument* newDocument) {
@@ -398,6 +403,8 @@ void TextEdit::contextMenuEvent (QContextMenuEvent* event) {
 	if (textCursor().currentTable()) {
 		menu->addSeparator();
 		menu->addMenu(tableAlignMenu);
+		menu->addSeparator();
+		menu->addAction(editTableWidthConstraintsAction);
 	}
 
 	/* NOT IMPLEMENTED YET
@@ -833,4 +840,24 @@ void TextEdit::sl_InsertDateTimeAction_Triggered() {
 			QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate)
 			).arg("<br>");
 	textCursor().insertHtml(text);
+}
+
+void TextEdit::sl_EditTableWidthConstraintsAction_Triggered() {
+	QTextTable* table = textCursor().currentTable();
+	if (!table) {
+		WARNING("No table");
+		return;
+	}
+
+	QTextTableFormat format = table->format();
+
+	EditTableWidthConstraintsWidget* widget = new EditTableWidthConstraintsWidget(format, table->columns(), 0);
+	widget->exec();
+	if (widget->result() == QDialog::Accepted) {
+		format.setWidth(widget->TableWidthConstraint);
+		format.setColumnWidthConstraints(widget->ColumnWidthConstraints);
+		table->setFormat(format);
+	}
+
+	delete widget;
 }
