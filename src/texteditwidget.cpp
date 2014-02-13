@@ -498,6 +498,7 @@ void TextEditWidget::sl_CreateTableAction_Triggered() {
 		return;
 	}
 
+	textField->textCursor().beginEditBlock();
 	table = textField->textCursor().insertTable(2, 2);
 	QTextTableFormat format = table->format();
 
@@ -508,6 +509,7 @@ void TextEditWidget::sl_CreateTableAction_Triggered() {
 	format.setWidth(tableWidth);
 
 	table->setFormat(format);
+	textField->textCursor().endEditBlock();
 
 	QTextTableCell cell = table->cellAt(0, 0);
 	textField->setTextCursor(cell.firstCursorPosition());
