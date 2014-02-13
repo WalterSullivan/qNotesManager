@@ -1,0 +1,23 @@
+﻿0.9.5 (?)
+	- Fixed application crash when trying to close unsaved document and choose
+		'Save' from appeared dialog;
+	- Fixed application crash when an item is added to a folder which is
+		not visible in the folder tree;
+	- Fixed application crash when closing a document with a pinned folder;
+	- Added context menu items for pinned folders;
+	- Fixed 'Edit' menu not updating properly when pinned folder has been 
+		changed;
+	- Fixed bug that caused updating note's modification time when loading a 
+		document;
+	- Added form to edit width of table and of it's columns. It can be
+		accessed through context menu;
+	- Small UI fixes.
+
+0.9.4 (07.02.2014)
+	- Small fixes
+
+0.9.3 (06.02.2014)
+	- Added 'Recent files' menu
+	- Small fixes
+
+0.9.2 (05.02.2014)
