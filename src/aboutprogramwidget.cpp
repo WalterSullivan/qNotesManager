@@ -16,6 +16,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "aboutprogramwidget.h"
+#include "appinfo.h"
 
 #include <QGridLayout>
 
@@ -43,7 +44,7 @@ AboutProgramWidget::AboutProgramWidget(QWidget *parent) : QDialog(parent) {
 	);
 
 	versionLabel = new QLabel();
-	versionLabel->setText(QString("Current version: %1").arg(VERSION));
+	versionLabel->setText(QString("Current version: %1").arg(V_SVERSION_STR));
 
 	okButton = new QPushButton("OK");
 	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(close()));

@@ -1,6 +1,5 @@
 TARGET = qnotesmanager
 TEMPLATE = app
-VERSION = 0.9.4
 RC_FILE = qnm.rc
 QT += network
 QMAKE_CXXFLAGS += -Wall
@@ -8,8 +7,6 @@ QMAKE_CXXFLAGS += -isystem \
 	$(QTDIR)/include
 DEFINES += ENABLE_LOG_TRACE
 BUILD_PATH = ./build
-DEFINES += APPNAME=\\\"qNotesManager\\\"
-DEFINES += VERSION=\\\"0.9.4\\\"
 CONFIG(debug, debug|release) { 
     # Debug
 	QMAKE_CXXFLAGS += -O0
@@ -120,7 +117,8 @@ HEADERS += src/tag.h \
     src/documentworker.h \
     src/iconitemdelegate.h \
     src/idummyimagesprovider.h \
-    src/edittablewidthconstraintswidget.h
+    src/edittablewidthconstraintswidget.h \
+    src/appinfo.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \

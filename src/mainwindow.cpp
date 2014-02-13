@@ -31,6 +31,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "applicationsettingswidget.h"
 #include "cipherer.h"
 #include "global.h"
+#include "appinfo.h"
 
 #include <QDebug>
 #include <QHBoxLayout>
@@ -74,7 +75,7 @@ MainWindow::MainWindow() : QMainWindow(0) {
 
 
 
-	setWindowTitle(APPNAME);
+	setWindowTitle(VER_PRODUCTNAME_STR);
 	updateRecentFilesMenu();
 
 	resize(Application::I()->Settings.GetWindowSize());
@@ -674,12 +675,12 @@ void MainWindow::sl_OpenRecentFileAction_Triggered() {
 void MainWindow::updateWindowTitle() {
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc == 0) {
-		setWindowTitle(APPNAME);
+		setWindowTitle(VER_PRODUCTNAME_STR);
 		setWindowModified(false);
 	} else {
 		QString title;
 		title = doc->GetFilename().isEmpty() ? "<unsaved>" : doc->GetFilename();
-		title.append("[*] - ").append(APPNAME);
+		title.append("[*] - ").append(VER_PRODUCTNAME_STR);
 		setWindowModified(doc->HasUnsavedData());
 		setWindowTitle(title);
 	}

@@ -24,6 +24,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "mainwindow.h"
 #include "application.h"
+#include "appinfo.h"
 
 
 using namespace qNotesManager;
@@ -33,7 +34,7 @@ void myMessageOutput(QtMsgType type, const char *msg);
 bool errorOutput;
 
 int main(int argc, char** argv) {
-	QString helpScreenText = QString().append("Usage: \n").append(APPNAME).append(
+	QString helpScreenText = QString().append("Usage: \n").append(VER_PRODUCTNAME_STR).append(
 			" [-v] [-h] [options] [file]\n"
 			"-v, --version				Print version and exit.\n"
 			"-h, --help				Print this screen\n"
@@ -55,7 +56,7 @@ int main(int argc, char** argv) {
 		if (arguments.count() == 1) {
 			QString arg = arguments.at(0);
 			if (arg == "-v" || arg == "--version") {
-				fprintf(stdout, "%s version: %s\n", APPNAME, VERSION); // FIXME: add actual version
+				fprintf(stdout, "%s version: %s\n", VER_PRODUCTNAME_STR, V_SVERSION_STR);
 				return 0;
 			} else if (arg == "-h" || arg == "--help") {
 				fprintf(stdout, qPrintable(helpScreenText));

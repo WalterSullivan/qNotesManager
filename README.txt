@@ -14,7 +14,7 @@
 	   just one click;
 	   - And more.
 
-       Copyright (C) 2012  Yury Khamenkov
+       Author: Yury Khamenkov
        waltersullivan.11121@gmail.com
 	   
 	   qNotesManager is free and opensource software. Please, feel free to 
