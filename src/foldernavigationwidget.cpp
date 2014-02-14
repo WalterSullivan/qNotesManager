@@ -49,10 +49,6 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 	treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
 
-	QItemDelegate* delegate = new ModelItemDelegate(this);
-	treeView->setItemDelegate(delegate);
-
-
 	QObject::connect(treeView, SIGNAL(customContextMenuRequested(QPoint)),
 					 this, SLOT(sl_TreeView_ContextMenuRequested(QPoint)));
 	QObject::connect(treeView, SIGNAL(clicked(QModelIndex)),
@@ -1050,4 +1046,8 @@ void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 		pinFolderButton->setEnabled(false);
 		pinFolderButton->setChecked(false);
 	}
+}
+
+void FolderNavigationWidget::SetModelItemDelegate(QItemDelegate* delegate) {
+	treeView->setItemDelegate(delegate);
 }

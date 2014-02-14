@@ -22,6 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "datenavigationwidget.h"
 #include "document.h"
 #include "application.h"
+#include "modelitemdelegate.h"
 
 #include <QVBoxLayout>
 
@@ -32,7 +33,10 @@ NavigationPanelWidget::NavigationPanelWidget(QWidget *parent) : QWidget(parent) 
 	QObject::connect(tabWidget, SIGNAL(currentChanged(int)),
 					 this, SLOT(sl_TabWidget_CurrentChanged(int)));
 
+	QItemDelegate* delegate = new ModelItemDelegate(this);
+
 	hierarchyWidget = new FolderNavigationWidget();
+	hierarchyWidget->SetModelItemDelegate(delegate);
 	QObject::connect(hierarchyWidget, SIGNAL(sg_NoteClicked(Note*)),
 					 this, SIGNAL(sg_NoteClicked(Note*)));
 	QObject::connect(hierarchyWidget, SIGNAL(sg_NoteDoubleClicked(Note*)),
@@ -42,6 +46,7 @@ NavigationPanelWidget::NavigationPanelWidget(QWidget *parent) : QWidget(parent) 
 	tabWidget->addTab(hierarchyWidget, QIcon(QPixmap(":/gui/folder-tree")), "Folders");
 
 	tagsWidget = new TagsNavigationWidget();
+	tagsWidget->SetModelItemDelegate(delegate);
 	QObject::connect(tagsWidget, SIGNAL(sg_NoteClicked(Note*)),
 					 this, SIGNAL(sg_NoteClicked(Note*)));
 	QObject::connect(tagsWidget, SIGNAL(sg_NoteDoubleClicked(Note*)),
@@ -49,6 +54,7 @@ NavigationPanelWidget::NavigationPanelWidget(QWidget *parent) : QWidget(parent) 
 	tabWidget->addTab(tagsWidget, QIcon(":/gui/tag"), "Tags"); // TODO: make icon and title widget's properties
 
 	datesWidget = new DateNavigationWidget();
+	datesWidget->SetModelItemDelegate(delegate);
 	QObject::connect(datesWidget, SIGNAL(sg_NoteClicked(Note*)),
 					 this, SIGNAL(sg_NoteClicked(Note*)));
 	QObject::connect(datesWidget, SIGNAL(sg_NoteDoubleClicked(Note*)),

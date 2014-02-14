@@ -37,6 +37,7 @@ DateNavigationWidget::DateNavigationWidget(QWidget *parent) : QWidget(parent) {
 
 	treeView = new QTreeView();
 	treeView->setHeaderHidden(true);
+	treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
 
 	QObject::connect(treeView, SIGNAL(clicked(QModelIndex)),
 					 this, SLOT(sl_View_clicked(QModelIndex)));
@@ -113,6 +114,10 @@ void DateNavigationWidget::SetModificationModel(DatesModel* model) {
 void DateNavigationWidget::SetTextDateModel(DatesModel* model) {
 	textDateModel = model;
 	sl_updateTreeModel();
+}
+
+void DateNavigationWidget::SetModelItemDelegate(QItemDelegate* delegate) {
+	treeView->setItemDelegate(delegate);
 }
 
 void DateNavigationWidget::sl_updateTreeModel(bool) {

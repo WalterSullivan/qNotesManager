@@ -35,6 +35,7 @@ TagsNavigationWidget::TagsNavigationWidget(QWidget *parent) : QWidget(parent) {
 
 	treeView = new QTreeView();
 	treeView->setHeaderHidden(true);
+	treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
 
 	QObject::connect(treeView, SIGNAL(clicked(QModelIndex)),
 					 this, SLOT(sl_View_clicked(QModelIndex)));
@@ -56,6 +57,10 @@ void TagsNavigationWidget::SetModel(TagsModel* _model) {
 			treeView->resizeColumnToContents(i);
 		}
 	}
+}
+
+void TagsNavigationWidget::SetModelItemDelegate(QItemDelegate* delegate) {
+	treeView->setItemDelegate(delegate);
 }
 
 void TagsNavigationWidget::sl_View_clicked (const QModelIndex& index) {

@@ -22,6 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTreeView>
 #include <QMenu>
 #include <QAction>
+#include <QItemDelegate>
 
 namespace qNotesManager {
 	class TagsModel;
@@ -32,6 +33,7 @@ namespace qNotesManager {
 	public:
 		explicit TagsNavigationWidget(QWidget *parent = 0);
 		void SetModel(TagsModel*);
+		void SetModelItemDelegate(QItemDelegate*);
 
 	private:
 		QTreeView*		treeView;
