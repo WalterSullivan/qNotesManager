@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "separatoritemdelegate.h"
+#include "modelitemdelegate.h"
 
 #include "basemodelitem.h"
 #include "global.h"
@@ -25,11 +25,11 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-SeparatorItemDelegate::SeparatorItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {
+ModelItemDelegate::ModelItemDelegate(QObject *parent) : QItemDelegate(parent) {
 }
 
 /*virtual*/
-void SeparatorItemDelegate::paint (QPainter* painter, const QStyleOptionViewItem& option,
+void ModelItemDelegate::paint (QPainter* painter, const QStyleOptionViewItem& option,
 						const QModelIndex& index) const {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (!item) {
@@ -37,7 +37,7 @@ void SeparatorItemDelegate::paint (QPainter* painter, const QStyleOptionViewItem
 		return;
 	}
 	if (item->DataType() != BaseModelItem::Separator) {
-		QStyledItemDelegate::paint(painter, option, index);
+		QItemDelegate::paint(painter, option, index);
 		return;
 	}
 

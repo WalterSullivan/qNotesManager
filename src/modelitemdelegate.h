@@ -15,21 +15,20 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SEPARATORITEMDELEGATE_H
-#define SEPARATORITEMDELEGATE_H
+#ifndef MODELITEMDELEGATE_H
+#define MODELITEMDELEGATE_H
 
-#include <QStyledItemDelegate>
+#include <QItemDelegate>
 
 namespace qNotesManager {
-	class SeparatorItemDelegate : public QStyledItemDelegate {
+	class ModelItemDelegate : public QItemDelegate {
 	Q_OBJECT
 	public:
-		explicit SeparatorItemDelegate(QObject *parent = 0);
-		/*virtual*/ void paint (QPainter* painter, const QStyleOptionViewItem& option,
+		explicit ModelItemDelegate(QObject *parent = 0);
+
+		virtual void paint (QPainter* painter, const QStyleOptionViewItem& option,
 							const QModelIndex& index) const;
-
-
 	};
 }
 
-#endif // SEPARATORITEMDELEGATE_H
+#endif // MODELITEMDELEGATE_H

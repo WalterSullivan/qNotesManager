@@ -88,7 +88,6 @@ HEADERS += src/tag.h \
     src/tracelogger.h \
     src/customiconslistwidget.h \
     src/separatormodelitem.h \
-    src/separatoritemdelegate.h \
     src/searchresultswidget.h \
     src/documentsearchthread.h \
     src/compressor.h \
@@ -118,7 +117,8 @@ HEADERS += src/tag.h \
     src/iconitemdelegate.h \
     src/idummyimagesprovider.h \
     src/edittablewidthconstraintswidget.h \
-    src/appinfo.h
+    src/appinfo.h \
+    src/modelitemdelegate.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -153,7 +153,6 @@ SOURCES += src/tagownerscollection.cpp \
     src/tracelogger.cpp \
     src/customiconslistwidget.cpp \
     src/separatormodelitem.cpp \
-    src/separatoritemdelegate.cpp \
     src/searchresultswidget.cpp \
     src/documentsearchthread.cpp \
     src/compressor.cpp \
@@ -180,5 +179,6 @@ SOURCES += src/tagownerscollection.cpp \
     src/httpimagedownloader.cpp \
     src/documentworker.cpp \
     src/iconitemdelegate.cpp \
-    src/edittablewidthconstraintswidget.cpp
+    src/edittablewidthconstraintswidget.cpp \
+    src/modelitemdelegate.cpp
 RESOURCES += icons.qrc

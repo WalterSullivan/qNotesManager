@@ -27,7 +27,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "folder.h"
 #include "note.h"
 #include "folderitempropertieswidget.h"
-#include "separatoritemdelegate.h"
+#include "modelitemdelegate.h"
 #include "global.h"
 
 #include <QVBoxLayout>
@@ -47,7 +47,8 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 	treeView->setDragDropMode(QAbstractItemView::InternalMove);
 	treeView->viewport()->setAcceptDrops(true);
 	treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	QStyledItemDelegate* delegate = new SeparatorItemDelegate(this);
+
+	QItemDelegate* delegate = new ModelItemDelegate(this);
 	treeView->setItemDelegate(delegate);
 	QObject::connect(treeView, SIGNAL(customContextMenuRequested(QPoint)),
 					 this, SLOT(sl_TreeView_ContextMenuRequested(QPoint)));
