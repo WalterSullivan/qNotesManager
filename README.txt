@@ -44,8 +44,14 @@
 
        See 'LICENSE' file to know more about GNU GPL.
 
-    3. Dependencies
-       This program requeries:
+    3. Platforms
+	   qNotesManager may be built on following platforms:
+	   - MS Windows;
+	   - GNU/Linux;
+	   - OS/2 (thanks to Elbert Pol for OS/2 build);
+	   - Mac OS (maybe, not tested).
+	   
+       This program requeries following libraries:
 	   - Qt4 libraries (4.4 or above)
 	   - openssl
 	   - qca2
