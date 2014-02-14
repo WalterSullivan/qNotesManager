@@ -26,6 +26,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 ModelItemDelegate::ModelItemDelegate(QObject *parent) : QItemDelegate(parent) {
+	_isEditing = false;
+	QObject::connect(this, SIGNAL(closeEditor(QWidget*)),
+					 this, SLOT(sl_Delegate_closeEditor(QWidget*)));
 }
 
 /*virtual*/
@@ -62,4 +65,17 @@ void ModelItemDelegate::paint (QPainter* painter, const QStyleOptionViewItem& op
 		painter->setPen(linePen);
 		painter->drawLine(line);
 	painter->restore();
+}
+
+void ModelItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
+	_isEditing = true;
+	QItemDelegate::setEditorData(editor, index);
+}
+
+bool ModelItemDelegate::isEditing() const {
+	return _isEditing;
+}
+
+void ModelItemDelegate::sl_Delegate_closeEditor (QWidget*) {
+	_isEditing = false;
 }

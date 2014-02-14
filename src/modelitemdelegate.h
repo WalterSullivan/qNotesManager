@@ -23,11 +23,19 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 namespace qNotesManager {
 	class ModelItemDelegate : public QItemDelegate {
 	Q_OBJECT
+	private:
+		mutable bool _isEditing;
 	public:
 		explicit ModelItemDelegate(QObject *parent = 0);
 
 		virtual void paint (QPainter* painter, const QStyleOptionViewItem& option,
 							const QModelIndex& index) const;
+
+		void setEditorData(QWidget* editor, const QModelIndex& index) const;
+		bool isEditing() const;
+
+	private slots:
+		void sl_Delegate_closeEditor (QWidget*);
 	};
 }
 
