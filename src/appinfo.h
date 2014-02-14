@@ -6,9 +6,9 @@
 
 #define V_MAJOR 0
 #define V_MINOR 9
-#define V_BUILD 5
+#define V_BUILD 6
 #define V_REVISION 0
-#define V_ALPHA 0
+#define V_ALPHA 1
 #define V_RC 0
 
 #define V_VERSION  V_MAJOR.V_MINOR.V_BUILD.V_REVISION
