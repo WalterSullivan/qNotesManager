@@ -66,13 +66,13 @@ TextEdit::TextEdit(QWidget *parent) :
 					 this, SLOT(sl_EditLinkActionTriggered()));
 
 	tableAlignMenu = new QMenu("Table alignment", this);
-	tableAlignLeft = new QAction("Left", this);
+	tableAlignLeft = new QAction(QIcon(":/gui/edit-alignment"), "Left", this);
 	QObject::connect(tableAlignLeft, SIGNAL(triggered()),
 					 this, SLOT(sl_TableAlignAction_Triggered()));
-	tableAlignRight = new QAction("Right", this);
+	tableAlignRight = new QAction(QIcon(":/gui/edit-alignment-right"), "Right", this);
 	QObject::connect(tableAlignRight, SIGNAL(triggered()),
 					 this, SLOT(sl_TableAlignAction_Triggered()));
-	tableAlignCenter = new QAction("Center", this);
+	tableAlignCenter = new QAction(QIcon(":/gui/edit-alignment-center"), "Center", this);
 	QObject::connect(tableAlignCenter, SIGNAL(triggered()),
 					 this, SLOT(sl_TableAlignAction_Triggered()));
 	tableAlignMenu->addAction(tableAlignLeft);
