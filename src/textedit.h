@@ -66,6 +66,8 @@ namespace qNotesManager {
 		QAction* const InsertPlainTextAction;
 		QAction* const InsertLineAction;
 		QAction* const InsertDateTimeAction;
+		QAction* const EditTableWidthConstraintsAction;
+		QMenu* const TableAlignMenu;
 
 	protected:
 		virtual void insertFromMimeData (const QMimeData * source);
@@ -91,7 +93,7 @@ namespace qNotesManager {
 		QAction* followLinkAction;
 		QAction* removeLinkAction;
 		QAction* editLinkAction;
-		QMenu*   tableAlignMenu;
+
 		QAction* tableAlignLeft;
 		QAction* tableAlignRight;
 		QAction* tableAlignCenter;
@@ -105,7 +107,7 @@ namespace qNotesManager {
 
 		QTextFormat formatToCopy;
 
-		QAction* editTableWidthConstraintsAction;
+
 
 		HyperlinkEditWidget* linkEditDialog;
 		QTimer	anchorTooltipTimer;

@@ -51,7 +51,9 @@ TextEdit::TextEdit(QWidget *parent) :
 	InsertImageFromFileAction(new QAction("Insert image from file", this)),
 	InsertPlainTextAction(new QAction("Insert plain text", this)),
 	InsertLineAction(new QAction("Insert line", this)),
-	InsertDateTimeAction(new QAction("Insert date and time", this))
+	InsertDateTimeAction(new QAction("Insert date and time", this)),
+	EditTableWidthConstraintsAction(new QAction(QIcon(":gui/resize"), "Edit table width...", this)),
+	TableAlignMenu(new QMenu("Table alignment", this))
 {
 	followLinkAction = new QAction(tr("Follow Link"),this);
 	QObject::connect(followLinkAction, SIGNAL(triggered()),
@@ -65,7 +67,6 @@ TextEdit::TextEdit(QWidget *parent) :
 	QObject::connect(editLinkAction, SIGNAL(triggered()),
 					 this, SLOT(sl_EditLinkActionTriggered()));
 
-	tableAlignMenu = new QMenu("Table alignment", this);
 	tableAlignLeft = new QAction(QIcon(":/gui/edit-alignment"), "Left", this);
 	QObject::connect(tableAlignLeft, SIGNAL(triggered()),
 					 this, SLOT(sl_TableAlignAction_Triggered()));
@@ -75,9 +76,9 @@ TextEdit::TextEdit(QWidget *parent) :
 	tableAlignCenter = new QAction(QIcon(":/gui/edit-alignment-center"), "Center", this);
 	QObject::connect(tableAlignCenter, SIGNAL(triggered()),
 					 this, SLOT(sl_TableAlignAction_Triggered()));
-	tableAlignMenu->addAction(tableAlignLeft);
-	tableAlignMenu->addAction(tableAlignRight);
-	tableAlignMenu->addAction(tableAlignCenter);
+	TableAlignMenu->addAction(tableAlignLeft);
+	TableAlignMenu->addAction(tableAlignRight);
+	TableAlignMenu->addAction(tableAlignCenter);
 
 
 	addAction(InsertHyperlinkAction);
@@ -138,8 +139,7 @@ TextEdit::TextEdit(QWidget *parent) :
 	imagePropertiesMenu->addAction(resizeImageAction);
 	imagePropertiesMenu->addAction(resizeImageCanvasAction);
 
-	editTableWidthConstraintsAction = new QAction(QIcon(":gui/resize"), "Edit table width...", this);
-	QObject::connect(editTableWidthConstraintsAction, SIGNAL(triggered()),
+	QObject::connect(EditTableWidthConstraintsAction, SIGNAL(triggered()),
 					 this, SLOT(sl_EditTableWidthConstraintsAction_Triggered()));
 }
 
@@ -402,9 +402,9 @@ void TextEdit::contextMenuEvent (QContextMenuEvent* event) {
 
 	if (textCursor().currentTable()) {
 		menu->addSeparator();
-		menu->addMenu(tableAlignMenu);
+		menu->addMenu(TableAlignMenu);
 		menu->addSeparator();
-		menu->addAction(editTableWidthConstraintsAction);
+		menu->addAction(EditTableWidthConstraintsAction);
 	}
 
 	/* NOT IMPLEMENTED YET
