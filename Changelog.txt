@@ -11,7 +11,8 @@
 		document;
 	- Added form to edit width of table and of it's columns. It can be
 		accessed through context menu;
-	- Small UI fixes.
+	- Items in tree views now may be renamed by pressing F2 of by context menu action;
+	- UI fixes.
 
 0.9.4 (07.02.2014)
 	- Small fixes
