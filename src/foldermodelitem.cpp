@@ -82,6 +82,29 @@ QVariant FolderModelItem::data(int role) const {
 	}
 }
 
+bool FolderModelItem::setData(const QVariant& value, int role) {
+	if (!value.isValid()) {return false;}
+
+	if (role == Qt::EditRole) {
+		QString newName = value.toString();
+		newName.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+		folder->SetName(newName);
+		return true;
+	}
+	return false;
+}
+
+/* virtual */
+Qt::ItemFlags FolderModelItem::flags () const {
+	Qt::ItemFlags flags = BaseModelItem::flags();
+
+	if (!folder->IsLocked() && folder->GetType() == Folder::UserFolder) {
+		return flags | Qt::ItemIsEditable;
+	}
+
+	return flags;
+}
+
 Folder* FolderModelItem::GetStoredData() const {
 	return folder;
 }

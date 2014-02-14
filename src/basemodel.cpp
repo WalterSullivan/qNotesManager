@@ -140,6 +140,15 @@ QVariant BaseModel::data(const QModelIndex& index, int role) const {
 	return item->data(role);
 }
 
+/*virtual*/
+bool BaseModel::setData(const QModelIndex& index, const QVariant& value,
+						int role) {
+	if (!index.isValid()) {return false;}
+
+	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
+	return item->setData(value, role);
+}
+
 /* virtual */
 Qt::ItemFlags BaseModel::flags (const QModelIndex& index) const {
 	if (!index.isValid()) {

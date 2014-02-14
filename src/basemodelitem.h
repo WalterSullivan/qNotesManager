@@ -80,6 +80,7 @@ namespace qNotesManager {
 		ItemType DataType() const;
 
 		virtual QVariant data(int role) const;
+		virtual bool setData(const QVariant& value, int role);
 		virtual BaseModelItem* parent() const;
 		virtual Qt::ItemFlags flags () const;
 

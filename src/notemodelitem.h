@@ -37,6 +37,10 @@ namespace qNotesManager {
 		/*virtual*/
 		QVariant data(int role) const;
 		/*virtual*/
+		bool setData(const QVariant& value, int role);
+		/*virtual*/
+		Qt::ItemFlags flags () const;
+		/*virtual*/
 		bool LessThan(const BaseModelItem*) const;
 
 	private slots:

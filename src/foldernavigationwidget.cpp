@@ -47,9 +47,12 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 	treeView->setDragDropMode(QAbstractItemView::InternalMove);
 	treeView->viewport()->setAcceptDrops(true);
 	treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
 
 	QItemDelegate* delegate = new ModelItemDelegate(this);
 	treeView->setItemDelegate(delegate);
+
+
 	QObject::connect(treeView, SIGNAL(customContextMenuRequested(QPoint)),
 					 this, SLOT(sl_TreeView_ContextMenuRequested(QPoint)));
 	QObject::connect(treeView, SIGNAL(clicked(QModelIndex)),
@@ -157,7 +160,7 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 	QObject::connect(openNoteAction, SIGNAL(triggered()),
 					 this, SLOT(sl_OpenNoteAction_Triggered()));
 
-	renameItemAction = new QAction("Rename", this);
+	renameItemAction = new QAction(QIcon(":/gui/rename"), "Rename", this);
 	QObject::connect(renameItemAction, SIGNAL(triggered()),
 					 this, SLOT(sl_RenameItemAction_Triggered()));
 
@@ -272,6 +275,7 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 				list.append(addFolderAction);
 				list.append(deleteItemAction);
 				list.append(itemPropertiesAction);
+				list.append(renameItemAction);
 				list.append(lockItemAction);
 				list.append(itemForeColorMenu->menuAction());
 				list.append(itemBackColorMenu->menuAction());
@@ -283,6 +287,7 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 			list.append(openNoteAction);
 			list.append(deleteItemAction);
 			list.append(itemPropertiesAction);
+			list.append(renameItemAction);
 			list.append(lockItemAction);
 			list.append(itemForeColorMenu->menuAction());
 			list.append(itemBackColorMenu->menuAction());
@@ -779,24 +784,22 @@ void FolderNavigationWidget::sl_OpenNoteAction_Triggered() {
 }
 
 void FolderNavigationWidget::sl_RenameItemAction_Triggered() {
-	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-	if (indexesList.size() != 1) {
-		WARNING("Wrong list size");
-		return;
-	}
-	QModelIndex index = indexesList.at(0);
-	if (!index.isValid()) {
+	if (!treeView->currentIndex().isValid()) {
 		WARNING("Invalid index");
 		return;
 	}
-
-	treeView->edit(index);
+	treeView->edit(treeView->currentIndex());
 }
 
 /* virtual */
 bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 	if (watched != treeView) {return false;}
 	if (event->type() != QEvent::KeyPress) {return false;}
+
+	ModelItemDelegate* delegate = dynamic_cast<ModelItemDelegate*>(treeView->itemDelegate());
+	if (delegate != 0 && delegate->isEditing()) {
+		return false;
+	}
 
 	QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 	if (keyEvent->key() == Qt::Key_Delete) {
@@ -1048,4 +1051,3 @@ void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 		pinFolderButton->setChecked(false);
 	}
 }
-

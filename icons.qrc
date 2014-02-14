@@ -920,5 +920,6 @@
         <file alias="power">icons/gui/control-power.png</file>
         <file alias="plus">icons/gui/plus.png</file>
         <file alias="resize">icons/gui/arrow-resize.png</file>
+        <file alias="rename">icons/gui/document-rename.png</file>
     </qresource>
 </RCC>

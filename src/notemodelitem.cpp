@@ -74,6 +74,29 @@ QVariant NoteModelItem::data(int role) const {
 	}
 }
 
+bool NoteModelItem::setData(const QVariant& value, int role) {
+	if (!value.isValid()) {return false;}
+
+	if (role == Qt::EditRole) {
+		QString newName = value.toString();
+		newName.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+		_storedData->SetName(newName);
+		return true;
+	}
+	return false;
+}
+
+/* virtual */
+Qt::ItemFlags NoteModelItem::flags () const {
+	Qt::ItemFlags flags = BaseModelItem::flags();
+
+	if (!_storedData->IsLocked()) {
+		return flags | Qt::ItemIsEditable;
+	}
+
+	return flags;
+}
+
 Note* NoteModelItem::GetStoredData() const {
 	return _storedData;
 }

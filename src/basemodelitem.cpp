@@ -153,6 +153,10 @@ QVariant BaseModelItem::data(int role) const {
 	return QVariant();
 }
 
+bool BaseModelItem::setData(const QVariant&, int) {
+	return false;
+}
+
 // Returns index where a new item will be inserted with AddChild()
 int BaseModelItem::FindInsertIndex(const BaseModelItem* item) const {
 	if (!item) {
