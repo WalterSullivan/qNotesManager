@@ -61,6 +61,8 @@ QVariant FolderModelItem::data(int role) const {
 			returnValue.append(childrenCount);
 		}
 		return returnValue;
+	} else if (role == Qt::ToolTipRole) {
+		return folder->GetName();
 	} else if (role == Qt::BackgroundRole) {
 		if (folder->IsLocked()) {
 			return QBrush();

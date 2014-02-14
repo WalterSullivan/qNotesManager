@@ -53,6 +53,8 @@ QVariant NoteModelItem::data(int role) const {
 		}
 	} else if (role == Qt::DisplayRole) {
 		return _storedData->GetName();
+	} else if (role == Qt::ToolTipRole) {
+		return _storedData->GetName();
 	} else if (role == Qt::BackgroundRole) {
 		if (_storedData->IsLocked()) {
 			return QBrush();

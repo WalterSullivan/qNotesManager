@@ -46,6 +46,8 @@ QVariant TagModelItem::data(int role) const {
 			returnValue.append(childrenCount);
 		}
 		return returnValue;
+	} else if (role == Qt::ToolTipRole) {
+		return _tag->GetName();
 	} else {
 		return QVariant();
 	}
