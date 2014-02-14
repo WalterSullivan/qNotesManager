@@ -920,9 +920,11 @@ void FolderNavigationWidget::deleteChildIndexes(QModelIndexList& list) const {
 }
 
 void FolderNavigationWidget::sl_Model_ApplySelection(const QModelIndexList& list) {
+	treeView->selectionModel()->clearSelection();
+
 	if (list.size() == 0) {return;}
 
-	treeView->selectionModel()->clearSelection();
+	treeView->selectionModel()->setCurrentIndex(list.at(0), QItemSelectionModel::NoUpdate);
 
 	foreach(QModelIndex index, list) {
 		if (index.parent().isValid()) {
