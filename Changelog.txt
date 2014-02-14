@@ -1,4 +1,4 @@
-﻿0.9.5 (?)
+﻿0.9.5 (14.02.2014)
 	- Fixed application crash when trying to close unsaved document and choose
 		'Save' from appeared dialog;
 	- Fixed application crash when an item is added to a folder which is
