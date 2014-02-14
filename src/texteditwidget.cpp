@@ -187,35 +187,48 @@ void TextEditWidget::CreateControls() {
 
 	TBRMainBar->addSeparator();
 
-	createTableAction = TBRMainBar->addAction(QIcon(":/gui/table"), "Create table");
+	createTableAction = new QAction(QIcon(":/gui/table"), "Create table", this);
 	QObject::connect(createTableAction, SIGNAL(triggered()),
 					 this, SLOT(sl_CreateTableAction_Triggered()));
 
-	insertRowAction = TBRMainBar->addAction(QIcon(":/gui/table-insert-row"), "Insert row");
+	insertRowAction = new QAction(QIcon(":/gui/table-insert-row"), "Insert row", this);
 	QObject::connect(insertRowAction, SIGNAL(triggered()),
 					 this, SLOT(sl_InsertRowAction_Triggered()));
-	insertRowAction->setVisible(false);
 
-	insertColumnAction = TBRMainBar->addAction(QIcon(":/gui/table-insert-column"), "Insert column");
+	insertColumnAction = new QAction(QIcon(":/gui/table-insert-column"), "Insert column", this);
 	QObject::connect(insertColumnAction, SIGNAL(triggered()),
 					 this, SLOT(sl_InsertColumnAction_Triggered()));
-	insertColumnAction->setVisible(false);
 
-	removeRowAction = TBRMainBar->addAction(QIcon(":/gui/table-delete-row"), "Remove row");
+	removeRowAction = new QAction(QIcon(":/gui/table-delete-row"), "Remove row", this);
 	QObject::connect(removeRowAction, SIGNAL(triggered()),
 					 this, SLOT(sl_RemoveRowAction_Triggered()));
-	removeRowAction->setVisible(false);
 
-	removeColumnAction = TBRMainBar->addAction(QIcon(":/gui/table-delete-column"), "Remove column");
+	removeColumnAction = new QAction(QIcon(":/gui/table-delete-column"), "Remove column", this);
 	QObject::connect(removeColumnAction, SIGNAL(triggered()),
 					 this, SLOT(sl_RemoveColumnAction_Triggered()));
-	removeColumnAction->setVisible(false);
 
-	mergeCellsAction = TBRMainBar->addAction(QIcon(":/gui/table-join"), "Merge cells");
+	mergeCellsAction = new QAction(QIcon(":/gui/table-join"), "Merge cells", this);
 	QObject::connect(mergeCellsAction, SIGNAL(triggered()),
 					 this, SLOT(sl_MergeCellsAction_Triggered()));
-	mergeCellsAction->setVisible(false);
 
+	createTableButton = new QToolButton();
+	createTableButton->setFocusPolicy(Qt::NoFocus);
+	createTableButton->setPopupMode(QToolButton::MenuButtonPopup);
+	createTableButton->setCheckable(false);
+	createTableButton->setDefaultAction(createTableAction);
+
+	createTableButtonMenu = new QMenu(this);
+	createTableButtonMenu->addAction(insertRowAction);
+	createTableButtonMenu->addAction(insertColumnAction);
+	createTableButtonMenu->addAction(removeRowAction);
+	createTableButtonMenu->addAction(removeColumnAction);
+	createTableButtonMenu->addAction(mergeCellsAction);
+	createTableButtonMenu->addSeparator();
+	createTableButtonMenu->addMenu(textField->TableAlignMenu);
+	createTableButtonMenu->addAction(textField->EditTableWidthConstraintsAction);
+	createTableButton->setMenu(createTableButtonMenu);
+
+	TBRMainBar->addWidget(createTableButton);
 	TBRMainBar->addSeparator();
 
 	foregroundTextColorButton = new ColorPickerButton(ColorPickerButton::TextForegroundColor);
@@ -494,7 +507,6 @@ void TextEditWidget::sl_DecreaseListIndent_Triggered() {
 void TextEditWidget::sl_CreateTableAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
 	if (table) {
-		WARNING("Wrong button state");
 		return;
 	}
 
@@ -617,12 +629,19 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 
 	const QTextTable* table = textField->textCursor().currentTable();
 	const bool tablePresent = (table != 0);
-	createTableAction->setVisible(!tablePresent);
-	insertRowAction->setVisible(tablePresent);
-	insertColumnAction->setVisible(tablePresent);
-	removeRowAction->setVisible(tablePresent);
-	removeColumnAction->setVisible(tablePresent);
-	mergeCellsAction->setVisible(tablePresent);
+
+	insertRowAction->setEnabled(tablePresent);
+	insertColumnAction->setEnabled(tablePresent);
+	removeRowAction->setEnabled(tablePresent);
+	removeColumnAction->setEnabled(tablePresent);
+	mergeCellsAction->setEnabled(tablePresent);
+	textField->EditTableWidthConstraintsAction->setEnabled(tablePresent);
+	textField->TableAlignMenu->setEnabled(tablePresent);
+	if (tablePresent) {
+		createTableAction->setText("Edit table...");
+	} else {
+		createTableAction->setText("Create table");
+	}
 }
 
 void TextEditWidget::sl_TextEdit_SelectionChanged() {

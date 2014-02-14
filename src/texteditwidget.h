@@ -82,6 +82,8 @@ namespace qNotesManager {
 		QAction*			increaseListIndentAction;
 		QAction*			decreaseListIndentAction;
 
+		QToolButton*		createTableButton;
+		QMenu*				createTableButtonMenu;
 		QAction*			createTableAction;
 		QAction*			insertRowAction;
 		QAction*			insertColumnAction;
