@@ -105,6 +105,9 @@ void Folder::SetType(Folder::FolderType _type) {
 
 QPixmap Folder::GetIcon() const {
 	if (type == UserFolder) {
+		if (Application::I()->CurrentDocument() == 0) {
+			return QPixmap();
+		}
 		return Application::I()->CurrentDocument()->GetItemIcon(iconID);
 	} else if (type == TrashFolder) {
 		if (Items.Count() > 0) {

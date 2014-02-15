@@ -113,6 +113,9 @@ QDateTime Note::GetModificationDate() const {
 }
 
 QPixmap Note::GetIcon() const {
+	if (Application::I()->CurrentDocument() == 0) {
+		return QPixmap();
+	}
 	QPixmap icon = Application::I()->CurrentDocument()->GetItemIcon(iconID);
 	return icon;
 }
