@@ -24,7 +24,7 @@ CONFIG(debug, debug|release) {
     MOC_DIR = $${BUILD_PATH}/debug/.moc
     RCC_DIR = $${BUILD_PATH}/debug/.rcc
     win32 { 
-        LIBS += -Llibs/win32
+        LIBS += -L$${_PRO_FILE_PWD_}/libs/win32
         LIBS += -lqcad2
     }
 }
@@ -42,14 +42,14 @@ else {
     MOC_DIR = $${BUILD_PATH}/release/.moc
     RCC_DIR = $${BUILD_PATH}/release/.rcc
     win32 { 
-        LIBS += -Llibs/win32
+        LIBS += -L$${_PRO_FILE_PWD_}/libs/win32
         LIBS += -lqca2
     }
 }
 
 win32 {
-	DEPENDPATH += src/qca/QtCrypto
-	INCLUDEPATH += src/qca/QtCrypto
+	DEPENDPATH += $${_PRO_FILE_PWD_}/src/qca/QtCrypto
+	INCLUDEPATH += $${_PRO_FILE_PWD_}/src/qca/QtCrypto
 }
 
 unix { 
