@@ -40,6 +40,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QClipboard>
 #include <QDateTime>
 #include <QDesktopServices>
+#include "cachedimagefile.h"
+#include <QBuffer>
 
 
 using namespace qNotesManager;
@@ -183,15 +185,98 @@ void TextEdit::insertFromMimeData(const QMimeData* source) {
 
 
 	if (source->hasImage()) { // paste image
-		//QImage image = source->imageData().value<QImage>();
-		//image.setText("FORMAT", "PNG"); // use PNG format to store unknown images
-		//TextDocument* doc = dynamic_cast<TextDocument*>(document());
-		//doc->InsertImage(image, textCursor());
+		// Try to find dropped image's hyperlink
+		bool nameFound = false;
+		QUrl imageFileUrl;
+
+		if (source->hasHtml() && !nameFound) {
+			QRegExp r("(<img)([^>]*)(src)([^\"]*)(\")([^\"]*)(\")");
+			QString possibleFileName;
+			if (r.indexIn(source->html(), 0) != -1) {
+				possibleFileName = r.cap(6);
+
+				QUrl url(possibleFileName);
+				if (url.isValid()) {
+					imageFileUrl = url;
+					nameFound = true;
+				}
+			}
+		}
+
+		if (source->hasText() && !nameFound) {
+			QUrl url = source->text();
+			if (url.isValid()) {
+				imageFileUrl = url;
+				nameFound = true;
+			}
+		}
+
+		if (source->hasUrls() && !nameFound) {
+			QUrl url = source->urls().at(0);
+			if (url.isValid()) {
+				imageFileUrl = url;
+				nameFound = true;
+			}
+		}
+
+		qDebug() << "Final url of dropped image: " << imageFileUrl.toString();
+
+		if (nameFound && imageFileUrl.isValid() && !imageFileUrl.isEmpty()) {
+			textCursor().insertImage(imageFileUrl.toString());
+			return;
+		} else {
+			// Unknown image
+			QImage image = source->imageData().value<QImage>();
+			if (image.isNull()) {
+				return;
+			}
+			QByteArray imageData;
+			QBuffer buffer(&imageData);
+			buffer.open(QIODevice::WriteOnly);
+			image.save(&buffer, "png");
+			buffer.close();
+			if (imageData.isEmpty()) {
+				return;
+			}
+
+			CachedImageFile* cachedImage = new CachedImageFile(imageData, "unnamed", "png");
+			quint32 hash = cachedImage->GetCRC32();
+			QString name = QString::number(hash);
+			TextDocument* doc = dynamic_cast<TextDocument*>(document());
+			doc->AddResourceImage(cachedImage);
+			textCursor().insertImage(name);
+		}
 
 	} else if (source->hasUrls()) {
 		// paste urls, for example from file manager
 		foreach (QUrl url, source->urls()) {
-			insertImageFromFile(url.toLocalFile());
+			if (!url.isValid()) {
+				continue;
+			}
+			QString filePath = url.toString();
+			QFileInfo info(filePath);
+			QString fileType = info.suffix().toLower();
+
+			if (fileType.isEmpty()) {continue;}
+
+			if (QImageReader::supportedImageFormats().contains(fileType.toUtf8())) {
+				// Dropped file is image file
+				textCursor().insertImage(filePath);
+			} else {
+				// Check if dropped file is a text file
+				if (url.scheme() == "file") {
+					filePath = url.toLocalFile();
+				}
+				if (fileType == "txt") {
+					QFile f(filePath);
+					if (f.open(QIODevice::Text | QIODevice::ReadOnly)) {
+						QByteArray fileData = f.readAll();
+						f.close();
+						QString fileText = QString(fileData);
+						textCursor().insertText(fileText);
+					}
+				}
+			}
 		}
 	} else {
 		QTextEdit::insertFromMimeData(source);
@@ -232,7 +317,30 @@ void TextEdit::sl_InsertImageFromFileAction_Triggered() {
 }
 
 bool TextEdit::canInsertFromMimeData(const QMimeData* source) const {
-	return source->hasImage() || source->hasUrls() || QTextEdit::canInsertFromMimeData(source);
+	if (source->hasImage()) {
+		return true;
+	} else if (source->hasUrls()) {
+		foreach (const QUrl& url, source->urls()) {
+			if (!url.isValid()) {
+				return false;
+			}
+
+			QString filePath = url.toString();
+			QFileInfo info(filePath);
+			QString fileType = info.suffix().toLower();
+			if (fileType.isEmpty()) {return false;}
+
+			if (
+					!QImageReader::supportedImageFormats().contains(fileType.toUtf8()) &&
+					!((url.scheme() == "file") && (fileType == "txt"))
+				) {
+					return false;
+			}
+		}
+		return true;
+	} else {
+		return QTextEdit::canInsertFromMimeData(source);
+	}
 }
 
 //virtual
