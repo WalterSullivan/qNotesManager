@@ -131,20 +131,26 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 		return QVariant();
 	}
 
-		if (type == QTextDocument::ImageResource) {
-			if (errorDownloads.contains(url)) {
-				return DummyImagesProvider->GetErrorImage();
-			}
-			if (!activeDownloads.contains(url)) {
-				qDebug() << "Creating download task";
-				activeDownloads.append(url);
-				loader->Download(url);
-				return DummyImagesProvider->GetLoadingImage();
-			} else {
-				qDebug() << "Url " << url << "is in active downloads list. Skipping";
-				return DummyImagesProvider->GetLoadingImage();
-			}
+	if (type == QTextDocument::ImageResource) {
+		QString stringUrl = url.toString();
+		if (originalImages.contains(stringUrl)) {
+			CachedImageFile* image = originalImages[stringUrl];
+			addResource(QTextDocument::ImageResource, url, image->GetPixmap());
+			return image->GetPixmap();
 		}
+		if (errorDownloads.contains(url)) {
+			return DummyImagesProvider->GetErrorImage();
+		}
+		if (!activeDownloads.contains(url)) {
+			qDebug() << "Creating download task";
+			activeDownloads.append(url);
+			loader->Download(url);
+			return DummyImagesProvider->GetLoadingImage();
+		} else {
+			qDebug() << "Url " << url << "is in active downloads list. Skipping";
+			return DummyImagesProvider->GetLoadingImage();
+		}
+	}
 
 	return QVariant();
 }
@@ -249,5 +255,4 @@ void TextDocument::AddResourceImage(CachedImageFile* image) {
 	quint32 hash = image->GetCRC32();
 	QString name = QString::number(hash);
 	originalImages.insert(name, image);
-	addResource(QTextDocument::ImageResource, QUrl(name), image->GetPixmap());
 }
