@@ -40,7 +40,7 @@ namespace qNotesManager {
 
 		QList<QUrl> activeDownloads;
 		QList<QUrl> errorDownloads;
-		void replaceImageUrl(QUrl oldName, QString newName);
+		void replaceImageUrl(const QUrl& oldName, const QString& newName);
 
 		QTimer restartDownloadsTimer;
 

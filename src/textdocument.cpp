@@ -155,28 +155,36 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 	return QVariant();
 }
 
-void TextDocument::replaceImageUrl(QUrl oldName, QString newName) {
+void TextDocument::replaceImageUrl(const QUrl &oldName, const QString &newName) {
+	QList <QPair<int, int> > fragments;
+
 	QTextBlock block = begin();
+
 	while(block.isValid()) {
 		QTextBlock::iterator iterator;
-		for(iterator = block.begin(); !(iterator.atEnd()); ++iterator) {
+		for(iterator = block.begin(); !(iterator.atEnd()); iterator++) {
 			QTextFragment fragment = iterator.fragment();
 			if(fragment.isValid() && fragment.charFormat().isImageFormat()) {
 				QTextImageFormat format = fragment.charFormat().toImageFormat();
-
 				if (QUrl::fromEncoded(format.name().toUtf8()) != oldName) {continue;}
-				qDebug() << "Changing url from" << format.name() << "to" << newName;
-				format.setName(newName);
-				QTextCursor cursor(this);
-				cursor.setPosition(fragment.position());
-				cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, fragment.length());
-				cursor.beginEditBlock();
-				cursor.setCharFormat(format);
-				cursor.endEditBlock();
+				fragments.append(QPair<int, int>(fragment.position(), fragment.length()));
 			}
 		}
 		block = block.next();
 	}
+
+
+	QTextCursor cursor(this);
+	cursor.beginEditBlock();
+	QPair<int, int> pair;
+	foreach (pair, fragments) {
+		cursor.setPosition(pair.first);
+		cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
+		QTextImageFormat format = cursor.charFormat().toImageFormat();
+		format.setName(newName);
+		cursor.mergeCharFormat(format);
+	}
+	cursor.endEditBlock();
 }
 
 QStringList TextDocument::GetImagesList() const {
