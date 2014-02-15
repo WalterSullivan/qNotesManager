@@ -126,6 +126,7 @@ namespace qNotesManager {
 		bool LockFolderItems;
 
 		void AddCustomIcon(CachedImageFile*);
+		void AddCustomIconToStorage(CachedImageFile*);
 		void RemoveCustomIcon(QString);
 		QPixmap GetItemIcon(const QString) const;
 
@@ -184,6 +185,7 @@ namespace qNotesManager {
 		void sl_Note_TagRemoved(Tag*);
 
 		void sl_returnSelfToMainThread();
+		void sl_InitCustomIcons();
 
 	};
 }

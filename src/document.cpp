@@ -176,6 +176,7 @@ void Document::Open(QString fileName) {
 	QObject::connect(w, SIGNAL(sg_finished()), w, SLOT(deleteLater()));
 	QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(deleteLater()));
 	QObject::connect(w, SIGNAL(sg_finished()), this, SLOT(sl_returnSelfToMainThread()), Qt::DirectConnection);
+	QObject::connect(w, SIGNAL(sg_finished()), this, SLOT(sl_InitCustomIcons()));
 
 	w->Load(this, fileName);
 	t->start();
@@ -219,6 +220,18 @@ void Document::Save(QString name, quint16 version) {
 void Document::sl_returnSelfToMainThread() {
 	// Called from different thread after loading
 	this->moveToThread(QCoreApplication::instance()->thread());
+}
+
+void Document::sl_InitCustomIcons() {
+	foreach (QString name, customIcons.keys()) {
+		CachedImageFile* image = customIcons[name];
+
+		QStandardItem* i = new QStandardItem(image->GetPixmap(QSize(16, 16)), QString());
+		i->setData(name, Qt::UserRole + 1);
+		i->setData("Custom icons", Qt::UserRole + 2);
+		i->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+		Application::I()->GetIconsModel()->appendRow(i);
+	}
 }
 
 void Document::sl_Folder_ItemAdded(AbstractFolderItem* const item, int) {
@@ -407,6 +420,22 @@ void Document::AddCustomIcon(CachedImageFile* image) {
 	Application::I()->GetIconsModel()->appendRow(i);
 
 	onChange();
+}
+
+void Document::AddCustomIconToStorage(CachedImageFile* image) {
+	if (!image) {
+		WARNING("Null image recieved");
+		return;
+	}
+
+	if (!image->IsValidImage()) {
+		WARNING("Invalid image recieved");
+		delete image;
+		return;
+	}
+
+	QString name = QString::number(image->GetCRC32());
+	customIcons.insert(name, image);
 }
 
 void Document::RemoveCustomIcon(QString key) {

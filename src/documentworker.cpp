@@ -314,7 +314,7 @@ void DocumentWorker::load_v1(BOIBuffer& buffer) {
 
 			CachedImageFile* image = new CachedImageFile(pixmapArray, nameArray, iconInfo.suffix());
 
-			doc->AddCustomIcon(image);
+			doc->AddCustomIconToStorage(image);
 			sendProgressSignal(&dataBuffer);
 		}
 	}
