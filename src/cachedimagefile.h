@@ -29,6 +29,8 @@ namespace qNotesManager {
 	private:
 		mutable QSize cachedPixmapSize;
 		mutable QPixmap cachedPixmap;
+		mutable bool cachePixmapInitialized;
+		void initCachePixmap() const;
 
 	public:
 		CachedImageFile(const QByteArray& array, QString name, QString format);

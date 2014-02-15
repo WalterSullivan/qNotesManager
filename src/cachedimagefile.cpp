@@ -26,23 +26,33 @@ CachedImageFile::CachedImageFile(const QByteArray& array, QString name, QString 
 		CachedFile(array, name),
 		cachedPixmapSize(QSize()),
 		cachedPixmap(QPixmap()),
+		cachePixmapInitialized(false),
 		Format(format) {
+
+}
+
+void CachedImageFile::initCachePixmap() const {
+	if (cachePixmapInitialized) {return;}
+
 	cachedPixmap.loadFromData(Data, Format.toStdString().c_str());
 	cachedPixmapSize = cachedPixmap.size();
+
+	cachePixmapInitialized = true;
 }
 
 bool CachedImageFile::IsValidImage() const {
+	if (!cachePixmapInitialized) {initCachePixmap();}
+
 	return !cachedPixmap.isNull();
 }
 
 QSize CachedImageFile::ImageSize() const {
+	if (!cachePixmapInitialized) {initCachePixmap();}
 	return cachedPixmap.isNull() ? QSize() : cachedPixmap.size();
 }
 
 QPixmap CachedImageFile::GetPixmap(QSize preferredSize) const {
-	if (cachedPixmap.isNull()) {
-		return cachedPixmap;
-	}
+	if (!cachePixmapInitialized) {initCachePixmap();}
 
 	if (preferredSize.isValid() && preferredSize != cachedPixmapSize) {
 		cachedPixmap = cachedPixmap.scaled(preferredSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
