@@ -27,6 +27,7 @@ namespace qNotesManager {
 	class CachedFile {
 	public:
 		explicit CachedFile(const QByteArray& array, QString name);
+		virtual ~CachedFile() {}
 
 		QByteArray Data;
 		QString FileName;

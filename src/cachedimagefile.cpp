@@ -25,17 +25,24 @@ using namespace qNotesManager;
 CachedImageFile::CachedImageFile(const QByteArray& array, QString name, QString format) :
 		CachedFile(array, name),
 		cachedPixmapSize(QSize()),
-		cachedPixmap(QPixmap()),
+		cachedPixmap(0),
 		cachePixmapInitialized(false),
 		Format(format) {
 
 }
 
+CachedImageFile::~CachedImageFile() {
+	if (cachedPixmap) {
+		delete cachedPixmap;
+	}
+}
+
 void CachedImageFile::initCachePixmap() const {
 	if (cachePixmapInitialized) {return;}
 
-	cachedPixmap.loadFromData(Data, Format.toStdString().c_str());
-	cachedPixmapSize = cachedPixmap.size();
+	cachedPixmap = new QPixmap();
+	cachedPixmap->loadFromData(Data, Format.toStdString().c_str());
+	cachedPixmapSize = cachedPixmap->size();
 
 	cachePixmapInitialized = true;
 }
@@ -43,23 +50,23 @@ void CachedImageFile::initCachePixmap() const {
 bool CachedImageFile::IsValidImage() const {
 	if (!cachePixmapInitialized) {initCachePixmap();}
 
-	return !cachedPixmap.isNull();
+	return !cachedPixmap->isNull();
 }
 
 QSize CachedImageFile::ImageSize() const {
 	if (!cachePixmapInitialized) {initCachePixmap();}
-	return cachedPixmap.isNull() ? QSize() : cachedPixmap.size();
+	return cachedPixmap->isNull() ? QSize() : cachedPixmap->size();
 }
 
 QPixmap CachedImageFile::GetPixmap(QSize preferredSize) const {
 	if (!cachePixmapInitialized) {initCachePixmap();}
 
 	if (preferredSize.isValid() && preferredSize != cachedPixmapSize) {
-		cachedPixmap = cachedPixmap.scaled(preferredSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+		*cachedPixmap = cachedPixmap->scaled(preferredSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 		cachedPixmapSize = preferredSize;
 	}
 
-	return cachedPixmap;
+	return *cachedPixmap;
 }
 
 CachedImageFile* CachedImageFile::FromFile(QString fileName) {
