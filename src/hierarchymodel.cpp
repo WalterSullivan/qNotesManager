@@ -196,7 +196,17 @@ void HierarchyModel::UnregisterItem(Note* note) {
 
 void HierarchyModel::SetPinnedFolder(Folder* f) {
 	if (f == 0) {
+		BaseModelItem* currentDisplayRootItem = GetDisplayRootItem();
+
 		SetDisplayRootItem(GetRootItem());
+
+		BaseModelItem* parentItem = currentDisplayRootItem->parent();
+		if (parentItem != 0) {
+			QModelIndexList list;
+			QModelIndex newItemIndex = createIndex(parentItem->IndexOfChild(currentDisplayRootItem), 0, currentDisplayRootItem);
+			list << newItemIndex;
+			emit sg_ApplySelection(list);
+		}
 	} else {
 		if (!_bridge.contains(f)) {
 			WARNING("Folder is not registered");

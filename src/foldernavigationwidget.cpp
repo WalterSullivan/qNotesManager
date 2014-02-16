@@ -35,6 +35,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QRegExp>
+#include <QStack>
 #include <QDebug>
 
 using namespace qNotesManager;
@@ -55,6 +56,10 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 					 this, SLOT(sl_View_clicked(QModelIndex)));
 	QObject::connect(treeView, SIGNAL(doubleClicked(QModelIndex)),
 					 this, SLOT(sl_View_doubleClicked(QModelIndex)));
+	QObject::connect(treeView, SIGNAL(expanded(QModelIndex)),
+					 this, SLOT(sl_View_Expanded(QModelIndex)));
+	QObject::connect(treeView, SIGNAL(collapsed(QModelIndex)),
+					 this, SLOT(sl_View_Collapsed(QModelIndex)));
 
 	treeView->installEventFilter(this);
 	treeView->setHeaderHidden(true);
@@ -73,6 +78,7 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 	pinFolderButton->setChecked(false);
 	pinFolderButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 	pinFolderButton->setEnabled(false);;
+	pinFolderButton->setFocusPolicy(Qt::NoFocus);
 	QObject::connect(pinFolderButton, SIGNAL(toggled(bool)),
 					 this, SLOT(sl_PinFolderButton_Toggled(bool)));
 
@@ -350,15 +356,7 @@ void FolderNavigationWidget::sl_PinFolderButton_Toggled(bool toggle) {
 		currentRootLabel->setText("");
 		currentRootLabel->setToolTip("");
 	} else {
-		QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
-		if (indexesList.count() != 1) {
-			pinFolderButton->blockSignals(true);
-			pinFolderButton->setChecked(false);
-			pinFolderButton->blockSignals(false);
-			return;
-		}
-
-		QModelIndex index = indexesList.at(0);
+		QModelIndex index = treeView->currentIndex();
 		if (!index.isValid()) {
 			WARNING("Invalid index");
 			return;
@@ -1012,11 +1010,72 @@ void FolderNavigationWidget::sl_View_SelectionChanged(const QItemSelection&, con
 	emit sg_SelectedItemsActionsListChanged();
 }
 
+void FolderNavigationWidget::sl_View_Expanded(const QModelIndex& index) {
+	if (!index.isValid()) {return;}
+	if (index.internalPointer() == 0) {return;}
+
+	BaseModelItem* modelItemToEdit =
+			static_cast<BaseModelItem*>(index.internalPointer());
+
+	if (modelItemToEdit->DataType() == BaseModelItem::folder) {
+		Folder* folder = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
+		if (!expandexFolders.contains(folder)) {
+			expandexFolders.push_back(folder);
+		}
+	}
+}
+
+void FolderNavigationWidget::sl_View_Collapsed(const QModelIndex& index) {
+	if (!index.isValid()) {return;}
+	if (index.internalPointer() == 0) {return;}
+
+	BaseModelItem* modelItemToEdit =
+			static_cast<BaseModelItem*>(index.internalPointer());
+
+	if (modelItemToEdit->DataType() == BaseModelItem::folder) {
+		Folder* folder = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
+		if (expandexFolders.contains(folder)) {
+			expandexFolders.removeAll(folder);
+		}
+	}
+}
+
+void FolderNavigationWidget::restoreExpandedIndexes() {
+	QStack<QModelIndex> indexes;
+	indexes.push(treeView->rootIndex());
+
+	while (!indexes.isEmpty()) {
+		QModelIndex index = indexes.pop();
+		for (int i = 0; i < model->rowCount(index); i++) {
+			QModelIndex child = model->index(i, 0, index);
+			if (child.isValid()) {
+				indexes.push(child);
+			}
+		}
+
+		if (index.isValid()) {
+			if (index.internalPointer() == 0) {continue;}
+			BaseModelItem* modelItemToEdit =
+					static_cast<BaseModelItem*>(index.internalPointer());
+
+			if (modelItemToEdit->DataType() == BaseModelItem::folder) {
+				Folder* folder = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
+				if (expandexFolders.contains(folder)) {
+					treeView->expand(index);
+				}
+			}
+		}
+	}
+}
+
 void FolderNavigationWidget::sl_Model_DisplayRootItemChanged() {
+	restoreExpandedIndexes();
 	emit sg_SelectedItemsActionsListChanged();
 }
 
 void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
+	expandexFolders.clear();
+
 	if (model) {
 		QObject::disconnect(model, 0, this, 0);
 	}

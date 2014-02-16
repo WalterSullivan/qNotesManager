@@ -72,9 +72,12 @@ namespace qNotesManager {
 
 		FolderItemPropertiesWidget* propertiesWidget;
 
+		QList<Folder*> expandexFolders;
+
 		void deleteItems(QModelIndexList& list, bool permanently = false);
 		// Delete indexes, which parents also in the list
 		void deleteChildIndexes(QModelIndexList& list) const;
+		void restoreExpandedIndexes();
 
 	public:
 		explicit FolderNavigationWidget(QWidget *parent = 0);
@@ -99,6 +102,8 @@ namespace qNotesManager {
 		void sl_View_clicked (const QModelIndex&);
 		void sl_View_doubleClicked (const QModelIndex&);
 		void sl_View_SelectionChanged(const QItemSelection&, const QItemSelection&);
+		void sl_View_Expanded(const QModelIndex&);
+		void sl_View_Collapsed(const QModelIndex&);
 
 		void sl_PinFolderButton_Toggled(bool);
 
