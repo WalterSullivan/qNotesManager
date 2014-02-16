@@ -93,6 +93,8 @@ namespace qNotesManager {
 		QString DefaultNoteIcon;
 		QString DefaultFolderIcon;
 
+		QIcon tagIcon;
+
 	public:
 		explicit Document();
 		~Document();

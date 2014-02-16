@@ -97,6 +97,8 @@ Document::Document() : QObject(0) {
 
 	DefaultFolderIcon = Application::I()->DefaultFolderIcon;
 	DefaultNoteIcon = Application::I()->DefaultNoteIcon;
+
+	tagIcon = QIcon(":/gui/tag");
 }
 
 Document::~Document() {
@@ -314,7 +316,7 @@ void Document::RegisterTag(Tag* tag) {
 	allTags.append(tag);
 	tag->setParent(this);
 	tagsByName.insert(tag->GetName(), tag);
-	QStandardItem* i = new QStandardItem(QIcon(":/gui/tag"), tag->GetName());
+	QStandardItem* i = new QStandardItem(tagIcon, tag->GetName());
 	tagsListModel->appendRow(i);
 	tagsListModel->sort(0, Qt::AscendingOrder);
 	emit sg_ItemRegistered(tag);
