@@ -46,6 +46,7 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(0) {
 	propertiesWidget = new QWidget();
 
 	openClosePropertiesButton = new QPushButton();
+	openClosePropertiesButton->setFocusPolicy(Qt::NoFocus);
 	QObject::connect(openClosePropertiesButton, SIGNAL(clicked()),
 					 this, SLOT(sl_OpenClosePropertiesButton_Clicked()));
 	openClosePropertiesButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
@@ -160,6 +161,13 @@ void NoteEditWidget::collapsePropertiesPanel() {
 	openClosePropertiesButton->setIcon(QIcon(":/gui/arrow-down"));
 	propertiesPanelCollapsed = true;
 
+	authorEdit->setFocusPolicy(Qt::NoFocus);
+	textCreationCheckbox->setFocusPolicy(Qt::NoFocus);
+	textCreationDateEdit->setFocusPolicy(Qt::NoFocus);
+	sourceEdit->setFocusPolicy(Qt::NoFocus);
+	tagsEdit->setFocusPolicy(Qt::NoFocus);
+	commentEdit->setFocusPolicy(Qt::NoFocus);
+
 	updateHeight();
 }
 
@@ -169,6 +177,13 @@ void NoteEditWidget::expandPropertiesPanel() {
 	openClosePropertiesButton->setToolTip("Collapse");
 	openClosePropertiesButton->setIcon(QIcon(":/gui/arrow-up"));
 	propertiesPanelCollapsed = false;
+
+	authorEdit->setFocusPolicy(Qt::StrongFocus);
+	textCreationCheckbox->setFocusPolicy(Qt::StrongFocus);
+	textCreationDateEdit->setFocusPolicy(Qt::StrongFocus);
+	sourceEdit->setFocusPolicy(Qt::StrongFocus);
+	tagsEdit->setFocusPolicy(Qt::StrongFocus);
+	commentEdit->setFocusPolicy(Qt::StrongFocus);
 
 	updateHeight();
 }

@@ -70,9 +70,11 @@ void TextEditWidget::CreateControls() {
 	fontComboBox = new QFontComboBox();
 	QObject::connect(fontComboBox,SIGNAL(currentFontChanged(QFont)),
 					 this, SLOT(sl_fontComboBoxCurrentFontChanged(QFont)) );
+	fontComboBox->setFocusPolicy(Qt::ClickFocus);
 	TBRMainBar->addWidget(fontComboBox);
 
 	fontSizeComboBox = new QComboBox();
+	fontSizeComboBox->setFocusPolicy(Qt::ClickFocus);
 	fontSizeComboBox->addItem("8", 8);
 	fontSizeComboBox->addItem("9", 9);
 	fontSizeComboBox->addItem("10", 10);
