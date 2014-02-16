@@ -351,7 +351,13 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 	const quint8 w_locked = (quint8)locked;
 
 	// Write images to temporary buffer
-	QSet<QString> imagesNamesList = document->GetImagesList();
+	QStringList imagesNamesList;
+	if (textDocumentInitialized) {
+		imagesNamesList = document->GetImagesList();
+	} else {
+		qDebug() << "resources list requested";
+		imagesNamesList = document->GetResourceImagesList();
+	}
 	QByteArray imagesArray;
 	BOIBuffer imagesArrayBuffer(&imagesArray);
 	imagesArrayBuffer.open(QIODevice::WriteOnly);

@@ -51,10 +51,11 @@ namespace qNotesManager {
 		explicit TextDocument(QObject *parent = 0);
 		~TextDocument();
 
-		QSet<QString> GetImagesList() const;
+		QStringList GetImagesList() const;
 
 		CachedImageFile* GetResourceImage(QString name) const;
 		void AddResourceImage(CachedImageFile*);
+		QStringList GetResourceImagesList() const;
 
 		void InsertImage(QImage image, QTextCursor cursor);
 		void InsertImage(QUrl url, QTextCursor cursor);

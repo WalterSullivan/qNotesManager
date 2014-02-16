@@ -179,8 +179,8 @@ void TextDocument::replaceImageUrl(QUrl oldName, QString newName) {
 	}
 }
 
-QSet<QString> TextDocument::GetImagesList() const {
-	QSet<QString> returnSet;
+QStringList TextDocument::GetImagesList() const {
+	QStringList returnSet;
 
 	QTextBlock block = begin();
 	while(block.isValid()) {
@@ -199,13 +199,17 @@ QSet<QString> TextDocument::GetImagesList() const {
 				continue;
 			}
 
-			returnSet.insert(imageName);
+			returnSet.append(imageName);
 
 		}
 		block = block.next();
 	}
 
 	return returnSet;
+}
+
+QStringList TextDocument:: GetResourceImagesList() const {
+	return originalImages.keys();
 }
 
 quint32 TextDocument::CalculateImageCRC(const QImage& image) const {
