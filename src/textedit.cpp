@@ -721,69 +721,69 @@ Qt::Alignment TextEdit::GetAlignment() const {
 	return textCursor().blockFormat().alignment();
 }
 
-void TextEdit::applyCharFormatting(QTextCharFormat& format, bool skipLinks,
-								   CharFormatApplyMode mode) {
+void TextEdit::applyCharFormatting(const QTextCharFormat &format, const bool skipLinks,
+								   const CharFormatApplyMode mode) {
 	qDebug() << "applyCharFormatting";
 	QTextCursor cursor = this->textCursor();
-	int start = cursor.selectionStart();
-	int end = cursor.selectionEnd();
-	int cStart = 0;
-	int cEnd = 0;
-	qDebug() << "Selection: start: " << start << ", end: " << end;
-	QTextBlock block = document()->findBlock(start);
-	QList<QTextCursor> cursors;
+	int selectionStart = cursor.selectionStart();
+	int selectionEnd = cursor.selectionEnd();
+	int fragmentStart = 0;
+	int fragmentEnd = 0;
+	qDebug() << "Selection: start: " << selectionStart << ", end: " << selectionEnd;
+	QTextBlock block = document()->findBlock(selectionStart);
+	QList<QPair<int, int> > fragments;
+	QList<QPair<int, int> > hyperLinkFragments;
 
 	while (true) {
 		if (!block.isValid()) {break;}
 		if (block.blockNumber() == -1) {
 			break;
 		}
-		if (block.position() > end) {break;}
+		if (block.position() > selectionEnd) {break;}
+
 		QTextBlock::iterator it;
 		qDebug() << "Text block #" << block.blockNumber() << ". Text:\n" << block.text();
 		for(it = block.begin(); !(it.atEnd()); ++it) {
 			QTextFragment currentFragment = it.fragment();
 			if (!currentFragment.isValid()) {continue;}
+
 			int fs = currentFragment.position();
 			int fe = currentFragment.position() + currentFragment.length();
 
 			if (currentFragment.charFormat().isAnchor() && skipLinks) {continue;}
-			if (end < fs || start > fe) {continue;} // skip not affected fragments
+			if (selectionEnd < fs || selectionStart > fe) {continue;} // skip not affected fragments
 
-
-			QTextCursor temp(document());
-
-			if (start < fs) {
-				cStart = fs;
+			if (selectionStart < fs) {
+				fragmentStart = fs;
 			} else {
-				cStart = start;
+				fragmentStart = selectionStart;
 			}
 
-			if (end < fe) {
-				cEnd = end;
+			if (selectionEnd < fe) {
+				fragmentEnd = selectionEnd;
 			} else {
-				cEnd = fe;
+				fragmentEnd = fe;
 			}
 
-			temp.setPosition(cStart);
-			temp.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, cEnd - cStart);
-			qDebug() << "Temp cursor. Pos: " << temp.selectionStart() << ", end: " << temp.selectionEnd() << ", length: " << temp.selectionEnd() - temp.selectionStart();
-
-			cursors.append(temp);
+			fragments.append(QPair<int, int>(fragmentStart, fragmentEnd - fragmentStart));
 		}
 
 		block = block.next();
 	}
 
-	foreach (QTextCursor c, cursors) {
-		c.beginEditBlock();
+	QPair<int, int> pair;
+	QTextCursor temp(document());
+	temp.beginEditBlock();
+	foreach (pair, fragments) {
+		temp.setPosition(pair.first);
+		temp.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
 		if (mode == Merge) {
-			c.mergeCharFormat(format);
+			temp.mergeCharFormat(format);
 		} else {
-			c.setCharFormat(format);
+			temp.setCharFormat(format);
 		}
-		c.endEditBlock();
 	}
+	temp.endEditBlock();
 }
 
 void TextEdit::sl_AnchorTooltipTimer_Timeout() {

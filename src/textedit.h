@@ -113,7 +113,8 @@ namespace qNotesManager {
 		QTimer	anchorTooltipTimer;
 
 		QTextFragment findFragmentAtPos(QPoint pos);
-		void applyCharFormatting(QTextCharFormat& format, bool skipLinks, CharFormatApplyMode = Merge);
+		void applyCharFormatting(const QTextCharFormat& format, const bool skipLinks,
+								 const CharFormatApplyMode = Merge);
 		void insertImageFromFile(QString fileName);
 
 		void setDocument(QTextDocument*) {} // hide inherited function
