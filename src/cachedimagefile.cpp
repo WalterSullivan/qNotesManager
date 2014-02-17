@@ -22,7 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-CachedImageFile::CachedImageFile(const QByteArray& array, QString name, QString format) :
+CachedImageFile::CachedImageFile(const QByteArray& array, const QString& name, const QString& format) :
 		CachedFile(array, name),
 		cachedPixmapSize(QSize()),
 		cachedPixmap(0),
@@ -58,7 +58,7 @@ QSize CachedImageFile::ImageSize() const {
 	return cachedPixmap->isNull() ? QSize() : cachedPixmap->size();
 }
 
-QPixmap CachedImageFile::GetPixmap(QSize preferredSize) const {
+QPixmap CachedImageFile::GetPixmap(const QSize& preferredSize) const {
 	if (!cachePixmapInitialized) {initCachePixmap();}
 
 	if (preferredSize.isValid() && preferredSize != cachedPixmapSize) {
@@ -69,16 +69,17 @@ QPixmap CachedImageFile::GetPixmap(QSize preferredSize) const {
 	return *cachedPixmap;
 }
 
-CachedImageFile* CachedImageFile::FromFile(QString fileName) {
-	QFile f(fileName);
+CachedImageFile* CachedImageFile::FromFile(const QString& fileName) {
+	QFile file(fileName);
 
-	if (!f.exists()) {
+	if (!file.exists()) {
 		return 0;
 	}
 
-	f.open(QIODevice::ReadOnly);
-	QByteArray array = f.readAll();
-	f.close();
+	if (!file.open(QIODevice::ReadOnly)) {return 0;}
+
+	QByteArray array = file.readAll();
+	file.close();
 
 	return new CachedImageFile(array, QFileInfo(fileName).fileName(), QFileInfo(fileName).suffix());
 }

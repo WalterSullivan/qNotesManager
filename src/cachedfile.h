@@ -22,23 +22,20 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QByteArray>
 
 namespace qNotesManager {
-	class BOIBuffer;
-
 	class CachedFile {
 	public:
-		explicit CachedFile(const QByteArray& array, QString name);
+		explicit CachedFile(const QByteArray& array, const QString& name);
 		virtual ~CachedFile() {}
 
 		QByteArray Data;
 		QString FileName;
 
 		quint32 GetCRC32() const;
+		int Size() const;
 
-		static CachedFile* FromFile(QString fileName);
+		bool Save(const QString& fileName) const;
 
-
-		//void Serialize(const int version, BOIBuffer& stream);
-
+		static CachedFile* FromFile(const QString& fileName);
 	};
 }
 

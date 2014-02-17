@@ -33,16 +33,16 @@ namespace qNotesManager {
 		void initCachePixmap() const;
 
 	public:
-		CachedImageFile(const QByteArray& array, QString name, QString format);
+		CachedImageFile(const QByteArray& array, const QString& name, const QString& format);
 		~CachedImageFile();
 
 		QString Format;
 
 		bool IsValidImage() const;
 		QSize ImageSize() const;
-		QPixmap GetPixmap(QSize preferredSize = QSize()) const;
+		QPixmap GetPixmap(const QSize& preferredSize = QSize()) const;
 
-		static CachedImageFile* FromFile(QString fileName);
+		static CachedImageFile* FromFile(const QString& fileName);
 	};
 }
 #endif // CACHEDIMAGEFILE_H
