@@ -301,13 +301,6 @@ void TextEdit::keyPressEvent (QKeyEvent* e) {
 			block = block.next();
 		}
 
-		foreach (QTextCursor c, cursors) {
-			QTextCharFormat frm;
-			frm.setForeground(QBrush(QColor(255, 0, 0)));
-			c.beginEditBlock();
-			c.mergeCharFormat(frm);
-			c.endEditBlock();
-		}
 	}
 
 	if (e->key() == Qt::Key_Q && e->modifiers() == Qt::ControlModifier) {
