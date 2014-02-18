@@ -47,6 +47,10 @@ void CachedImageFile::initCachePixmap() const {
 	cachePixmapInitialized = true;
 }
 
+QString CachedImageFile::GetFormat() const {
+	return Format;
+}
+
 bool CachedImageFile::IsValidImage() const {
 	if (!cachePixmapInitialized) {initCachePixmap();}
 

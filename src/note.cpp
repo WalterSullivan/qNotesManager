@@ -372,7 +372,7 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 		QByteArray imageNameArray = image->GetFileName().toUtf8();
 		const quint32 imageNameSize = imageNameArray.size();
 
-		const QByteArray formatArray = image->Format.toAscii();
+		const QByteArray formatArray = image->GetFormat().toAscii();
 		const quint32 formatArraySize = formatArray.size();
 
 		// writing data
