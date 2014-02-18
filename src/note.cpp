@@ -483,7 +483,7 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 	quint32 r_imagesListSize = 0;
 	bytesRead = stream.read(r_imagesListSize);
 
-	QMap<QString, CachedImageFile*> images;
+	QList<CachedImageFile*> images;
 
 	if (r_imagesListSize > 0) {
 		quint32 imagesSize = 0;
@@ -505,7 +505,7 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 			bytesRead = stream.read(r_imageArray.data(), r_imageArraySize);
 
 			CachedImageFile* image = new CachedImageFile(r_imageArray, r_imageName, imageFormat);
-			images.insert(r_imageName, image);
+			images.push_back(image);
 
 			imagesSize +=	sizeof(r_imageNameSize) +
 							r_imageNameSize +
@@ -537,8 +537,8 @@ Note* Note::Deserialize(const int version, BOIBuffer& stream) {
 	note->locked = (bool)r_locked;
 	note->cachedHtml = r_textArray;
 	note->textDocumentInitialized = false;
-	foreach(QString name, images.keys()) {
-		note->document->AddResourceImage(images.value(name));
+	foreach(CachedImageFile* image, images) {
+		note->document->AddResourceImage(image);
 	}
 
 	return note;
