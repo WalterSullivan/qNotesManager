@@ -369,7 +369,7 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 			continue;
 		}
 
-		QByteArray imageNameArray = image->FileName.toUtf8();
+		QByteArray imageNameArray = image->GetFileName().toUtf8();
 		const quint32 imageNameSize = imageNameArray.size();
 
 		const QByteArray formatArray = image->Format.toAscii();
@@ -382,9 +382,9 @@ void Note::Serialize(const int version, BOIBuffer& stream) const {
 		imagesArrayBuffer.write(formatArraySize);
 		imagesArrayBuffer.write(formatArray.constData(), formatArraySize);
 
-		const quint32 imageArraySize = image->Data.size();
+		const quint32 imageArraySize = image->Size();
 		imagesArrayBuffer.write(imageArraySize);
-		imagesArrayBuffer.write(image->Data.constData(), imageArraySize);
+		imagesArrayBuffer.write(image->GetData(), imageArraySize);
 	}
 	imagesArrayBuffer.close();
 

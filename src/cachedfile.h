@@ -23,15 +23,20 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 namespace qNotesManager {
 	class CachedFile {
+	private:
+	protected:
+		QByteArray Data;
+		QString FileName;
+
 	public:
 		explicit CachedFile(const QByteArray& array, const QString& name);
 		virtual ~CachedFile() {}
 
-		QByteArray Data;
-		QString FileName;
-
 		quint32 GetCRC32() const;
 		int Size() const;
+
+		const char* GetData() const;
+		QString GetFileName() const;
 
 		bool Save(const QString& fileName) const;
 

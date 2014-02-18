@@ -37,6 +37,14 @@ int CachedFile::Size() const {
 	return Data.size();
 }
 
+const char* CachedFile::GetData() const {
+	return Data.constData();
+}
+
+QString CachedFile::GetFileName() const {
+	return FileName;
+}
+
 bool CachedFile::Save(const QString& fileName) const {
 	if (Data.size() == 0) {return false;}
 

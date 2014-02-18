@@ -573,14 +573,14 @@ void DocumentWorker::save_v1() {
 		foreach(QString name, doc->customIcons.keys()) {
 			CachedImageFile* image = doc->customIcons.value(name);
 
-			const QByteArray nameArray = image->FileName.toUtf8();
+			const QByteArray nameArray = image->GetFileName().toUtf8();
 			const quint32 nameArraySize = nameArray.size();
 			dataBuffer.write(nameArraySize);
 			dataBuffer.write(nameArray.constData(), nameArraySize);
 
-			const quint32 imageDataSize = image->Data.size();
+			const quint32 imageDataSize = image->Size();
 			dataBuffer.write(imageDataSize);
-			dataBuffer.write(image->Data.constData(), imageDataSize);
+			dataBuffer.write(image->GetData(), imageDataSize);
 		}
 
 		const qint64 lastPos = dataBuffer.pos();
