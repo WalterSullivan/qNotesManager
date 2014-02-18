@@ -107,6 +107,11 @@ bool Cipherer::IsCipherTypeSupported(QString type) {
 	return QCA::isSupported(str.toStdString().c_str());
 }
 
+bool Cipherer::IsFeatureSupported(const char* feature) {
+	QCA::Initializer init;
+	return QCA::isSupported(feature);
+}
+
 QString Cipherer::GetCipherName(int cipherID) {
 	if (!avaliableCipherTypes.contains(cipherID)) {
 		return QString();

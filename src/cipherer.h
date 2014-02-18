@@ -48,6 +48,7 @@ namespace qNotesManager {
 		QString GetMD5Hash(const QByteArray& data);
 
 		bool IsCipherTypeSupported(QString);
+		bool IsFeatureSupported(const char* feature);
 
 		QString GetCipherName(int cipherID);
 
