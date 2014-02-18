@@ -49,6 +49,10 @@ QString CachedFile::GetFileName() const {
 	return FileName;
 }
 
+bool CachedFile::HasSameDataAs(const CachedFile* other) const {
+	return Data == other->Data;
+}
+
 bool CachedFile::Save(const QString& fileName) const {
 	if (Data.size() == 0) {return false;}
 
