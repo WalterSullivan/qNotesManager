@@ -42,7 +42,6 @@ namespace qNotesManager {
 		QList<QUrl> errorDownloads;
 		void replaceImageUrl(QUrl oldName, QString newName);
 
-		quint32 CalculateImageCRC(const QImage&) const;
 		QTimer restartDownloadsTimer;
 
 		QHash<QString, CachedImageFile*> originalImages;
@@ -56,9 +55,6 @@ namespace qNotesManager {
 		CachedImageFile* GetResourceImage(QString name) const;
 		void AddResourceImage(CachedImageFile*);
 		QStringList GetResourceImagesList() const;
-
-		void InsertImage(QImage image, QTextCursor cursor);
-		void InsertImage(QUrl url, QTextCursor cursor);
 
 		IDummyImagesProvider* DummyImagesProvider;
 

@@ -212,33 +212,6 @@ QStringList TextDocument:: GetResourceImagesList() const {
 	return originalImages.keys();
 }
 
-quint32 TextDocument::CalculateImageCRC(const QImage& image) const {
-	QByteArray a;
-	QBuffer b(&a);
-	b.open(QIODevice::WriteOnly);
-	image.save(&b, image.text("FORMAT").toStdString().c_str());
-	b.close();
-
-	return crc32buf(a.constData(), a.length());
-}
-
-void TextDocument::InsertImage(QImage image, QTextCursor cursor) {
-	if (image.isNull()) {
-		WARNING("Image is null");
-		return;
-	}
-	quint32 crc = CalculateImageCRC(image);
-	QUrl url(QString::number(crc));
-	if (!resource(QTextDocument::ImageResource, url).isValid()) {
-		addResource(QTextDocument::ImageResource, url, image);
-	}
-	cursor.insertImage(url.toString());
-}
-
-void TextDocument::InsertImage(QUrl url, QTextCursor cursor) {
-	WARNING("Not implemented");
-}
-
 void TextDocument::sl_RestartDownloadsTimer_Timeout() {
 	QMutableListIterator<QUrl> it(errorDownloads);
 
