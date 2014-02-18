@@ -45,6 +45,8 @@ namespace qNotesManager {
 		QByteArray GetSecureHash(const QByteArray& data, quint8 hashID);
 		bool IsSecureHashSupported(quint8);
 
+		QString GetMD5Hash(const QByteArray& data);
+
 		bool IsCipherTypeSupported(QString);
 
 		QString GetCipherName(int cipherID);
