@@ -24,6 +24,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 namespace qNotesManager {
 	class CachedFile {
 	private:
+		mutable quint32 cachedCrc32;
+
 	protected:
 		QByteArray Data;
 		QString FileName;

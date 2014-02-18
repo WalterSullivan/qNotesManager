@@ -25,12 +25,16 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 CachedFile::CachedFile(const QByteArray& array, const QString& name) :
+	cachedCrc32(0),
 	Data(array),
 	FileName(name) {
 }
 
 quint32 CachedFile::GetCRC32() const {
-	return crc32buf(Data.constData(), Data.length());
+	if (cachedCrc32 == 0) {
+		cachedCrc32 = crc32buf(Data.constData(), Data.length());
+	}
+	return cachedCrc32;
 }
 
 int CachedFile::Size() const {
