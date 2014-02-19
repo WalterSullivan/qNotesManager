@@ -82,8 +82,7 @@ void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* im
 		return;
 	}
 
-	quint32 hash = image->GetCRC32();
-	QString name = QString::number(hash);
+	QString name = image->GetMD5();
 	QUrl newUrl(name);
 	if (!originalImages.contains(name)) {
 		qDebug() << "Resource for id " << name << " not found. Adding resource";
@@ -237,7 +236,6 @@ CachedImageFile* TextDocument::GetResourceImage(QString name) const {
 }
 
 void TextDocument::AddResourceImage(CachedImageFile* image) {
-	quint32 hash = image->GetCRC32();
-	QString name = QString::number(hash);
-	originalImages.insert(name, image);
+	QString md5 = image->GetMD5();
+	originalImages.insert(md5, image);
 }

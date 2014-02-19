@@ -240,8 +240,7 @@ void TextEdit::insertFromMimeData(const QMimeData* source) {
 			}
 
 			CachedImageFile* cachedImage = new CachedImageFile(imageData, "unnamed", "png");
-			quint32 hash = cachedImage->GetCRC32();
-			QString name = QString::number(hash);
+			QString name = cachedImage->GetMD5();
 			TextDocument* doc = dynamic_cast<TextDocument*>(document());
 			doc->AddResourceImage(cachedImage);
 			textCursor().insertImage(name);

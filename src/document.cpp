@@ -444,7 +444,7 @@ void Document::AddCustomIcon(CachedImageFile* image) {
 		return;
 	}
 
-	QString name = QString::number(image->GetCRC32());
+	QString name = image->GetMD5();
 	customIcons.insert(name, image);
 
 	QStandardItem* i = new QStandardItem(image->GetPixmap(QSize(16, 16)), QString());
@@ -468,7 +468,7 @@ void Document::AddCustomIconToStorage(CachedImageFile* image) {
 		return;
 	}
 
-	QString name = QString::number(image->GetCRC32());
+	QString name = image->GetMD5();
 	customIcons.insert(name, image);
 }
 

@@ -344,6 +344,7 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 	}
 
 	// Read user icons
+	QHash<QString, QString> iconNames;
 	{
 		quint32 userIconsBlockSize = 0;
 		readResult = dataBuffer.read(userIconsBlockSize);
@@ -362,6 +363,7 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 			readResult = dataBuffer.read(pixmapArray.data(), imageDataSize);
 
 			CachedImageFile* image = new CachedImageFile(pixmapArray, nameArray, iconInfo.suffix());
+			iconNames.insert(QString::number(image->GetCRC32()), image->GetMD5());
 
 			doc->AddCustomIconToStorage(image);
 			sendProgressSignal(&dataBuffer);
@@ -397,6 +399,10 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 			readResult = dataBuffer.read(folderItemID);
 			Note* note = loadNote_v1(dataBuffer);
 
+			if (iconNames.contains(note->iconID)) {
+				note->iconID = iconNames[note->iconID];
+			}
+
 			folderItems.insert(folderItemID, note);
 			sendProgressSignal(&dataBuffer);
 		}
@@ -419,8 +425,12 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 		while(dataBuffer.pos() < blockLastByte) {
 			readResult = dataBuffer.read(folderID);
 			Folder* folder = loadFolder_v1(dataBuffer);
-			folderItems.insert(folderID, folder);
 
+			if (iconNames.contains(folder->iconID)) {
+				folder->iconID = iconNames[folder->iconID];
+			}
+
+			folderItems.insert(folderID, folder);
 			sendProgressSignal(&dataBuffer);
 		}
 	}
@@ -896,6 +906,33 @@ Note* Serializer::loadNote_v1(BOIBuffer& buffer) {
 		// If block has more data in case of newer file version.
 		buffer.seek(buffer.pos() + bytesToSkip);
 	}
+
+	// Change crc image urls to md5
+	{
+		QHash<QString, QString> urls;
+		foreach (CachedImageFile* image, images) {
+			urls.insert(QString::number(image->GetCRC32()), image->GetMD5());
+		}
+
+		QString html = r_textArray;
+		QRegExp regexp("(<img src=\")([^\"]*)(\")");
+		int index = 0;
+
+		while ((index = regexp.indexIn(html, index)) != -1) {
+			QString oldUrl = regexp.cap(2);
+			int pos = regexp.pos(2);
+			int length = oldUrl.length();
+
+			if (urls.contains(oldUrl)) {
+				html.replace(pos, length, urls[oldUrl]);
+			}
+
+			index += regexp.matchedLength();
+		}
+
+		r_textArray = html.toUtf8();
+	}
+
 
 	Note* note = new Note("");
 	note->name = r_captionArray;
