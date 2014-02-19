@@ -463,7 +463,7 @@ void TextEdit::mouseReleaseEvent (QMouseEvent* event) {
 
 	if (formatToCopy.isValid()) {
 		QTextCharFormat format = formatToCopy.toCharFormat();
-		applyCharFormatting(format, true, Set);
+		applyCharFormatting(format, Set);
 		formatToCopy = QTextFormat(QTextFormat::InvalidFormat);
 		emit sg_CopyFormatCleared(false);
 	}
@@ -515,6 +515,7 @@ void TextEdit::sl_RemoveLinkAction_Triggered() {
 	format.clearProperty(QTextFormat::AnchorName);
 	format.clearProperty(QTextFormat::ForegroundBrush);
 	format.setFontUnderline(false);
+	format.setUnderlineColor(QColor());
 	cursor.setPosition(currentFragment.position());
 	cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, currentFragment.length());
 	cursor.beginEditBlock();
@@ -607,19 +608,19 @@ QTextFragment TextEdit::findFragmentAtPos(QPoint pos) {
 
 void TextEdit::ClearFormatting() {
 	QTextCharFormat f;
-	applyCharFormatting(f, true, Set);
+	applyCharFormatting(f, Set);
 }
 
 void TextEdit::SetSelectionForeColor(QColor color) {
 	QTextCharFormat f;
 	f.setForeground(QBrush(color));
-	applyCharFormatting(f, true);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetSelectionBackColor(QColor color) {
 	QTextCharFormat f;
 	f.setBackground(QBrush(color));
-	applyCharFormatting(f, true);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetSelectionBold(bool bold) {
@@ -629,13 +630,13 @@ void TextEdit::SetSelectionBold(bool bold) {
 	} else {
 		f.setFontWeight(QFont::Normal);
 	}
-	applyCharFormatting(f, false);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetSelectionItalic(bool italic) {
 	QTextCharFormat f;
 	f.setFontItalic(italic);
-	applyCharFormatting(f, false);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetSelectionUnderline(bool underline) {
@@ -648,7 +649,7 @@ void TextEdit::SetSelectionUnderline(bool underline) {
 	} else if (!underline) {
 		f.setUnderlineColor(QColor());
 	}
-	applyCharFormatting(f, true);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetSelectionUnderlineColor(QColor color) {
@@ -659,19 +660,19 @@ void TextEdit::SetSelectionUnderlineColor(QColor color) {
 	}
 
 	f.setUnderlineColor(color);
-	applyCharFormatting(f, true);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetSelectionUnderlineStyle(QTextCharFormat::UnderlineStyle style) {
 	QTextCharFormat f;
 	f.setUnderlineStyle(style);
-	applyCharFormatting(f, true);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetSelectionStrikeOut(bool strikeout) {
 	QTextCharFormat f;
 	f.setFontStrikeOut(strikeout);
-	applyCharFormatting(f, false);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetAlignment(Qt::Alignment a) {
@@ -681,13 +682,13 @@ void TextEdit::SetAlignment(Qt::Alignment a) {
 void TextEdit::SetFontFamily(QString family) {
 	QTextCharFormat f;
 	f.setFontFamily(family);
-	applyCharFormatting(f, false);
+	applyCharFormatting(f);
 }
 
 void TextEdit::SetFontSize(qreal size) {
 	QTextCharFormat f;
 	f.setFontPointSize(size);
-	applyCharFormatting(f, false);
+	applyCharFormatting(f);
 }
 
 QColor TextEdit::GetForeColor() const {
@@ -721,8 +722,7 @@ Qt::Alignment TextEdit::GetAlignment() const {
 	return textCursor().blockFormat().alignment();
 }
 
-void TextEdit::applyCharFormatting(const QTextCharFormat &format, const bool skipLinks,
-								   const CharFormatApplyMode mode) {
+void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharFormatApplyMode mode) {
 	qDebug() << "applyCharFormatting";
 	QTextCursor cursor = this->textCursor();
 	int selectionStart = cursor.selectionStart();
@@ -750,7 +750,6 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const bool ski
 			int fs = currentFragment.position();
 			int fe = currentFragment.position() + currentFragment.length();
 
-			if (currentFragment.charFormat().isAnchor() && skipLinks) {continue;}
 			if (selectionEnd < fs || selectionStart > fe) {continue;} // skip not affected fragments
 
 			if (selectionStart < fs) {
@@ -765,7 +764,11 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const bool ski
 				fragmentEnd = fe;
 			}
 
-			fragments.append(QPair<int, int>(fragmentStart, fragmentEnd - fragmentStart));
+			if (currentFragment.charFormat().isAnchor()) {
+				hyperLinkFragments.append(QPair<int, int>(fragmentStart, fragmentEnd - fragmentStart));
+			} else {
+				fragments.append(QPair<int, int>(fragmentStart, fragmentEnd - fragmentStart));
+			}
 		}
 
 		block = block.next();
@@ -773,6 +776,7 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const bool ski
 
 	QPair<int, int> pair;
 	QTextCursor temp(document());
+	QTextCharFormat hyperlinkFormat;
 	temp.beginEditBlock();
 	foreach (pair, fragments) {
 		temp.setPosition(pair.first);
@@ -781,6 +785,27 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const bool ski
 			temp.mergeCharFormat(format);
 		} else {
 			temp.setCharFormat(format);
+		}
+	}
+	// Change format for hyperlinks
+	QTextCharFormat newHyperlinkFormat = format;
+	foreach (pair, hyperLinkFragments) {
+		temp.setPosition(pair.first);
+		temp.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
+
+		hyperlinkFormat = temp.charFormat();
+		newHyperlinkFormat.setAnchor(hyperlinkFormat.isAnchor());
+		newHyperlinkFormat.setAnchorHref(hyperlinkFormat.anchorHref());
+		newHyperlinkFormat.setAnchorName(hyperlinkFormat.anchorName());
+		newHyperlinkFormat.setAnchorNames(hyperlinkFormat.anchorNames());
+		newHyperlinkFormat.setUnderlineStyle(hyperlinkFormat.underlineStyle());
+		newHyperlinkFormat.setUnderlineColor(hyperlinkFormat.underlineColor());
+		newHyperlinkFormat.setForeground(hyperlinkFormat.foreground());
+
+		if (mode == Merge) {
+			temp.mergeCharFormat(newHyperlinkFormat);
+		} else {
+			temp.setCharFormat(newHyperlinkFormat);
 		}
 	}
 	temp.endEditBlock();
