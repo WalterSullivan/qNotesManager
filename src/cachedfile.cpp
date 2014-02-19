@@ -18,6 +18,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "cachedfile.h"
 
 #include "crc32.h"
+#include "cipherer.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -35,6 +36,11 @@ quint32 CachedFile::GetCRC32() const {
 		cachedCrc32 = crc32buf(Data.constData(), Data.length());
 	}
 	return cachedCrc32;
+}
+
+QString CachedFile::GetMD5() const {
+	Cipherer c;
+	return c.GetMD5Hash(Data);
 }
 
 int CachedFile::Size() const {

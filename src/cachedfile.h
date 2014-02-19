@@ -35,6 +35,7 @@ namespace qNotesManager {
 		virtual ~CachedFile() {}
 
 		quint32 GetCRC32() const;
+		QString GetMD5() const;
 		int Size() const;
 
 		const char* GetData() const;
