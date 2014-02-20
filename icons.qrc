@@ -921,5 +921,7 @@
         <file alias="plus">icons/gui/plus.png</file>
         <file alias="resize">icons/gui/arrow-resize.png</file>
         <file alias="rename">icons/gui/document-rename.png</file>
+        <file alias="star-plus">icons/gui/star--plus.png</file>
+        <file alias="star-minus">icons/gui/star--minus.png</file>
     </qresource>
 </RCC>

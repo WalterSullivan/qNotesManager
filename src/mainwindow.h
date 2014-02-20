@@ -47,6 +47,7 @@ namespace qNotesManager {
 	class NotesTabWidget;
 	class DocumentPropertiesWidget;
 	class Document;
+	class BookmarksMenu;
 
 	class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -84,6 +85,9 @@ namespace qNotesManager {
 		QMenu* editMenu;
 
 		QMenu* formatMenu;
+
+		BookmarksMenu* bookmarksMenu;
+
 
 		QMenu* optionsMenu;
 		QAction* showToolbarAction;
@@ -170,6 +174,8 @@ namespace qNotesManager {
 
 		void sl_ShowHideMainWindowAction_Triggered();
 		void sl_QuickNoteAction_Triggered();
+
+		void sl_BookmarksMenu_NoteOpenRequest(Note*);
 
 		// Application event handlers
 		void sl_CurrentDocument_Changed();

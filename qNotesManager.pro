@@ -118,7 +118,9 @@ HEADERS += src/tag.h \
     src/edittablewidthconstraintswidget.h \
     src/appinfo.h \
     src/modelitemdelegate.h \
-    src/serializer.h
+    src/serializer.h \
+    src/bookmarksmenu.h
+
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -180,5 +182,7 @@ SOURCES += src/tagownerscollection.cpp \
     src/iconitemdelegate.cpp \
     src/edittablewidthconstraintswidget.cpp \
     src/modelitemdelegate.cpp \
-    src/serializer.cpp
+    src/serializer.cpp \
+    src/bookmarksmenu.cpp
+
 RESOURCES += icons.qrc

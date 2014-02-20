@@ -32,6 +32,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "cipherer.h"
 #include "global.h"
 #include "appinfo.h"
+#include "bookmarksmenu.h"
 
 #include <QDebug>
 #include <QHBoxLayout>
@@ -260,9 +261,13 @@ void MainWindow::createControls() {
 	formatMenu->menuAction()->setEnabled(false);
 	menuBar->addMenu(formatMenu);
 
+	bookmarksMenu = new BookmarksMenu("Bookmarks", this);
+	QObject::connect(bookmarksMenu, SIGNAL(sg_OpenBookmark(Note*)),
+					 this, SLOT(sl_BookmarksMenu_NoteOpenRequest(Note*)));
+	menuBar->addMenu(bookmarksMenu);
+
 	optionsMenu = new QMenu("Options", this);
 	menuBar->addMenu(optionsMenu);
-
 
 	optionsMenu->addAction(showToolbarAction);
 	optionsMenu->addAction(showStatusBarAction);
@@ -271,8 +276,6 @@ void MainWindow::createControls() {
 
 	aboutMenu = new QMenu("About", this);
 	menuBar->addMenu(aboutMenu);
-
-
 
 	aboutMenu->addAction(aboutProgramAction);
 	aboutMenu->addAction(aboutQtAction);
@@ -589,6 +592,8 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	Document* doc = Application::I()->CurrentDocument();
 	engine->SetTargetDocument(doc);
 	navigationPanel->SetTargetDocument(doc);
+	bookmarksMenu->SetDocument(doc);
+
 	if (doc) {
 		QObject::connect(doc, SIGNAL(sg_Changed()),
 						 this, SLOT(sl_CurrentDocument_Changed()));
@@ -724,6 +729,8 @@ void MainWindow::sl_Application_NoteDeleted(Note* n) {
 }
 
 void MainWindow::sl_CurrentNoteChanged(Note* note) {
+	bookmarksMenu->sl_CurrentNoteChanged(note);
+
 	if (formatMenu->actions().size() > 0) {
 		formatMenu->clear();
 	}
@@ -789,6 +796,10 @@ void MainWindow::sl_QuickNoteAction_Triggered() {
 	}
 
 	doc->GetTempFolder()->Items.Add(n);
+}
+
+void MainWindow::sl_BookmarksMenu_NoteOpenRequest(Note* note) {
+	notesTabWidget->OpenNote(note);
 }
 
 void MainWindow::sl_EditMenuContentChanged() {

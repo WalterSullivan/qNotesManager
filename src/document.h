@@ -63,6 +63,7 @@ namespace qNotesManager {
 		QList<Tag*>		allTags;
 		QList<Note*>	allNotes;
 		QList<Folder*>	allFolders;
+		QList<Note*> bookmarks;
 
 		QMap<QString, Tag*> tagsByName; // to quickly fing tag by name
 
@@ -124,7 +125,6 @@ namespace qNotesManager {
 		DatesModel* GetModificationDatesModel() const;
 		DatesModel* GetTextDatesModel() const;
 
-
 		QList<Tag*> GetTagsList() const;
 		QList<Note*> GetNotesList() const;
 
@@ -150,6 +150,12 @@ namespace qNotesManager {
 		void SetDefaultNoteIcon(QString id);
 		void SetDefaultFolderIcon(QString id);
 
+		int GetBookmarksCount() const;
+		Note* GetBookmark(int index) const;
+		void AddBookmark(Note*);
+		void RemoveBookmark(Note*);
+		bool IsBookmark(Note*);
+
 	signals:
 		void sg_Changed();	// Emitted when document was changed
 
@@ -160,6 +166,8 @@ namespace qNotesManager {
 		void sg_ItemUnregistered(Folder*);
 		void sg_ItemUnregistered(Note*);
 		void sg_ItemUnregistered(Tag*);
+
+		void sg_BookmarksListChanged();
 
 
 		// Worker signals

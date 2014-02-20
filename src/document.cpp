@@ -324,6 +324,11 @@ void Document::UnregisterItem(AbstractFolderItem* const item) {
 		n->Tags.Clear(); // ? Tags must be unregistered, but this line modifies note.
 
 		allNotes.removeAll(n);
+
+		if (bookmarks.contains(n)) {
+			RemoveBookmark(n);
+		}
+
 		emit sg_ItemUnregistered(n);
 	}
 }
@@ -377,6 +382,17 @@ void Document::sl_Note_TagRemoved(Tag* tag) {
 
 // when folder or note or tag were changed
 void Document::sl_ItemDataChanged() {
+	QObject* sender = QObject::sender();
+	AbstractFolderItem* item = dynamic_cast<AbstractFolderItem*>(sender);
+	if (item != 0) {
+		if (item->GetItemType() == AbstractFolderItem::Type_Note) {
+			Note* n = dynamic_cast<Note*>(item);
+			if (n != 0 && bookmarks.contains(n)) {
+				emit sg_BookmarksListChanged();
+			}
+		}
+	}
+
 	onChange();
 }
 
@@ -587,6 +603,38 @@ void Document::SetDefaultFolderIcon(QString id) {
 
 	DefaultFolderIcon = id;
 	onChange();
+}
+
+int Document::GetBookmarksCount() const {
+	return bookmarks.count();
+}
+
+Note* Document::GetBookmark(int index) const {
+	if (index < 0 || index >= bookmarks.count()) {return 0;}
+
+	return bookmarks[index];
+}
+
+void Document::AddBookmark(Note* note) {
+	if (bookmarks.contains(note)) {return;}
+
+	bookmarks.push_back(note);
+	onChange();
+	emit sg_BookmarksListChanged();
+}
+
+void Document::RemoveBookmark(Note* note) {
+	if (!bookmarks.contains(note)) {return;}
+
+	bookmarks.removeOne(note);
+	onChange();
+	emit sg_BookmarksListChanged();
+}
+
+bool Document::IsBookmark(Note* note) {
+	if (note == 0) {return false;}
+
+	return bookmarks.contains(note);
 }
 
 
