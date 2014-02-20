@@ -151,6 +151,8 @@ void Serializer::load() {
 			emit sg_LoadingAborted();
 			return;
 		}
+
+		r_fileVersion = lastSupportedSpecificationVersion;
 	}
 
 	doc->fileVersion = r_fileVersion;
@@ -163,8 +165,6 @@ void Serializer::load() {
 			WARNING("Wrong case branch");
 			emit sg_LoadingFailed("Unknown file version");
 	}
-
-
 }
 
 void Serializer::load_v1(BOIBuffer& buffer) {
