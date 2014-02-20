@@ -466,6 +466,22 @@ void Serializer::load_v1(BOIBuffer& buffer) {
 void Serializer::save() {
 	emit sg_SavingStarted();
 
+	if (saveVersion > lastSupportedSpecificationVersion) {
+		bool abort = false;
+
+		QSemaphore s;
+		emit sg_ConfirmationRequest(&s, "Specified save version is not supported."
+									"Use last supported version?", &abort);
+		s.acquire();
+
+		if (abort) {
+			emit sg_SavingAborted();
+			return;
+		}
+
+		saveVersion = lastSupportedSpecificationVersion;
+	}
+
 	switch (saveVersion) {
 		case 0x0001:
 			save_v1();
