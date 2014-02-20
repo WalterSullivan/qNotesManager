@@ -23,9 +23,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 namespace qNotesManager {
 	class Note;
-	class BOIBuffer;
 
 	class Tag : public QObject {
+	friend class Serializer;
 	Q_OBJECT
 	private:
 		const QString _name;
@@ -35,9 +35,6 @@ namespace qNotesManager {
 	public:
 		explicit Tag(const QString& name);
 		QString GetName() const;
-
-		void Serialize(const int version, BOIBuffer& stream) const;
-		static Tag* Deserialize(const int version, BOIBuffer& stream);
 
 		TagOwnersCollection Owners;
 

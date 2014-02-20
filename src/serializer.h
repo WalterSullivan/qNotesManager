@@ -34,17 +34,19 @@ namespace qNotesManager {
 		QString filename;
 		quint16 saveVersion;
 
-		void loadDocument();
-		void loadDocument_v1(BOIBuffer&);
+		void	loadDocument();
+		void	loadDocument_v1(BOIBuffer&);
 
-		Note* loadNote_v1(BOIBuffer&);
-		Folder* loadFolder_v1(BOIBuffer&);
+		Note*	loadNote_v1(BOIBuffer&);
+		Folder*	loadFolder_v1(BOIBuffer&);
+		Tag*	loadTag_v1(BOIBuffer&);
 
-		void saveDocument();
-		void saveDocument_v1();
+		void	saveDocument();
+		void	saveDocument_v1();
 
-		void saveNote_v1(const Note*, BOIBuffer&);
-		void saveFolder_v1(const Folder*, BOIBuffer&);
+		void	saveNote_v1(const Note*, BOIBuffer&);
+		void	saveFolder_v1(const Folder*, BOIBuffer&);
+		void	saveTag_v1(const Tag*, BOIBuffer&);
 
 		void sendProgressSignal(BOIBuffer*);
 

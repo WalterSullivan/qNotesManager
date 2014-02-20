@@ -328,7 +328,7 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 		while (dataBuffer.pos() < blockEndByte) {
 			quint32 tagID = 0;
 			readResult = dataBuffer.read(tagID);
-			Tag* tag = Tag::Deserialize(doc->fileVersion, dataBuffer);
+			Tag* tag = loadTag_v1(dataBuffer);
 
 			tagsIDs.insert(tagID, tag);
 			sendProgressSignal(&dataBuffer);
@@ -613,7 +613,7 @@ void Serializer::saveDocument_v1() {
 			dataBuffer.write(tagID);
 			tagsIDs.insert(tag, tagID);
 			tagID++;
-			tag->Serialize(doc->fileVersion, dataBuffer);
+			saveTag_v1(tag, dataBuffer);
 		}
 		const qint64 blockEndPosition = dataBuffer.pos();
 		blockSize = blockEndPosition - blockStartPosition;
@@ -1089,4 +1089,38 @@ void Serializer::saveFolder_v1(const Folder* folder, BOIBuffer& buffer) {
 	buffer.write(s_backColor);
 	buffer.write(s_foreColor);
 	buffer.write(s_locked);
+}
+
+Tag* Serializer::loadTag_v1(BOIBuffer& buffer) {
+	qint64 result = 0;
+
+	quint32 r_itemSize = 0;
+	result = buffer.read(r_itemSize);
+
+	const qint64 streamStartPos = buffer.pos();
+
+	quint32 r_nameSize = 0;
+	result = buffer.read(r_nameSize);
+
+	QByteArray r_nameArray(r_nameSize, 0x0);
+	result = buffer.read(r_nameArray.data(), r_nameSize);
+
+	const quint32 bytesToSkip = r_itemSize - (buffer.pos() - streamStartPos);
+
+	if (bytesToSkip != 0) {
+		buffer.seek(buffer.pos() + bytesToSkip); // If chunck has more data in case of newer file version.
+	}
+
+	return new Tag(r_nameArray);
+}
+
+void Serializer::saveTag_v1(const Tag* tag, BOIBuffer& buffer) {
+	const QByteArray w_nameArray = tag->_name.toUtf8();
+	const quint32 w_nameSize = w_nameArray.size();
+	const quint32 w_itemSize = w_nameSize + sizeof(w_nameSize);
+
+	qint64 result = 0;
+	result = buffer.write(w_itemSize);
+	result = buffer.write(w_nameSize);
+	result = buffer.write(w_nameArray.constData(), w_nameSize);
 }
