@@ -85,7 +85,7 @@ Document::Document() : QObject(0) {
 
 
 	fileName = QString();
-	fileVersion = currentFileVersion;
+	fileVersion = Serializer::actualSpecificationVersion;
 	compressionLevel = Compressor::MaximumLevel;
 	cipherID = 0;
 	password = QByteArray();

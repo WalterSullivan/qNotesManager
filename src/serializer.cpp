@@ -134,13 +134,13 @@ void Serializer::load() {
 	quint16 r_fileVersion = 0;
 	buffer.read(r_fileVersion);
 
-	if ((r_fileVersion >> 8) > (doc->currentFileVersion >> 8)) {
+	if ((r_fileVersion >> 8) > (lastSupportedSpecificationVersion >> 8)) {
 		emit sg_LoadingFailed("File was created in a newer version of program and cannot be loaded");
 		return;
 	}
 
-	if (((r_fileVersion >> 8) == (doc->currentFileVersion >> 8)) &&
-		((r_fileVersion & 0x00ff) > (doc->currentFileVersion & 0x00ff))) {
+	if (((r_fileVersion >> 8) == (lastSupportedSpecificationVersion >> 8)) &&
+		((r_fileVersion & 0x00ff) > (lastSupportedSpecificationVersion & 0x00ff))) {
 		bool abort = false;
 
 		QSemaphore s;

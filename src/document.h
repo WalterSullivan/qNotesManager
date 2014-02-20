@@ -85,8 +85,6 @@ namespace qNotesManager {
 		quint8 cipherID;
 		QByteArray password;
 
-		static const quint16 currentFileVersion = 0x0001;
-
 		QDateTime creationDate;
 		QDateTime modificationDate;
 
