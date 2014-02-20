@@ -50,7 +50,7 @@ void Serializer::Save(Document* d, QString _filename, quint16 _version) {
 	doc = d;
 	filename = _filename;
 	operation = Saving;
-	version = _version;
+	saveVersion = _version;
 }
 
 void Serializer::sl_start() {
@@ -466,7 +466,7 @@ void Serializer::load_v1(BOIBuffer& buffer) {
 void Serializer::save() {
 	emit sg_SavingStarted();
 
-	switch (version) {
+	switch (saveVersion) {
 		case 0x0001:
 			save_v1();
 			break;
@@ -772,7 +772,7 @@ void Serializer::save_v1() {
 
 	doc->hasUnsavedData = false;
 	if (doc->fileName != filename) {doc->fileName = filename;}
-	if (doc->fileVersion != version) {doc->fileVersion = version;}
+	if (doc->fileVersion != saveVersion) {doc->fileVersion = saveVersion;}
 	emit sg_SavingFinished();
 }
 

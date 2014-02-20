@@ -32,7 +32,7 @@ namespace qNotesManager {
 		Operation operation;
 		Document* doc;
 		QString filename;
-		quint16 version;
+		quint16 saveVersion;
 
 		void load();
 		void load_v1(BOIBuffer&);
