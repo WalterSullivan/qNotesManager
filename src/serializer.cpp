@@ -25,6 +25,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "tag.h"
 #include "folder.h"
 #include "cachedimagefile.h"
+#include "textdocument.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -344,7 +345,7 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 		while (dataBuffer.pos() < blockEndByte) {
 			quint32 folderItemID = 0;
 			readResult = dataBuffer.read(folderItemID);
-			Note* note = Note::Deserialize(doc->fileVersion, dataBuffer);
+			Note* note = loadNote_v1(dataBuffer);
 
 			folderItems.insert(folderItemID, note);
 			sendProgressSignal(&dataBuffer);
@@ -634,7 +635,7 @@ void Serializer::saveDocument_v1() {
 			dataBuffer.write(folderOrNoteID);
 			folderItemsIDs.insert(note, folderOrNoteID);
 			folderOrNoteID++;
-			note->Serialize(doc->fileVersion, dataBuffer);
+			saveNote_v1(note, dataBuffer);
 		}
 		const qint64 blockEndPosition = dataBuffer.pos();
 		blockSize = blockEndPosition - blockStartPosition;
@@ -787,6 +788,219 @@ void Serializer::saveDocument_v1() {
 	if (doc->fileName != filename) {doc->fileName = filename;}
 	if (doc->fileVersion != saveVersion) {doc->fileVersion = saveVersion;}
 	emit sg_SavingFinished();
+}
+
+Note* Serializer::loadNote_v1(BOIBuffer& buffer) {
+	qint64 bytesRead = 0;
+
+	quint32 r_itemSize = 0;
+	bytesRead = buffer.read(r_itemSize);
+
+	const qint64 dataStartPos = buffer.pos();
+
+	quint32 r_captionSize = 0;
+	bytesRead = buffer.read(r_captionSize);
+	QByteArray r_captionArray(r_captionSize, 0x0);
+	bytesRead = buffer.read(r_captionArray.data(), r_captionSize);
+	quint32 r_textSize = 0;
+	bytesRead = buffer.read(r_textSize);
+	QByteArray r_textArray(r_textSize, 0x0);
+	bytesRead = buffer.read(r_textArray.data(), r_textSize);
+	quint32 r_creationDate = 0;
+	bytesRead = buffer.read(r_creationDate);
+	quint32 r_modificationDate = 0;
+	bytesRead = buffer.read(r_modificationDate);
+	quint32 r_textDate = 0;
+	bytesRead = buffer.read(r_textDate);
+	quint32 r_authorSize = 0;
+	bytesRead = buffer.read(r_authorSize);
+	QByteArray r_authorArray(r_authorSize, 0x0);
+	bytesRead = buffer.read(r_authorArray.data(), r_authorSize);
+	quint32 r_sourceSize = 0;
+	bytesRead = buffer.read(r_sourceSize);
+	QByteArray r_sourceArray(r_sourceSize, 0x0);
+	bytesRead = buffer.read(r_sourceArray.data(), r_sourceSize);
+	quint32 r_commentSize = 0;
+	bytesRead = buffer.read(r_commentSize);
+	QByteArray r_commentArray(r_commentSize, 0x0);
+	bytesRead = buffer.read(r_commentArray.data(),			r_commentSize);
+	quint32 r_iconIDSize = 0;
+	bytesRead = buffer.read(r_iconIDSize);
+	QByteArray r_iconID(r_iconIDSize, 0x0);
+	bytesRead = buffer.read(r_iconID.data(),			r_iconIDSize);
+	quint32 r_backColor = 0;
+	bytesRead = buffer.read(r_backColor);
+	quint32 r_foreColor = 0;
+	bytesRead = buffer.read(r_foreColor);
+	quint8 r_locked = 0;
+	bytesRead = buffer.read(r_locked);
+	quint32 r_imagesListSize = 0;
+	bytesRead = buffer.read(r_imagesListSize);
+
+	QList<CachedImageFile*> images;
+
+	if (r_imagesListSize > 0) {
+		quint32 imagesSize = 0;
+
+		while(imagesSize < r_imagesListSize) {
+			quint32 r_imageNameSize = 0;
+			bytesRead = buffer.read(r_imageNameSize);
+			QByteArray r_imageName(r_imageNameSize, 0x0);
+			bytesRead = buffer.read(r_imageName.data(), r_imageNameSize);
+
+			quint32 imageFormatSize = 0;
+			bytesRead = buffer.read(imageFormatSize);
+			QByteArray imageFormat(imageFormatSize, 0x0);
+			bytesRead = buffer.read(imageFormat.data(), imageFormatSize);
+
+			quint32 r_imageArraySize = 0;
+			bytesRead = buffer.read(r_imageArraySize);
+			QByteArray r_imageArray(r_imageArraySize, 0x0);
+			bytesRead = buffer.read(r_imageArray.data(), r_imageArraySize);
+
+			CachedImageFile* image = new CachedImageFile(r_imageArray, r_imageName, imageFormat);
+			images.push_back(image);
+
+			imagesSize +=	sizeof(r_imageNameSize) +
+							r_imageNameSize +
+							sizeof(imageFormatSize) +
+							imageFormatSize +
+							sizeof(r_imageArraySize) +
+							r_imageArraySize;
+		}
+	}
+
+	const quint32 bytesToSkip = r_itemSize - (buffer.pos() - dataStartPos);
+
+	if (bytesToSkip != 0) {
+		// If block has more data in case of newer file version.
+		buffer.seek(buffer.pos() + bytesToSkip);
+	}
+
+	Note* note = new Note("");
+	note->name = r_captionArray;
+	note->creationDate = QDateTime::fromTime_t(r_creationDate);
+	note->modificationDate = QDateTime::fromTime_t(r_modificationDate);
+	note->textDate = r_textDate == 0 ? QDateTime() : QDateTime::fromTime_t(r_textDate);
+	note->author = r_authorArray;
+	note->source = r_sourceArray;
+	note->comment = r_commentArray;
+	note->iconID = r_iconID;
+	note->nameBackColor.setRgba(r_backColor);
+	note->nameForeColor.setRgba(r_foreColor);
+	note->locked = (bool)r_locked;
+	note->cachedHtml = r_textArray;
+	note->textDocumentInitialized = false;
+	foreach(CachedImageFile* image, images) {
+		note->document->AddResourceImage(image);
+	}
+
+	return note;
+}
+
+void Serializer::saveNote_v1(const Note* note, BOIBuffer& buffer) {
+	const QByteArray w_captionArray = note->name.toUtf8();
+	const quint32 w_captionSize = w_captionArray.size();
+	const QByteArray w_textArray = note->cachedHtml.isNull() ?
+								   note->document->toHtml().toUtf8() : note->cachedHtml.toUtf8();
+	const quint32 w_textSize = w_textArray.size();
+	const quint32 w_creationDate = note->creationDate.toTime_t();
+	const quint32 w_modificationDate = note->modificationDate.toTime_t();
+	const quint32 w_textDate = note->textDate.isValid() ? note->textDate.toTime_t() : 0;
+	const QByteArray w_iconID = note->iconID.toAscii();
+	const quint32 w_iconIDSize = w_iconID.size();
+	const QByteArray w_authorArray = note->author.toUtf8();
+	const quint32 w_authorSize = w_authorArray.size();
+	const QByteArray w_sourceArray = note->source.toUtf8();
+	const quint32 w_sourceSize = w_sourceArray.size();
+	const QByteArray w_commentArray = note->comment.toUtf8();
+	const quint32 w_commentSize = w_commentArray.size();
+	const quint32 w_backColor = note->nameBackColor.rgba();
+	const quint32 w_foreColor = note->nameForeColor.rgba();
+	const quint8 w_locked = (quint8)note->locked;
+
+	// Write images to temporary buffer
+	QStringList imagesNamesList;
+	if (note->textDocumentInitialized) {
+		imagesNamesList = note->document->GetImagesList();
+	} else {
+		imagesNamesList = note->document->GetResourceImagesList();
+	}
+
+	QByteArray imagesArray;
+	BOIBuffer imagesArrayBuffer(&imagesArray);
+	imagesArrayBuffer.open(QIODevice::WriteOnly);
+
+	foreach (QString imageName, imagesNamesList) {
+		CachedImageFile* image = note->document->GetResourceImage(imageName);
+		if (!image) {
+			WARNING("Image not found");
+			continue;
+		}
+
+		QByteArray imageNameArray = image->GetFileName().toUtf8();
+		const quint32 imageNameSize = imageNameArray.size();
+
+		const QByteArray formatArray = image->GetFormat().toAscii();
+		const quint32 formatArraySize = formatArray.size();
+
+		// writing data
+		imagesArrayBuffer.write(imageNameSize);
+		imagesArrayBuffer.write(imageNameArray.constData(), imageNameSize);
+
+		imagesArrayBuffer.write(formatArraySize);
+		imagesArrayBuffer.write(formatArray.constData(), formatArraySize);
+
+		const quint32 imageArraySize = image->Size();
+		imagesArrayBuffer.write(imageArraySize);
+		imagesArrayBuffer.write(image->GetData(), imageArraySize);
+	}
+	imagesArrayBuffer.close();
+
+
+	const quint32 w_imagesArraySize = imagesArray.size();
+	const quint32 w_itemSize =	sizeof(w_captionSize) +
+								w_captionSize +
+								sizeof(w_textSize) +
+								w_textSize +
+								sizeof(w_creationDate) +
+								sizeof(w_modificationDate) +
+								sizeof(w_textDate) +
+								w_iconIDSize +
+								sizeof(w_iconIDSize) +
+								sizeof(w_authorSize) +
+								w_authorSize +
+								sizeof(w_sourceSize) +
+								w_sourceSize +
+								sizeof(w_commentSize) +
+								w_commentSize +
+								sizeof(w_backColor) +
+								sizeof(w_foreColor) +
+								sizeof(w_locked) +
+								sizeof(w_imagesArraySize) +
+								w_imagesArraySize;
+	qint64 result = 0;
+	result = buffer.write(w_itemSize);
+	result = buffer.write(w_captionSize);
+	result = buffer.write(w_captionArray.constData(),	w_captionSize);
+	result = buffer.write(w_textSize);
+	result = buffer.write(w_textArray.constData(),		w_textSize);
+	result = buffer.write(w_creationDate);
+	result = buffer.write(w_modificationDate);
+	result = buffer.write(w_textDate);
+	result = buffer.write(w_authorSize);
+	result = buffer.write(w_authorArray.constData(),	w_authorSize);
+	result = buffer.write(w_sourceSize);
+	result = buffer.write(w_sourceArray.constData(),	w_sourceSize);
+	result = buffer.write(w_commentSize);
+	result = buffer.write(w_commentArray.constData(),	w_commentSize);
+	result = buffer.write(w_iconIDSize);
+	result = buffer.write(w_iconID.constData(), w_iconIDSize);
+	result = buffer.write(w_backColor);
+	result = buffer.write(w_foreColor);
+	result = buffer.write(w_locked);
+	result = buffer.write(w_imagesArraySize);
+	result = buffer.write(imagesArray);
 }
 
 void Serializer::sendProgressSignal(BOIBuffer* buffer) {

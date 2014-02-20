@@ -37,8 +37,12 @@ namespace qNotesManager {
 		void loadDocument();
 		void loadDocument_v1(BOIBuffer&);
 
+		Note* loadNote_v1(BOIBuffer&);
+
 		void saveDocument();
 		void saveDocument_v1();
+
+		void saveNote_v1(const Note*, BOIBuffer&);
 
 		void sendProgressSignal(BOIBuffer*);
 

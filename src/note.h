@@ -21,7 +21,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "abstractfolderitem.h"
 #include "notetagscollection.h"
 
-
 #include <QObject>
 #include <QDateTime>
 #include <QIcon>
@@ -29,16 +28,14 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTimer>
 #include <QHash>
 
-
 namespace qNotesManager {
 	class Tag;
 	class TextDocument;
-	class BOIBuffer;
 	class CachedImageFile;
-
 
 	class Note : public AbstractFolderItem {
 	Q_OBJECT
+	friend class Serializer;
 	private:
 		QString					name;
 		mutable QString			text;				// Note's plain text (for text search)
@@ -108,9 +105,6 @@ namespace qNotesManager {
 
 		TextDocument* GetTextDocument();
 		bool TextDocumentInitialized() const;
-
-		void Serialize(const int version, BOIBuffer& stream) const;
-		static Note* Deserialize(const int version, BOIBuffer& stream);
 
 		NoteTagsCollection Tags;
 		bool IsTagsListInitializationInProgress;
