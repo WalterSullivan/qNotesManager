@@ -25,6 +25,7 @@ namespace qNotesManager {
 	class CachedFile {
 	private:
 		mutable quint32 cachedCrc32;
+		mutable QString cachedMD5;
 
 	protected:
 		QByteArray Data;

@@ -27,6 +27,7 @@ using namespace qNotesManager;
 
 CachedFile::CachedFile(const QByteArray& array, const QString& name) :
 	cachedCrc32(0),
+	cachedMD5(QString()),
 	Data(array),
 	FileName(name) {
 }
@@ -40,7 +41,10 @@ quint32 CachedFile::GetCRC32() const {
 
 QString CachedFile::GetMD5() const {
 	Cipherer c;
-	return c.GetMD5Hash(Data);
+	if (cachedMD5.isEmpty()) {
+		cachedMD5 = c.GetMD5Hash(Data);
+	}
+	return cachedMD5;
 }
 
 int CachedFile::Size() const {
