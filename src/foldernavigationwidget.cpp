@@ -1019,9 +1019,7 @@ void FolderNavigationWidget::sl_View_Expanded(const QModelIndex& index) {
 
 	if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 		Folder* folder = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-		if (!expandexFolders.contains(folder)) {
-			expandexFolders.push_back(folder);
-		}
+		folder->SetExpanded(true);
 	}
 }
 
@@ -1034,9 +1032,7 @@ void FolderNavigationWidget::sl_View_Collapsed(const QModelIndex& index) {
 
 	if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 		Folder* folder = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-		if (expandexFolders.contains(folder)) {
-			expandexFolders.removeAll(folder);
-		}
+		folder->SetExpanded(false);
 	}
 }
 
@@ -1053,16 +1049,15 @@ void FolderNavigationWidget::restoreExpandedIndexes() {
 			}
 		}
 
-		if (index.isValid()) {
-			if (index.internalPointer() == 0) {continue;}
-			BaseModelItem* modelItemToEdit =
-					static_cast<BaseModelItem*>(index.internalPointer());
+		if (!index.isValid()) {continue;}
+		if (index.internalPointer() == 0) {continue;}
+		BaseModelItem* modelItemToEdit =
+				static_cast<BaseModelItem*>(index.internalPointer());
 
-			if (modelItemToEdit->DataType() == BaseModelItem::folder) {
-				Folder* folder = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-				if (expandexFolders.contains(folder)) {
-					treeView->expand(index);
-				}
+		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
+			Folder* folder = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
+			if (folder->IsExpanded()) {
+				treeView->expand(index);
 			}
 		}
 	}
@@ -1074,8 +1069,6 @@ void FolderNavigationWidget::sl_Model_DisplayRootItemChanged() {
 }
 
 void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
-	expandexFolders.clear();
-
 	if (model) {
 		QObject::disconnect(model, 0, this, 0);
 	}

@@ -51,6 +51,7 @@ namespace qNotesManager {
 		QString			iconID;
 		QDateTime		creationDate;
 		QDateTime		modificationDate;
+		bool			expanded;
 
 	public:
 		explicit Folder(QString _name = QString(), FolderType _type = UserFolder);
@@ -80,6 +81,9 @@ namespace qNotesManager {
 
 		bool IsLocked() const;
 		void SetLocked(bool);
+
+		bool IsExpanded() const;
+		void SetExpanded(bool);
 
 		QString GetPath() const;
 

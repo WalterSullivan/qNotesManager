@@ -72,8 +72,6 @@ namespace qNotesManager {
 
 		FolderItemPropertiesWidget* propertiesWidget;
 
-		QList<Folder*> expandexFolders;
-
 		void deleteItems(QModelIndexList& list, bool permanently = false);
 		// Delete indexes, which parents also in the list
 		void deleteChildIndexes(QModelIndexList& list) const;

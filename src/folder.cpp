@@ -38,6 +38,7 @@ Folder::Folder(QString _name, FolderType _type) :
 		iconID(QString()),
 		creationDate(QDateTime::currentDateTime()),
 		modificationDate(QDateTime::currentDateTime()),
+		expanded(false),
 		Items(this) {
 	QObject::connect(&Items, SIGNAL(sg_ItemAdded(AbstractFolderItem* const, int)),
 					   this, SIGNAL(sg_ItemAdded(AbstractFolderItem* const, int)));
@@ -209,6 +210,14 @@ void Folder::SetLocked(bool e) {
 			WARNING("Unknown item type");
 		}
 	}
+}
+
+bool Folder::IsExpanded() const {
+	return expanded;
+}
+
+void Folder::SetExpanded(bool value) {
+	expanded = value;
 }
 
 QString Folder::GetPath() const {
