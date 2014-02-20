@@ -48,8 +48,8 @@ namespace qNotesManager {
 		static const quint16 lastSupportedSpecificationVersion = 0x0001;
 		static const quint16 actualSpecificationVersion = lastSupportedSpecificationVersion;
 
-		void Load(Document* d, QString filename);
-		void Save(Document* d, QString _filename, quint16 _version);
+		void Load(Document* d, const QString& fileNameToLoad);
+		void Save(Document* d, const QString& fileNameToSave, quint16 version);
 
 	signals:
 		void sg_LoadingStarted();
@@ -65,19 +65,14 @@ namespace qNotesManager {
 		void sg_SavingFailed(QString errorString);
 		void sg_SavingAborted();
 
-
 		void sg_PasswordRequired(QSemaphore*, QString*, bool);
 		void sg_ConfirmationRequest(QSemaphore*, QString, bool*);
 		void sg_Message(QString);
-
-
-
 
 		void sg_finished();
 
 	public slots:
 		void sl_start();
-
 	};
 }
 

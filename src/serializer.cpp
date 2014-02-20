@@ -30,7 +30,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QFileInfo>
 #include <QApplication>
 #include <QStack>
-#include <QDebug>
 
 using namespace qNotesManager;
 
@@ -40,17 +39,17 @@ Serializer::Serializer() : QObject(0) {
 	filename = QString();
 }
 
-void Serializer::Load(Document* d, QString _filename) {
+void Serializer::Load(Document* d, const QString& fileNameToLoad) {
 	doc = d;
-	filename = _filename;
+	filename = fileNameToLoad;
 	operation = Loading;
 }
 
-void Serializer::Save(Document* d, QString _filename, quint16 _version) {
+void Serializer::Save(Document* d, const QString& fileNameToSave, quint16 version) {
 	doc = d;
-	filename = _filename;
+	filename = fileNameToSave;
 	operation = Saving;
-	saveVersion = _version;
+	saveVersion = version;
 }
 
 void Serializer::sl_start() {
@@ -490,8 +489,6 @@ void Serializer::save() {
 			WARNING("Wrong case branch");
 			emit sg_SavingFailed("Unknown file version");
 	}
-
-
 }
 
 void Serializer::save_v1() {
@@ -798,7 +795,6 @@ void Serializer::sendProgressSignal(BOIBuffer* buffer) {
 		return;
 	}
 	int progress = buffer->size() == 0 ? 0 : (buffer->pos() * 100) / buffer->size();
-	//qDebug() << "Progress:" << progress;
 
 	emit sg_LoadingProgress(progress);
 }
