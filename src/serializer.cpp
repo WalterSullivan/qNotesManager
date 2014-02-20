@@ -78,23 +78,22 @@ void Serializer::sl_start() {
 }
 
 void Serializer::load() {
-	//qDebug() << "Worker:" << QThread::currentThreadId();
-
 	emit sg_LoadingStarted();
 
 	QFile file(filename);
 	if (!file.exists()) {
-		emit sg_LoadingFailed("Could not read file");
+		emit sg_LoadingFailed("File not found. Make sure it exists and you have read permissions");
 		return;
 	}
 
-	if (file.size() < 13) { // must me guaranteed program can read 9 bytes of signature and fileSize data
-		emit sg_LoadingFailed("Could not read file");
+	if (file.size() < 13) {
+		// must me guaranteed program can read 9 bytes of signature and file CRC
+		emit sg_LoadingFailed("File is too short. Either file is corrupted or it is not a qNotesManager save file");
 		return;
 	}
 
 	if (!file.open(QIODevice::ReadOnly)) {
-		emit sg_LoadingFailed("Could not read file");
+		emit sg_LoadingFailed("Could not read the file. Make sure it exists and you have read permissions");
 		return;
 	}
 
@@ -330,7 +329,6 @@ void Serializer::load_v1(BOIBuffer& buffer) {
 			quint32 tagID = 0;
 			readResult = dataBuffer.read(tagID);
 			Tag* tag = Tag::Deserialize(doc->fileVersion, dataBuffer);
-			//tag->moveToThread(QCoreApplication::instance()->thread());
 
 			tagsIDs.insert(tagID, tag);
 			sendProgressSignal(&dataBuffer);
@@ -348,8 +346,6 @@ void Serializer::load_v1(BOIBuffer& buffer) {
 			quint32 folderItemID = 0;
 			readResult = dataBuffer.read(folderItemID);
 			Note* note = Note::Deserialize(doc->fileVersion, dataBuffer);
-			//note->moveToThread(QCoreApplication::instance()->thread());
-
 
 			folderItems.insert(folderItemID, note);
 			sendProgressSignal(&dataBuffer);
@@ -373,7 +369,6 @@ void Serializer::load_v1(BOIBuffer& buffer) {
 		while(dataBuffer.pos() < blockLastByte) {
 			readResult = dataBuffer.read(folderID);
 			Folder* folder = Folder::Deserialize(doc->fileVersion, dataBuffer);
-			//folder->moveToThread(QCoreApplication::instance()->thread());
 			folderItems.insert(folderID, folder);
 
 			sendProgressSignal(&dataBuffer);
