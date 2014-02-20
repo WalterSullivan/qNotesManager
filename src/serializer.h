@@ -34,11 +34,11 @@ namespace qNotesManager {
 		QString filename;
 		quint16 saveVersion;
 
-		void load();
-		void load_v1(BOIBuffer&);
+		void loadDocument();
+		void loadDocument_v1(BOIBuffer&);
 
-		void save();
-		void save_v1();
+		void saveDocument();
+		void saveDocument_v1();
 
 		void sendProgressSignal(BOIBuffer*);
 

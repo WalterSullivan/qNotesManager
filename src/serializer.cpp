@@ -61,10 +61,10 @@ void Serializer::sl_start() {
 
 	switch (operation) {
 	case Loading:
-		load();
+		loadDocument();
 		break;
 	case Saving:
-		save();
+		saveDocument();
 		break;
 	case Unknown:
 	default:
@@ -76,7 +76,7 @@ void Serializer::sl_start() {
 	emit sg_finished();
 }
 
-void Serializer::load() {
+void Serializer::loadDocument() {
 	emit sg_LoadingStarted();
 
 	QFile file(filename);
@@ -158,7 +158,7 @@ void Serializer::load() {
 
 	switch (r_fileVersion) {
 		case 0x0001:
-			load_v1(buffer);
+			loadDocument_v1(buffer);
 			break;
 		default:
 			WARNING("Wrong case branch");
@@ -166,7 +166,7 @@ void Serializer::load() {
 	}
 }
 
-void Serializer::load_v1(BOIBuffer& buffer) {
+void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 	qint64 readResult = 0;
 
 	quint8 r_compressionLevel = 0;
@@ -462,7 +462,7 @@ void Serializer::load_v1(BOIBuffer& buffer) {
 	emit sg_LoadingFinished();
 }
 
-void Serializer::save() {
+void Serializer::saveDocument() {
 	emit sg_SavingStarted();
 
 	if (saveVersion > lastSupportedSpecificationVersion) {
@@ -483,7 +483,7 @@ void Serializer::save() {
 
 	switch (saveVersion) {
 		case 0x0001:
-			save_v1();
+			saveDocument_v1();
 			break;
 		default:
 			WARNING("Wrong case branch");
@@ -491,7 +491,7 @@ void Serializer::save() {
 	}
 }
 
-void Serializer::save_v1() {
+void Serializer::saveDocument_v1() {
 	QByteArray fileDataArray;
 
 	BOIBuffer fileDataBuffer(&fileDataArray);
