@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DOCUMENTWORKER_H
-#define DOCUMENTWORKER_H
+#ifndef SERIALIZER_H
+#define SERIALIZER_H
 
 #include <QObject>
 #include <QSemaphore>
@@ -25,7 +25,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "boibuffer.h"
 
 namespace qNotesManager {
-	class DocumentWorker : public QObject {
+	class Serializer : public QObject {
 	Q_OBJECT
 		enum Operation {Unknown, Loading, Saving};
 
@@ -43,7 +43,7 @@ namespace qNotesManager {
 		void sendProgressSignal(BOIBuffer*);
 
 	public:
-		explicit DocumentWorker();
+		explicit Serializer();
 
 		void Load(Document* d, QString filename);
 		void Save(Document* d, QString _filename, quint16 _version);
@@ -78,4 +78,4 @@ namespace qNotesManager {
 	};
 }
 
-#endif // DOCUMENTWORKER_H
+#endif // SERIALIZER_H

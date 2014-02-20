@@ -47,7 +47,7 @@ namespace qNotesManager {
 
 	class Document : public QObject {
 	Q_OBJECT
-	friend class DocumentWorker;
+	friend class Serializer;
 
 	private:
 		bool hasUnsavedData;

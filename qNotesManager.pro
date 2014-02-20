@@ -113,12 +113,12 @@ HEADERS += src/tag.h \
     src/imageloader.h \
     src/localimageloader.h \
     src/httpimagedownloader.h \
-    src/documentworker.h \
     src/iconitemdelegate.h \
     src/idummyimagesprovider.h \
     src/edittablewidthconstraintswidget.h \
     src/appinfo.h \
-    src/modelitemdelegate.h
+    src/modelitemdelegate.h \
+    src/serializer.h
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -177,8 +177,8 @@ SOURCES += src/tagownerscollection.cpp \
     src/localimageloader.cpp \
     src/imageloader.cpp \
     src/httpimagedownloader.cpp \
-    src/documentworker.cpp \
     src/iconitemdelegate.cpp \
     src/edittablewidthconstraintswidget.cpp \
-    src/modelitemdelegate.cpp
+    src/modelitemdelegate.cpp \
+    src/serializer.cpp
 RESOURCES += icons.qrc

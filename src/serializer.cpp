@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "documentworker.h"
+#include "serializer.h"
 
 #include "global.h"
 #include "crc32.h"
@@ -34,26 +34,26 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-DocumentWorker::DocumentWorker() : QObject(0) {
+Serializer::Serializer() : QObject(0) {
 	doc = 0;
 	operation = Unknown;
 	filename = QString();
 }
 
-void DocumentWorker::Load(Document* d, QString _filename) {
+void Serializer::Load(Document* d, QString _filename) {
 	doc = d;
 	filename = _filename;
 	operation = Loading;
 }
 
-void DocumentWorker::Save(Document* d, QString _filename, quint16 _version) {
+void Serializer::Save(Document* d, QString _filename, quint16 _version) {
 	doc = d;
 	filename = _filename;
 	operation = Saving;
 	version = _version;
 }
 
-void DocumentWorker::sl_start() {
+void Serializer::sl_start() {
 	if (!doc || operation == Unknown || filename.isEmpty()) {
 		WARNING("Wrong argument");
 		emit sg_finished();
@@ -77,7 +77,7 @@ void DocumentWorker::sl_start() {
 	emit sg_finished();
 }
 
-void DocumentWorker::load() {
+void Serializer::load() {
 	//qDebug() << "Worker:" << QThread::currentThreadId();
 
 	emit sg_LoadingStarted();
@@ -168,7 +168,7 @@ void DocumentWorker::load() {
 
 }
 
-void DocumentWorker::load_v1(BOIBuffer& buffer) {
+void Serializer::load_v1(BOIBuffer& buffer) {
 	qint64 readResult = 0;
 
 	quint8 r_compressionLevel = 0;
@@ -468,7 +468,7 @@ void DocumentWorker::load_v1(BOIBuffer& buffer) {
 	emit sg_LoadingFinished();
 }
 
-void DocumentWorker::save() {
+void Serializer::save() {
 	emit sg_SavingStarted();
 
 	switch (version) {
@@ -483,7 +483,7 @@ void DocumentWorker::save() {
 
 }
 
-void DocumentWorker::save_v1() {
+void Serializer::save_v1() {
 	QByteArray fileDataArray;
 
 	BOIBuffer fileDataBuffer(&fileDataArray);
@@ -781,7 +781,7 @@ void DocumentWorker::save_v1() {
 	emit sg_SavingFinished();
 }
 
-void DocumentWorker::sendProgressSignal(BOIBuffer* buffer) {
+void Serializer::sendProgressSignal(BOIBuffer* buffer) {
 	if (!buffer) {
 		WARNING("Null pointer recieved");
 		return;

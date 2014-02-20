@@ -26,7 +26,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "tagsmodel.h"
 #include "datesmodel.h"
 #include "cachedimagefile.h"
-#include "documentworker.h"
+#include "serializer.h"
 #include "global.h"
 #include "compressor.h"
 
@@ -159,7 +159,7 @@ bool Document::HasUnsavedData() const {
 }
 
 void Document::Open(QString fileName) {
-	DocumentWorker* w = new DocumentWorker();
+	Serializer* w = new Serializer();
 	QThread* t = new QThread();
 	w->moveToThread(t);
 	this->moveToThread(t);
@@ -190,7 +190,7 @@ void Document::Save(QString name, quint16 version) {
 		return;
 	}
 
-	DocumentWorker* w = new DocumentWorker();
+	Serializer* w = new Serializer();
 	QThread* t = new QThread();
 	w->moveToThread(t);
 	this->moveToThread(t);
