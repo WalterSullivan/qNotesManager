@@ -29,9 +29,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
 namespace qNotesManager {
-	class BOIBuffer;
-
 	class Folder : public AbstractFolderItem {
+	friend class Serializer;
 	Q_OBJECT
 	public:
 		enum FolderType {
@@ -85,11 +84,6 @@ namespace qNotesManager {
 		QString GetPath() const;
 
 		FolderItemCollection Items;
-
-
-
-		void Serialize(const int version, BOIBuffer& stream) const;
-		static Folder* Deserialize(const int version, BOIBuffer& stream);
 
 	signals:
 		void sg_VisualPropertiesChanged();

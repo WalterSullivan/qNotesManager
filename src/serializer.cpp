@@ -368,7 +368,7 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 		// Read user folders
 		while(dataBuffer.pos() < blockLastByte) {
 			readResult = dataBuffer.read(folderID);
-			Folder* folder = Folder::Deserialize(doc->fileVersion, dataBuffer);
+			Folder* folder = loadFolder_v1(dataBuffer);
 			folderItems.insert(folderID, folder);
 
 			sendProgressSignal(&dataBuffer);
@@ -662,7 +662,7 @@ void Serializer::saveDocument_v1() {
 			dataBuffer.write(folderOrNoteID);
 			folderItemsIDs.insert(f, folderOrNoteID);
 			folderOrNoteID++;
-			f->Serialize(doc->fileVersion, dataBuffer);
+			saveFolder_v1(f, dataBuffer);
 		}
 
 		const qint64 blockEndPosition = dataBuffer.pos();
@@ -1011,4 +1011,82 @@ void Serializer::sendProgressSignal(BOIBuffer* buffer) {
 	int progress = buffer->size() == 0 ? 0 : (buffer->pos() * 100) / buffer->size();
 
 	emit sg_LoadingProgress(progress);
+}
+
+Folder* Serializer::loadFolder_v1(BOIBuffer& buffer) {
+	qint64 bytesRead = 0;
+
+	quint32 r_itemSize = 0;
+	bytesRead = buffer.read(r_itemSize);
+
+	const qint64 bufferStartPos = buffer.pos();
+
+	quint32 r_captionSize = 0;
+	bytesRead = buffer.read(r_captionSize);
+	QByteArray r_caption(r_captionSize, 0x0);
+	bytesRead = buffer.read(r_caption.data(), r_captionSize);
+	quint32 r_creationDate = 0;
+	bytesRead = buffer.read(r_creationDate);
+	quint32 r_modificationDate = 0;
+	bytesRead = buffer.read(r_modificationDate);
+	quint32 r_iconIDSize = 0;
+	bytesRead = buffer.read(r_iconIDSize);
+	QByteArray r_iconID(r_iconIDSize, 0x0);
+	bytesRead = buffer.read(r_iconID.data(), r_iconIDSize);
+	quint32 r_backColor = 0;
+	bytesRead = buffer.read(r_backColor);
+	quint32 r_foreColor = 0;
+	bytesRead = buffer.read(r_foreColor);
+	quint8 r_locked = 0;
+	bytesRead = buffer.read(r_locked);
+
+	const quint32 bytesToSkip = r_itemSize - (buffer.pos() - bufferStartPos);
+
+	if (bytesToSkip != 0) {
+		// If chunck has more data in case of newer file version.
+		buffer.seek(buffer.pos() + bytesToSkip);
+	}
+
+	Folder* folder = new Folder("");
+	folder->name = r_caption;
+	folder->nameForeColor.setRgba(r_foreColor);
+	folder->nameBackColor.setRgba(r_backColor);
+	folder->locked = (bool)r_locked;
+	folder->iconID = r_iconID;
+	folder->creationDate = QDateTime::fromTime_t(r_creationDate);
+	folder->modificationDate = QDateTime::fromTime_t(r_modificationDate);
+
+	return folder;
+}
+
+void Serializer::saveFolder_v1(const Folder* folder, BOIBuffer& buffer) {
+	const QByteArray s_caption = folder->name.toUtf8();
+	const quint32 s_captionSize = s_caption.size();
+	const quint32 s_creationDate = folder->creationDate.toTime_t();
+	const quint32 s_modificationDate = folder->modificationDate.toTime_t();
+	const QByteArray s_iconID = folder->iconID.toAscii();
+	const quint32 s_iconIDSize = s_iconID.size();
+	const quint32 s_backColor = folder->nameBackColor.rgba();
+	const quint32 s_foreColor = folder->nameForeColor.rgba();
+	const quint8 s_locked = (quint8)folder->locked;
+	const quint32 s_itemSize =	s_captionSize +
+								sizeof(s_captionSize) +
+								sizeof(s_creationDate) +
+								sizeof(s_modificationDate) +
+								s_iconIDSize +
+								sizeof(s_iconIDSize) +
+								sizeof(s_backColor) +
+								sizeof(s_foreColor) +
+								sizeof(s_locked);
+
+	buffer.write(s_itemSize);
+	buffer.write(s_captionSize);
+	buffer.write(s_caption.constData(), s_captionSize);
+	buffer.write(s_creationDate);
+	buffer.write(s_modificationDate);
+	buffer.write(s_iconIDSize);
+	buffer.write(s_iconID.constData(), s_iconIDSize);
+	buffer.write(s_backColor);
+	buffer.write(s_foreColor);
+	buffer.write(s_locked);
 }

@@ -20,7 +20,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "application.h"
 #include "document.h"
 #include "note.h"
-#include "boibuffer.h"
 #include "global.h"
 
 #include <QDebug>
@@ -224,84 +223,4 @@ QString Folder::GetPath() const {
 	}
 
 	return path;
-}
-
-void Folder::Serialize(const int version, BOIBuffer& stream) const {
-	(void)version;
-	const QByteArray s_caption = name.toUtf8();
-	const quint32 s_captionSize = s_caption.size();
-	const quint32 s_creationDate = creationDate.toTime_t();
-	const quint32 s_modificationDate = modificationDate.toTime_t();
-	const QByteArray s_iconID = iconID.toAscii();
-	const quint32 s_iconIDSize = s_iconID.size();
-	const quint32 s_backColor = nameBackColor.rgba();
-	const quint32 s_foreColor = nameForeColor.rgba();
-	const quint8 s_locked = (quint8)locked;
-	const quint32 s_itemSize =	s_captionSize +
-								sizeof(s_captionSize) +
-								sizeof(s_creationDate) +
-								sizeof(s_modificationDate) +
-								s_iconIDSize +
-								sizeof(s_iconIDSize) +
-								sizeof(s_backColor) +
-								sizeof(s_foreColor) +
-								sizeof(s_locked);
-
-	stream.write(s_itemSize);
-	stream.write(s_captionSize);
-	stream.write(s_caption.constData(), s_captionSize);
-	stream.write(s_creationDate);
-	stream.write(s_modificationDate);
-	stream.write(s_iconIDSize);
-	stream.write(s_iconID.constData(), s_iconIDSize);
-	stream.write(s_backColor);
-	stream.write(s_foreColor);
-	stream.write(s_locked);
-}
-
-/* static */
-Folder* Folder::Deserialize(const int version, BOIBuffer& stream) {
-	(void)version;
-	qint64 bytesRead = 0;
-
-	quint32 r_itemSize = 0;
-	bytesRead = stream.read(r_itemSize);
-
-	const qint64 streamStartPos = stream.pos();
-
-	quint32 r_captionSize = 0;
-	bytesRead = stream.read(r_captionSize);
-	QByteArray r_caption(r_captionSize, 0x0);
-	bytesRead = stream.read(r_caption.data(), r_captionSize);
-	quint32 r_creationDate = 0;
-	bytesRead = stream.read(r_creationDate);
-	quint32 r_modificationDate = 0;
-	bytesRead = stream.read(r_modificationDate);
-	quint32 r_iconIDSize = 0;
-	bytesRead = stream.read(r_iconIDSize);
-	QByteArray r_iconID(r_iconIDSize, 0x0);
-	bytesRead = stream.read(r_iconID.data(), r_iconIDSize);
-	quint32 r_backColor = 0;
-	bytesRead = stream.read(r_backColor);
-	quint32 r_foreColor = 0;
-	bytesRead = stream.read(r_foreColor);
-	quint8 r_locked = 0;
-	bytesRead = stream.read(r_locked);
-
-	const quint32 bytesToSkip = r_itemSize - (stream.pos() - streamStartPos);
-
-	if (bytesToSkip != 0) {
-		stream.seek(stream.pos() + bytesToSkip); // If chunck has more data in case of newer file version.
-	}
-
-	Folder* f = new Folder("");
-	f->name = r_caption;
-	f->nameForeColor.setRgba(r_foreColor);
-	f->nameBackColor.setRgba(r_backColor);
-	f->locked = (bool)r_locked;
-	f->iconID = r_iconID;
-	f->creationDate = QDateTime::fromTime_t(r_creationDate);
-	f->modificationDate = QDateTime::fromTime_t(r_modificationDate);
-
-	return f;
 }
