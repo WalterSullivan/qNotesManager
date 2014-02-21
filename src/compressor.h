@@ -29,8 +29,8 @@ namespace qNotesManager {
 		static const quint8 MaximumLevel = 9;
 		static const quint8 MinimumLevel = 1;
 
-		QByteArray Compress(QByteArray& source, quint8 compressionLevel);
-		QByteArray Decompress(QByteArray& source);
+		QByteArray Compress(const QByteArray& source, const quint8 compressionLevel);
+		QByteArray Decompress(const QByteArray& source);
 	};
 }
 

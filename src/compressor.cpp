@@ -22,14 +22,14 @@ using namespace qNotesManager;
 Compressor::Compressor() {
 }
 
-QByteArray Compressor::Compress(QByteArray& source, quint8 compressionLevel) {
+QByteArray Compressor::Compress(const QByteArray& source, const quint8 compressionLevel) {
 	if (source.isEmpty() || compressionLevel > Compressor::MaximumLevel || compressionLevel == 0) {
 		return source;
 	}
 	return qCompress(source, (int)compressionLevel);
 }
 
-QByteArray Compressor::Decompress(QByteArray& source) {
+QByteArray Compressor::Decompress(const QByteArray& source) {
 	if (source.isEmpty()) {return source;}
 	return qUncompress(source);
 }
