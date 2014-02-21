@@ -253,9 +253,12 @@ void MainWindow::createControls() {
 	documentMenu->addAction(exitAction);
 
 	editMenu = new QMenu("Edit", this);
+	editMenu->menuAction()->setEnabled(false);
+	menuBar->addMenu(editMenu);
 
 	formatMenu = new QMenu("Format", this);
-
+	formatMenu->menuAction()->setEnabled(false);
+	menuBar->addMenu(formatMenu);
 
 	optionsMenu = new QMenu("Options", this);
 	menuBar->addMenu(optionsMenu);
@@ -586,11 +589,7 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	Document* doc = Application::I()->CurrentDocument();
 	engine->SetTargetDocument(doc);
 	navigationPanel->SetTargetDocument(doc);
-	if (!doc) {
-		if (menuBar->actions().contains(editMenu->menuAction())) {
-			menuBar->removeAction(editMenu->menuAction());
-		}
-	} else {
+	if (doc) {
 		QObject::connect(doc, SIGNAL(sg_Changed()),
 						 this, SLOT(sl_CurrentDocument_Changed()));
 		QObject::connect(doc, SIGNAL(sg_ItemUnregistered(Note*)),
@@ -608,9 +607,9 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 						 this, SLOT(sl_Document_SavingStarted()));
 
 		Application::I()->Settings.SetLastDocumentName(doc->GetFilename());
-
-		sl_EditMenuContentChanged();
 	}
+
+	sl_EditMenuContentChanged();
 
 	// Actions
 	bool enable = (doc != 0);
@@ -732,13 +731,9 @@ void MainWindow::sl_CurrentNoteChanged(Note* note) {
 	const QList<QAction*> actions = notesTabWidget->GetCurrentEditActionsList();
 
 	if (actions.isEmpty()) {
-		if (menuBar->actions().contains(formatMenu->menuAction())) {
-			menuBar->removeAction(formatMenu->menuAction());
-		}
+		formatMenu->menuAction()->setEnabled(false);
 	} else {
-		if (!menuBar->actions().contains(formatMenu->menuAction())) {
-			menuBar->insertMenu(optionsMenu->menuAction(), formatMenu);
-		}
+		formatMenu->menuAction()->setEnabled(true);
 		foreach (QAction* action, actions) {
 			formatMenu->addAction(action);
 		}
@@ -798,11 +793,10 @@ void MainWindow::sl_QuickNoteAction_Triggered() {
 
 void MainWindow::sl_EditMenuContentChanged() {
 	if (!Application::I()->CurrentDocument()) {
-		if (menuBar->actions().contains(editMenu->menuAction())) {
-			menuBar->removeAction(editMenu->menuAction());
-		}
+		editMenu->menuAction()->setEnabled(false);
 		return;
 	}
+
 	if (editMenu->actions().size() > 0) {
 		editMenu->clear();
 	}
@@ -810,19 +804,9 @@ void MainWindow::sl_EditMenuContentChanged() {
 	const QList<QAction*> actions = navigationPanel->GetSelectedItemsActions();
 
 	if (actions.isEmpty()) {
-		if (menuBar->actions().contains(editMenu->menuAction())) {
-			menuBar->removeAction(editMenu->menuAction());
-		}
+		editMenu->menuAction()->setEnabled(false);
 	} else {
-		if (!menuBar->actions().contains(editMenu->menuAction())) {
-			QAction* before = 0;
-			if (menuBar->actions().contains(formatMenu->menuAction())) {
-				before = formatMenu->menuAction();
-			} else {
-				before = optionsMenu->menuAction();
-			}
-			menuBar->insertMenu(before, editMenu);
-		}
+		editMenu->menuAction()->setEnabled(true);
 		foreach (QAction* action, actions) {
 			editMenu->addAction(action);
 		}
