@@ -50,6 +50,7 @@ namespace qNotesManager {
 	friend class Serializer;
 
 	private:
+		bool inInitMode;
 		bool hasUnsavedData;
 		bool isModified;
 		void onChange();

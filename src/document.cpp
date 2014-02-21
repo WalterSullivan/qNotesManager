@@ -44,6 +44,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 Document::Document() : QObject(0) {
+	inInitMode = false;
+
 	rootFolder = new Folder("_root_", Folder::SystemFolder);
 	rootFolder->setParent(this);
 	QObject::connect(rootFolder, SIGNAL(sg_ItemAdded(AbstractFolderItem*const, int)),
@@ -157,6 +159,8 @@ void Document::SetPinnedFolder(Folder* newPinnedFolder) {
 }
 
 void Document::onChange() {
+	if (inInitMode) {return;}
+
 	modificationDate = QDateTime::currentDateTime();
 	if (!isModified) {isModified = true;}
 

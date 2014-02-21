@@ -78,6 +78,8 @@ void Serializer::sl_start() {
 }
 
 void Serializer::loadDocument() {
+	doc->inInitMode = true;
+
 	emit sg_LoadingStarted();
 
 	QFile file(filename);
@@ -168,6 +170,8 @@ void Serializer::loadDocument() {
 			WARNING("Wrong case branch");
 			emit sg_LoadingFailed("Unknown file version");
 	}
+
+	doc->inInitMode = false;
 }
 
 void Serializer::saveDocument() {
@@ -505,7 +509,6 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 
 	dataBuffer.close();
 
-	doc->hasUnsavedData = false;
 	emit sg_LoadingFinished();
 }
 
@@ -1425,7 +1428,6 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 
 	dataBuffer.close();
 
-	doc->hasUnsavedData = false;
 	emit sg_LoadingFinished();
 }
 
