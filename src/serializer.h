@@ -35,26 +35,38 @@ namespace qNotesManager {
 		quint16 saveVersion;
 
 		void	loadDocument();
+		void	saveDocument();
+
 		void	loadDocument_v1(BOIBuffer&);
+		void	saveDocument_v1();
 
 		Note*	loadNote_v1(BOIBuffer&);
 		Folder*	loadFolder_v1(BOIBuffer&);
 		Tag*	loadTag_v1(BOIBuffer&);
 
-		void	saveDocument();
-		void	saveDocument_v1();
-
 		void	saveNote_v1(const Note*, BOIBuffer&);
 		void	saveFolder_v1(const Folder*, BOIBuffer&);
 		void	saveTag_v1(const Tag*, BOIBuffer&);
+
+		// Ver 2
+		void	loadDocument_v2(BOIBuffer&);
+		void	saveDocument_v2();
+
+		Note*	loadNote_v2(BOIBuffer&);
+		Folder*	loadFolder_v2(BOIBuffer&);
+		Tag*	loadTag_v2(BOIBuffer&);
+
+		void	saveNote_v2(const Note*, BOIBuffer&);
+		void	saveFolder_v2(const Folder*, BOIBuffer&);
+		void	saveTag_v2(const Tag*, BOIBuffer&);
 
 		void sendProgressSignal(BOIBuffer*);
 
 	public:
 		explicit Serializer();
 
-		static const quint16 lastSupportedSpecificationVersion = 0x0001;
-		static const quint16 actualSpecificationVersion = lastSupportedSpecificationVersion;
+		static const quint16 lastSupportedSpecificationVersion = 0x0002;
+		static const quint16 actualSpecificationVersion = 0x0001;
 
 		void Load(Document* d, const QString& fileNameToLoad);
 		void Save(Document* d, const QString& fileNameToSave, quint16 version);
