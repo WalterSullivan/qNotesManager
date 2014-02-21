@@ -89,10 +89,9 @@ void Folder::SetName (const QString s) {
 	if (name == s) {return;}
 
 	name = s;
-	modificationDate = QDateTime::currentDateTime();
 
 	emit sg_VisualPropertiesChanged();
-	emit sg_DataChanged();
+	onChange();
 }
 
 Folder::FolderType Folder::GetType() const {
@@ -130,10 +129,9 @@ void Folder::SetIconID(const QString id) {
 	}
 
 	iconID = id;
-	modificationDate = QDateTime::currentDateTime();
 
 	emit sg_VisualPropertiesChanged();
-	emit sg_DataChanged();
+	onChange();
 }
 
 QString Folder::GetIconID() const {
@@ -157,9 +155,9 @@ void Folder::SetNameForeColor(const QColor c) {
 	if (nameForeColor == c) {return;}
 
 	nameForeColor = c;
-	modificationDate = QDateTime::currentDateTime();
 
 	emit sg_VisualPropertiesChanged();
+	onChange();
 }
 
 QColor Folder::GetNameBackColor() const {
@@ -171,9 +169,9 @@ void Folder::SetNameBackColor(const QColor c) {
 	if (nameBackColor == c) {return;}
 
 	nameBackColor = c;
-	modificationDate = QDateTime::currentDateTime();
 
 	emit sg_VisualPropertiesChanged();
+	onChange();
 }
 
 QColor Folder::GetDefaultForeColor() const {
@@ -192,9 +190,6 @@ void Folder::SetLocked(bool e) {
 	if (locked == e) {return;}
 
 	locked = e;
-	modificationDate = QDateTime::currentDateTime();
-
-	emit sg_VisualPropertiesChanged();
 
 	if (!Application::I()->CurrentDocument()->LockFolderItems) {return;}
 
@@ -210,6 +205,9 @@ void Folder::SetLocked(bool e) {
 			WARNING("Unknown item type");
 		}
 	}
+
+	emit sg_VisualPropertiesChanged();
+	onChange();
 }
 
 bool Folder::IsExpanded() const {
@@ -218,11 +216,10 @@ bool Folder::IsExpanded() const {
 
 void Folder::SetExpanded(bool value) {
 	expanded = value;
+	onChange(false);
 }
 
 QString Folder::GetPath() const {
-	//if (GetParent() == 0) {return "";}
-
 	QString path = name;
 
 	Folder* f = GetParent();
@@ -232,4 +229,12 @@ QString Folder::GetPath() const {
 	}
 
 	return path;
+}
+
+void Folder::onChange(bool updateModificationTime) {
+	if (updateModificationTime) {
+		modificationDate = QDateTime::currentDateTime();
+	}
+
+	emit sg_DataChanged();
 }

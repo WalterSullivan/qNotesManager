@@ -53,6 +53,8 @@ namespace qNotesManager {
 		QDateTime		modificationDate;
 		bool			expanded;
 
+		void onChange(bool updateModificationTime = true);
+
 	public:
 		explicit Folder(QString _name = QString(), FolderType _type = UserFolder);
 		~Folder();
