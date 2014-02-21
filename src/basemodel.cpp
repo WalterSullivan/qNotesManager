@@ -28,7 +28,6 @@ BaseModel::BaseModel(QObject *parent) : QAbstractItemModel(parent) {
 
 /*virtual*/
 BaseModel::~BaseModel() {
-	SetDisplayRootItem(0);
 }
 
 void BaseModel::SetDisplayRootItem(BaseModelItem* item) {
