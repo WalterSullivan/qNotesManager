@@ -82,7 +82,7 @@ namespace qNotesManager {
 		void SetCurrentItem(Note*);
 		void SetModel(HierarchyModel* model);
 		void SetModelItemDelegate(QItemDelegate*);
-		void SetPinnedFolder(Folder*);
+		void UpdatePinnedFolderData();
 
 		QList<QAction*> GetSelectedItemsActions() const;
 

@@ -341,7 +341,7 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 }
 
 void FolderNavigationWidget::sl_PinFolderButton_Toggled(bool toggle) {
-	if (!model) {
+	if (!model || !Application::I()->CurrentDocument()) {
 		currentRootLabel->setText("");
 		currentRootLabel->setToolTip("");
 
@@ -351,11 +351,8 @@ void FolderNavigationWidget::sl_PinFolderButton_Toggled(bool toggle) {
 		return;
 	}
 
-	if (!toggle) {
-		model->SetPinnedFolder(0);
-		currentRootLabel->setText("");
-		currentRootLabel->setToolTip("");
-	} else {
+	Folder* folderToPin = 0;
+	if (toggle) {
 		QModelIndex index = treeView->currentIndex();
 		if (!index.isValid()) {
 			WARNING("Invalid index");
@@ -370,24 +367,20 @@ void FolderNavigationWidget::sl_PinFolderButton_Toggled(bool toggle) {
 			return;
 		}
 
-		Folder* f = dynamic_cast<FolderModelItem*>(modelItem)->GetStoredData();
-		model->SetPinnedFolder(f);
-
-		QString path = f->GetPath();
-
-		currentRootLabel->setText(path);
-		currentRootLabel->setToolTip(path);
+		folderToPin = dynamic_cast<FolderModelItem*>(modelItem)->GetStoredData();
 	}
+
+	Application::I()->CurrentDocument()->SetPinnedFolder(folderToPin);
+	UpdatePinnedFolderData();
 }
 
-void FolderNavigationWidget::SetPinnedFolder(Folder* folder) {
-	if (folder) {
-		model->SetPinnedFolder(folder);
-		QString path = folder->GetPath();
+void FolderNavigationWidget::UpdatePinnedFolderData() {
+	if (model &&
+		model->GetPinnedFolder()) {
+		QString path = model->GetPinnedFolder()->GetPath();
 		currentRootLabel->setText(path);
 		currentRootLabel->setToolTip(path);
 	} else {
-		model->SetPinnedFolder(0);
 		currentRootLabel->setText("");
 		currentRootLabel->setToolTip("");
 	}
@@ -1091,14 +1084,19 @@ void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 						 this, SLOT(sl_View_SelectionChanged(QItemSelection,QItemSelection)));
 	}
 
+	treeView->setEnabled(model != 0);
+	pinFolderButton->setEnabled(model != 0);
+
 	if (model) {
-		treeView->setEnabled(true);
-		pinFolderButton->setEnabled(true);
-		pinFolderButton->setChecked(false);
+		pinFolderButton->blockSignals(true);
+		pinFolderButton->setChecked(model->GetPinnedFolder() != 0);
+		pinFolderButton->blockSignals(false);
+		UpdatePinnedFolderData();
 	} else {
-		treeView->setEnabled(false);
-		pinFolderButton->setEnabled(false);
+		pinFolderButton->blockSignals(true);
 		pinFolderButton->setChecked(false);
+		pinFolderButton->blockSignals(false);
+		UpdatePinnedFolderData();
 	}
 }
 
