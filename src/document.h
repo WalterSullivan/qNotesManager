@@ -57,6 +57,7 @@ namespace qNotesManager {
 		Folder*		rootFolder;
 		Folder*		tempFolder;
 		Folder*		trashFolder;
+		Folder*		pinnedFolder;
 
 		QList<Tag*>		allTags;
 		QList<Note*>	allNotes;
@@ -109,6 +110,9 @@ namespace qNotesManager {
 		Folder* GetTempFolder() const;
 		Folder* GetTrashFolder() const;
 		Folder* GetRoot() const;
+
+		Folder* GetPinnedFolder() const;
+		void SetPinnedFolder(Folder*);
 
 		Tag* FindTagByName(QString name) const;
 

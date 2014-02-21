@@ -68,6 +68,8 @@ Document::Document() : QObject(0) {
 					 this, SLOT(sl_Folder_ItemRemoved(AbstractFolderItem*const)));
 	QObject::connect(trashFolder, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 
+	pinnedFolder = 0;
+
 	tagsListModel = new QStandardItemModel(this);
 
 	hierarchyModel = new HierarchyModel(this);
@@ -142,6 +144,16 @@ Folder* Document::GetTrashFolder() const {
 
 Folder* Document::GetRoot() const {
 	return rootFolder;
+}
+
+Folder* Document::GetPinnedFolder() const {
+	return pinnedFolder;
+}
+
+void Document::SetPinnedFolder(Folder* newPinnedFolder) {
+	pinnedFolder = newPinnedFolder;
+	hierarchyModel->SetPinnedFolder(pinnedFolder);
+	onChange();
 }
 
 void Document::onChange() {
