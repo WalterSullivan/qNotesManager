@@ -216,7 +216,6 @@ bool Folder::IsExpanded() const {
 
 void Folder::SetExpanded(bool value) {
 	expanded = value;
-	onChange(false);
 }
 
 QString Folder::GetPath() const {
@@ -231,10 +230,8 @@ QString Folder::GetPath() const {
 	return path;
 }
 
-void Folder::onChange(bool updateModificationTime) {
-	if (updateModificationTime) {
-		modificationDate = QDateTime::currentDateTime();
-	}
+void Folder::onChange() {
+	modificationDate = QDateTime::currentDateTime();
 
 	emit sg_DataChanged();
 }
