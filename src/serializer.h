@@ -66,7 +66,7 @@ namespace qNotesManager {
 		explicit Serializer();
 
 		static const quint16 lastSupportedSpecificationVersion = 0x0002;
-		static const quint16 actualSpecificationVersion = 0x0001;
+		static const quint16 actualSpecificationVersion = lastSupportedSpecificationVersion;
 
 		void Load(Document* d, const QString& fileNameToLoad);
 		void Save(Document* d, const QString& fileNameToSave, quint16 version);
