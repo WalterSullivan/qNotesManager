@@ -1,4 +1,35 @@
-﻿0.9.5 (14.02.2014)
+﻿0.9.6 (24.02.2014)
+	- New features:
+		- Bookmarks. Add frequently used notes to bookmarks for easy access;
+		- Files attachment. Attach files to your notes;
+		- Implemented inserting images and text files into a note using 
+		drag'n'drop or clipboard;
+		
+	- Bug fixes:
+		- Fixed application crash when closing a document, which has items with
+		custom icons;
+		- Fixed bug when custom icons didn't load properly;
+		- Fixed bug when images in a note didn't load properly;
+		- Fixed bug when images from a note, that was not opened during 
+		session, were not saved correctly;
+		- Fixed bug when new formatting (font size, etc) did not apply to 
+		hyperlinks;
+		- Fixed bug when document's modification time changed during loading;
+		- Fixed bug when changing some folder's properties didn't set 
+		'Modified' status to document;
+		- Fixed application crash caused by inserting multiple images;
+		- Fixed applying format for multiple text blocks, so it will be saved 
+		as a single UNDO action;
+		- Fixed bug when 'Undo' and 'Redo' menu items are enabled, 
+		but undo and redo operations are not available;
+		
+	- Other:
+		- Fixed focus problems for collapsed note's metadata panel;
+		- Folder tree now preserves its state (collapsed and expanded folders) 
+		when pinned folder was changed;
+		- Various UI fixes.
+
+0.9.5 (14.02.2014)
 	- Fixed application crash when trying to close unsaved document and choose
 		'Save' from appeared dialog;
 	- Fixed application crash when an item is added to a folder which is
@@ -9,7 +40,7 @@
 		changed;
 	- Fixed bug that caused updating note's modification time when loading a 
 		document;
-	- Added form to edit width of table and of it's columns. It can be
+	- Added form to edit width of table and of its columns. It can be
 		accessed through context menu;
 	- Items in tree views now may be renamed by pressing F2 of by context menu action;
 	- UI fixes.
