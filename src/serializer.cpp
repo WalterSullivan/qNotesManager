@@ -1426,6 +1426,28 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 		}
 	}
 
+	// Load bookmarks
+	{
+		quint32 bookmarksCount = 0;
+		readResult = dataBuffer.read(bookmarksCount);
+		for (quint32 i = 0; i < bookmarksCount; i++) {
+			quint32 bookmarkID = 0;
+			dataBuffer.read(bookmarkID);
+
+			if (!folderItems.contains(bookmarkID)) {
+				WARNING("Could not find note by ID");
+				continue;
+			}
+			Note* bookmark = dynamic_cast<Note*>(folderItems.value(bookmarkID));
+			if (bookmark == 0) {
+				WARNING("Could not find note by ID");
+				continue;
+			}
+
+			doc->AddBookmark(bookmark);
+		}
+	}
+
 	dataBuffer.close();
 
 	emit sg_LoadingFinished();
@@ -1671,6 +1693,16 @@ void Serializer::saveDocument_v2() {
 		dataBuffer.seek(blockSizePosition);
 		dataBuffer.write(blockSize);
 		dataBuffer.seek(blockEndPosition);
+	}
+
+	// Write bookmarks
+	{
+		quint32 bookmarksCount = doc->bookmarks.count();
+		dataBuffer.write(bookmarksCount);
+		foreach(Note* note, doc->bookmarks) {
+			quint32 bookmarkID = folderItemsIDs[note];
+			dataBuffer.write(bookmarkID);
+		}
 	}
 
 
