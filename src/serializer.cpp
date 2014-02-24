@@ -1841,6 +1841,36 @@ Note* Serializer::loadNote_v2(BOIBuffer& buffer) {
 		}
 	}
 
+	// Load attached files
+	QList<CachedFile*> attachedFiles;
+	quint32 r_filesArraySize = 0;
+	bytesRead = buffer.read(r_filesArraySize);
+	if (r_filesArraySize > 0) {
+		quint32 loadedDataSize = 0;
+
+		while (loadedDataSize < r_filesArraySize) {
+			quint32 r_fileNameSize = 0;
+			bytesRead = buffer.read(r_fileNameSize);
+
+			QByteArray r_fileName(r_fileNameSize, 0x0);
+			bytesRead = buffer.read(r_fileName.data(), r_fileNameSize);
+
+			quint32 r_fileArraySize = 0;
+			bytesRead = buffer.read(r_fileArraySize);
+
+			QByteArray r_fileArray(r_fileArraySize, 0x0);
+			bytesRead = buffer.read(r_fileArray.data(), r_fileArraySize);
+
+			CachedFile* file = new CachedFile(r_fileArray, r_fileName);
+			attachedFiles.push_back(file);
+
+			loadedDataSize +=	sizeof(r_fileNameSize) +
+								r_fileNameSize +
+								sizeof(r_fileArraySize) +
+								r_fileArraySize;
+		}
+	}
+
 	const quint32 bytesToSkip = r_itemSize - (buffer.pos() - dataStartPos);
 
 	if (bytesToSkip != 0) {
@@ -1864,6 +1894,9 @@ Note* Serializer::loadNote_v2(BOIBuffer& buffer) {
 	note->textDocumentInitialized = false;
 	foreach(CachedImageFile* image, images) {
 		note->document->AddResourceImage(image);
+	}
+	foreach(CachedFile* file, attachedFiles) {
+		note->attachedFiles.push_back(file);
 	}
 
 	return note;
@@ -1928,8 +1961,27 @@ void Serializer::saveNote_v2(const Note* note, BOIBuffer& buffer) {
 	}
 	imagesArrayBuffer.close();
 
+	QByteArray attachedFilesArray;
+	BOIBuffer attachedFilesArrayBuffer(&attachedFilesArray);
+	attachedFilesArrayBuffer.open(QIODevice::WriteOnly);
+
+	foreach (CachedFile* file, note->attachedFiles) {
+		QByteArray fileNameArray = file->GetFileName().toUtf8();
+		const quint32 fileNameSize = fileNameArray.size();
+
+		// writing data
+		attachedFilesArrayBuffer.write(fileNameSize);
+		attachedFilesArrayBuffer.write(fileNameArray.constData(), fileNameSize);
+
+		const quint32 fileArraySize = file->Size();
+		attachedFilesArrayBuffer.write(fileArraySize);
+		attachedFilesArrayBuffer.write(file->GetData(), fileArraySize);
+	}
+	attachedFilesArrayBuffer.close();
+
 
 	const quint32 w_imagesArraySize = imagesArray.size();
+	const quint32 w_fileaArraySize = attachedFilesArray.size();
 	const quint32 w_itemSize =	sizeof(w_captionSize) +
 								w_captionSize +
 								sizeof(w_textSize) +
@@ -1949,7 +2001,9 @@ void Serializer::saveNote_v2(const Note* note, BOIBuffer& buffer) {
 								sizeof(w_foreColor) +
 								sizeof(w_locked) +
 								sizeof(w_imagesArraySize) +
-								w_imagesArraySize;
+								w_imagesArraySize +
+								sizeof(w_fileaArraySize) +
+								w_fileaArraySize;
 	qint64 result = 0;
 	result = buffer.write(w_itemSize);
 	result = buffer.write(w_captionSize);
@@ -1972,6 +2026,8 @@ void Serializer::saveNote_v2(const Note* note, BOIBuffer& buffer) {
 	result = buffer.write(w_locked);
 	result = buffer.write(w_imagesArraySize);
 	result = buffer.write(imagesArray);
+	result = buffer.write(w_fileaArraySize);
+	result = buffer.write(attachedFilesArray);
 }
 
 Folder* Serializer::loadFolder_v2(BOIBuffer& buffer) {
