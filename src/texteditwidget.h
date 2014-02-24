@@ -121,7 +121,9 @@ namespace qNotesManager {
 		void ShowFragment(const NoteFragment& fragment);
 		int CurrentPosition() const;
 		void SetDocument(TextDocument*);
+
 		QList<QAction*> EditActionsList() const;
+		void UpdateActionsStatus(bool enabled);
 
 		void SetReadOnly(bool);
 

@@ -321,9 +321,7 @@ void NoteEditWidget::updateControlsStatus() {
 	sourceEdit->setEnabled(!currentNoteLocked);
 	tagsEdit->setEnabled(!currentNoteLocked);
 	commentEdit->setEnabled(!currentNoteLocked);
-	foreach (QAction* action, EditActionsList()) {
-		action->setEnabled(!currentNoteLocked);
-	}
+	textEditWidget->UpdateActionsStatus(!currentNoteLocked);
 }
 
 void NoteEditWidget::fillControlsWithData() {

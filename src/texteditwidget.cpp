@@ -756,10 +756,29 @@ int TextEditWidget::CurrentPosition() const {
 
 void TextEditWidget::SetDocument(TextDocument* document) {
 	textField->SetDocument(document);
+
+	undoAction->setEnabled(document->isUndoAvailable());
+	redoAction->setEnabled(document->isRedoAvailable());
 }
 
 QList<QAction*> TextEditWidget::EditActionsList() const {
 	return publicActionsList;
+}
+
+void TextEditWidget::UpdateActionsStatus(bool enabled) {
+	foreach (QAction* action, publicActionsList) {
+		if (action == undoAction || action == redoAction) {
+			if (!enabled) {
+				undoAction->setEnabled(false);
+				redoAction->setEnabled(false);
+			} else {
+				undoAction->setEnabled(textField->document()->isUndoAvailable());
+				redoAction->setEnabled(textField->document()->isRedoAvailable());
+			}
+		} else {
+			action->setEnabled(enabled);
+		}
+	}
 }
 
 void TextEditWidget::sl_TextEdit_UndoAvaliable(bool avaliable) {
