@@ -201,6 +201,8 @@ void Document::Open(QString fileName) {
 }
 
 void Document::Save(QString name, quint16 version) {
+	fileVersion = Serializer::actualSpecificationVersion;
+
 	if (name.isEmpty() && this->fileName.isEmpty()) {
 		WARNING("No filename specified");
 		return;
