@@ -2,6 +2,7 @@ TARGET = qnotesmanager
 TEMPLATE = app
 RC_FILE = qnm.rc
 QT += network
+CONFIG += crypto
 QMAKE_CXXFLAGS += -Wall
 QMAKE_CXXFLAGS += -isystem \
 	$(QTDIR)/include
