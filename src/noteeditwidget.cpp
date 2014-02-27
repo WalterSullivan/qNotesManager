@@ -361,9 +361,7 @@ void NoteEditWidget::sl_TextCreationDateTime_Changed(const QDateTime& newDateTim
 
 }
 
-void NoteEditWidget::sl_TagsEdit_CollectionChanged(QStringList tags) {
-	qDebug() << "Tags collection changed";
-
+void NoteEditWidget::sl_TagsEdit_CollectionChanged(QStringList newTags) {
 	if (!currentNote) {
 		WARNING("Null pointer recieved");
 		return;
@@ -371,12 +369,15 @@ void NoteEditWidget::sl_TagsEdit_CollectionChanged(QStringList tags) {
 
 	for (int i = (currentNote->Tags.Count() - 1); i >= 0; i--) {
 		Tag* t = currentNote->Tags.ItemAt(i);
-		if (!tags.contains(t->GetName())) {currentNote->Tags.Remove(t);}
-		if (tags.contains(t->GetName())) {tags.removeAll(t->GetName());}
+		QString tagName = t->GetName();
+
+		if (!newTags.contains(tagName)) {currentNote->Tags.Remove(t);}
+		if (newTags.contains(tagName)) {newTags.removeAll(tagName);}
 	}
-	foreach (QString s, tags) {
-		Tag* t = Application::I()->CurrentDocument()->FindTagByName(s); // FIXME
-		if (t == 0) {t = new Tag(s);}
+
+	foreach (QString newTagName, newTags) {
+		Tag* t = Application::I()->CurrentDocument()->FindTagByName(newTagName); // FIXME
+		if (t == 0) {t = new Tag(newTagName);}
 		currentNote->Tags.Add(t);
 	}
 }
