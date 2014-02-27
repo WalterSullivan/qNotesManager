@@ -45,7 +45,6 @@ void TagsLineEdit::SetTagsModel(QAbstractItemModel* model) {
 
 void TagsLineEdit::editingFinished() {
 	QStringList tags;
-	qDebug() << "\nTagsLineEdit::EditingFinished";
 
 	QString text = this->text();
 	QString temp = "";
@@ -56,27 +55,26 @@ void TagsLineEdit::editingFinished() {
 		if (i == -1) {
 			if (start <= (text.length() - 1)) {
 				temp = text.mid(start, text.length() - start).trimmed();
-				if (!temp.isEmpty()) {tags.append(temp);}
+				if (!temp.isEmpty() && !tags.contains(temp, Qt::CaseInsensitive)) {
+					tags.append(temp);
+				}
 			}
 			break;
 		}
-		if (i == start) {
-			++start;
-			continue;
-		}
+
 		temp = text.mid(start, i - start).trimmed();
-		if (!temp.isEmpty()) {tags.append(temp);}
 		start = i + 1;
+
+		if (!temp.isEmpty() && !tags.contains(temp, Qt::CaseInsensitive)) {
+			tags.append(temp);
+		}
 	}
 
 	emit sg_TagsCollectionChanged(tags);
 }
 
 void TagsLineEdit::sl_Completer_Activated (const QString& selectedText) {
-	qDebug() << "\nCompleter activated";
-
 	QString text = this->text();
-	QString temp = "";
 	int current = cursorPosition();
 	int end = current;
 	int start = current == 0 ? 0 : current - 1;
