@@ -120,11 +120,11 @@ void NotesTabWidget::ShowFragment(const NoteFragment& fragment) {
 		return;
 	}
 
-	if (!hash.contains(fragment.NotePrt)) {
-		OpenNote(const_cast<Note*>(fragment.NotePrt));
-	}
+	OpenNote(const_cast<Note*>(fragment.NotePrt));
+
 	NoteEditWidget* noteWidget =
 			dynamic_cast<NoteEditWidget*>(hash.value(fragment.NotePrt));
+
 	noteWidget->ShowFragment(fragment);
 }
 
