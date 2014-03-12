@@ -26,6 +26,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QDebug>
 #include <QTextBlock>
 #include <QTextFragment>
+#include <QTextDocumentFragment>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QFileInfo>
@@ -282,6 +283,72 @@ void TextEdit::insertFromMimeData(const QMimeData* source) {
 	}
 }
 
+bool TextEdit::canInsertFromMimeData(const QMimeData* source) const {
+	if (source->hasImage()) {
+		return true;
+	} else if (source->hasUrls()) {
+		foreach (const QUrl& url, source->urls()) {
+			if (!url.isValid()) {
+				return false;
+			}
+
+			QString filePath = url.toString();
+			QFileInfo info(filePath);
+			QString fileType = info.suffix().toLower();
+			if (fileType.isEmpty()) {return false;}
+
+			if (
+					!QImageReader::supportedImageFormats().contains(fileType.toUtf8()) &&
+					!((url.scheme() == "file") && (fileType == "txt"))
+				) {
+					return false;
+			}
+		}
+		return true;
+	} else {
+		return QTextEdit::canInsertFromMimeData(source);
+	}
+}
+
+QMimeData* TextEdit::createMimeDataFromSelection() const {
+	const TextDocument* d = qobject_cast<TextDocument*>(document());
+	if (d == 0) {
+		return QTextEdit::createMimeDataFromSelection();
+	}
+
+	QMimeData* data = new QMimeData();
+
+	const QTextDocumentFragment selection = textCursor().selection();
+	if (selection.isEmpty()) {
+		return data;
+	}
+
+	QString html = selection.toHtml();
+
+	QRegExp regexp("(<img src=\")([^\"]*)(\")");
+	int index = 0;
+
+	while ((index = regexp.indexIn(html, index)) != -1) {
+		QString url = regexp.cap(2);
+		int pos = regexp.pos(2);
+		int length = url.length();
+
+		const CachedImageFile* image = d->GetResourceImage(url);
+		if (image != 0) {
+			const QString fileName = image->SaveToTempFolder();
+			if (!fileName.isEmpty()) {
+				const QUrl newUrl = QUrl::fromLocalFile(fileName);
+				html.replace(pos, length, newUrl.toString());
+			}
+		}
+
+		index += regexp.matchedLength();
+	}
+	data->setHtml(html);
+
+	return data;
+}
+
 void TextEdit::insertImageFromFile(QString fileName) {
 	textCursor().insertImage(QUrl::fromLocalFile(fileName).toString());
 }
@@ -312,33 +379,6 @@ void TextEdit::sl_InsertImageFromFileAction_Triggered() {
 
 	foreach (QString s, list) {
 		insertImageFromFile(s);
-	}
-}
-
-bool TextEdit::canInsertFromMimeData(const QMimeData* source) const {
-	if (source->hasImage()) {
-		return true;
-	} else if (source->hasUrls()) {
-		foreach (const QUrl& url, source->urls()) {
-			if (!url.isValid()) {
-				return false;
-			}
-
-			QString filePath = url.toString();
-			QFileInfo info(filePath);
-			QString fileType = info.suffix().toLower();
-			if (fileType.isEmpty()) {return false;}
-
-			if (
-					!QImageReader::supportedImageFormats().contains(fileType.toUtf8()) &&
-					!((url.scheme() == "file") && (fileType == "txt"))
-				) {
-					return false;
-			}
-		}
-		return true;
-	} else {
-		return QTextEdit::canInsertFromMimeData(source);
 	}
 }
 

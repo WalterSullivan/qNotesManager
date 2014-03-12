@@ -72,6 +72,7 @@ namespace qNotesManager {
 	protected:
 		virtual void insertFromMimeData (const QMimeData * source);
 		virtual bool canInsertFromMimeData(const QMimeData *source) const;
+		virtual QMimeData* createMimeDataFromSelection() const;
 
 		virtual void contextMenuEvent (QContextMenuEvent * event);
 
