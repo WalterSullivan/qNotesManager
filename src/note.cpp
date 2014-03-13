@@ -145,7 +145,7 @@ QString Note::GetIconID() const {
 
 QString Note::GetText() const {
 	if (!cachedHtml.isNull()) {
-		initTextDocument();
+		sl_InitTextDocument();
 	}
 
 	QReadLocker locker(&lock);
@@ -321,7 +321,7 @@ void Note::sl_DocumentChanged() {
 
 TextDocument* Note::GetTextDocument() const {
 	if (!cachedHtml.isNull()) {
-		initTextDocument();
+		sl_InitTextDocument();
 	}
 
 	return document;
@@ -390,7 +390,7 @@ void Note::sl_TextUpdateTimer_Timeout() {
 	text = document->toPlainText();
 }
 
-void Note::initTextDocument() const {
+void Note::sl_InitTextDocument() const {
 	if (textDocumentInitialized) {return;}
 
 	QWriteLocker locker(&lock);

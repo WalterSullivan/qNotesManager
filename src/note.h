@@ -62,7 +62,6 @@ namespace qNotesManager {
 		QList<CachedFile*> attachedFiles;
 
 		void onChange();
-		void initTextDocument() const;
 
 	public:
 		explicit Note(QString name = QString());
@@ -139,6 +138,8 @@ namespace qNotesManager {
 		void sl_TagsCollectionModified(Tag*);
 		void sl_TextUpdateTimer_Timeout();
 
+	public slots:
+		void sl_InitTextDocument() const;
 	};
 }
 
