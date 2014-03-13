@@ -64,6 +64,10 @@ bool CachedFile::HasSameDataAs(const CachedFile* other) const {
 }
 
 bool CachedFile::Save(const QString& fileName) const {
+	if (fileName.isEmpty()) {
+		return false;
+	}
+
 	if (Data.size() == 0) {return false;}
 
 	QFile file(fileName);
