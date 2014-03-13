@@ -44,6 +44,8 @@ namespace qNotesManager {
 
 		DocumentSearchEngine*	engine;
 
+		void ClearResults();
+
 	signals:
 		void sg_ShowSearchResults(NoteFragment);
 		void sg_CloseRequest();

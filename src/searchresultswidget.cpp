@@ -122,6 +122,10 @@ void SearchResultsWidget::sl_ClearButton_Clicked() {
 	expandAllButton->setEnabled(false);
 }
 
+void SearchResultsWidget::ClearResults() {
+	sl_ClearButton_Clicked();
+}
+
 void SearchResultsWidget::sl_ExpandAllButton_Clicked() {
 	treeView->expandAll();
 }

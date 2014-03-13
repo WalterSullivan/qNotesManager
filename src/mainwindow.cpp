@@ -592,6 +592,10 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 
 	Document* doc = Application::I()->CurrentDocument();
 	engine->SetTargetDocument(doc);
+	if (searchResultsWidget) {
+		searchResultsWidget->ClearResults();
+		searchResultsWidget->hide();
+	}
 	navigationPanel->SetTargetDocument(doc);
 	bookmarksMenu->SetDocument(doc);
 
@@ -625,6 +629,8 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	documentPropertiesAction->setEnabled(enable);
 	globalSearchAction->setEnabled(enable);
 	sl_Clipboard_DataChanged();
+
+
 
 	updateWindowTitle();
 }
