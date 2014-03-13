@@ -73,7 +73,6 @@ void DocumentSearchEngine::StartSearch(QString query, bool matchCase, bool searc
 		return;
 	}
 
-	query = query.trimmed();
 	if (query.isEmpty()) {
 		emit sg_SearchError("Search text is empty");
 		return;
