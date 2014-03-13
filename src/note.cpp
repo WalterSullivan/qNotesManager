@@ -319,7 +319,7 @@ void Note::sl_DocumentChanged() {
 	onChange();
 }
 
-TextDocument* Note::GetTextDocument() {
+TextDocument* Note::GetTextDocument() const {
 	if (!cachedHtml.isNull()) {
 		initTextDocument();
 	}

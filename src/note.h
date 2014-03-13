@@ -106,7 +106,7 @@ namespace qNotesManager {
 		QString GetComment() const;
 		void SetComment(QString c);
 
-		TextDocument* GetTextDocument();
+		TextDocument* GetTextDocument() const;
 		bool TextDocumentInitialized() const;
 
 		int GetAttachedFilesCount() const;
