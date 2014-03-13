@@ -328,6 +328,7 @@ TextDocument* Note::GetTextDocument() const {
 }
 
 bool Note::TextDocumentInitialized() const {
+	QReadLocker locker(&lock);
 	return textDocumentInitialized;
 }
 
@@ -391,9 +392,9 @@ void Note::sl_TextUpdateTimer_Timeout() {
 }
 
 void Note::sl_InitTextDocument() const {
-	if (textDocumentInitialized) {return;}
-
 	QWriteLocker locker(&lock);
+
+	if (textDocumentInitialized) {return;}
 
 	document->blockSignals(true);
 		if (!cachedHtml.isNull()) {
