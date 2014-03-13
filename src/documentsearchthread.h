@@ -66,6 +66,7 @@ namespace qNotesManager {
 			void sg_SearchStarted();
 			void sg_SearchEnded();
 			void sg_SearchProgress(int);
+			void sg_TextDocumentInitRequest();
 
 	};
 }

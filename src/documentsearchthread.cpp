@@ -102,6 +102,21 @@ void DocumentSearchThread::run() {
 		const Note* n = searchQueue.takeFirst();
 		listLock.unlock();
 
+		// If note's text document was not initialized, ask to initialize it in main
+		// thread (!important) and put it back in the queue
+		if (!n->TextDocumentInitialized()) {
+			QObject::connect(this, SIGNAL(sg_TextDocumentInitRequest()),
+							 n, SLOT(sl_InitTextDocument()), Qt::QueuedConnection);
+			sg_TextDocumentInitRequest();
+			QObject::disconnect(this, 0, n, 0);
+
+			listLock.lockForWrite();
+			searchQueue.push_front(n);
+			listLock.unlock();
+			continue;
+		}
+
+
 		SetCurrentNote(n);
 
 		// TODO: fix this mess
