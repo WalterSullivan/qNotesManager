@@ -391,6 +391,8 @@ void Note::sl_TextUpdateTimer_Timeout() {
 }
 
 void Note::initTextDocument() const {
+	if (textDocumentInitialized) {return;}
+
 	QWriteLocker locker(&lock);
 
 	document->blockSignals(true);
