@@ -63,5 +63,5 @@ bool TagModelItem::LessThan(const BaseModelItem* item) const {
 		return BaseModelItem::LessThan(item);
 	}
 	const TagModelItem* tagItem = dynamic_cast<const TagModelItem*>(item);
-	return _tag->GetName() < tagItem->_tag->GetName();
+	return _tag->GetName().toUpper() < tagItem->_tag->GetName().toUpper();
 }

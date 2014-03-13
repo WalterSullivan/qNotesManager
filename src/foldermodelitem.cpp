@@ -119,7 +119,7 @@ bool FolderModelItem::LessThan(const BaseModelItem* item) const {
 		return BaseModelItem::LessThan(item);
 	}
 	const FolderModelItem* folderItem = dynamic_cast<const FolderModelItem*>(item);
-	return folder->GetName() < folderItem->folder->GetName();
+	return folder->GetName().toUpper() < folderItem->folder->GetName().toUpper();
 }
 
 void FolderModelItem::drawLockedIcon(QPixmap& pixmap) const {

@@ -111,7 +111,7 @@ bool NoteModelItem::LessThan(const BaseModelItem* item) const {
 		return BaseModelItem::LessThan(item);
 	}
 	const NoteModelItem* noteItem = dynamic_cast<const NoteModelItem*>(item);
-	return _storedData->GetName() < noteItem->_storedData->GetName();
+	return _storedData->GetName().toUpper() < noteItem->_storedData->GetName().toUpper();
 }
 
 void NoteModelItem::drawLock(QPixmap& pixmap) const {
