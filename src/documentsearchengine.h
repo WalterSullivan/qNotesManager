@@ -54,7 +54,6 @@ namespace qNotesManager {
 
 	private slots:
 		void sl_Document_NoteDeleted(Note*);
-		void sl_Document_NoteAdded(Note*);
 		void sl_Document_Destroyed();
 
 	};

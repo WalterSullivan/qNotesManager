@@ -120,10 +120,6 @@ void DocumentSearchEngine::sl_Document_NoteDeleted(Note* n) {
 	thread->RemoveNote(n);
 }
 
-void DocumentSearchEngine::sl_Document_NoteAdded(Note* n) {
-	thread->AddNote(n);
-}
-
 void DocumentSearchEngine::SetTargetDocument(Document* doc) {
 	if (IsSearchActive()) {
 		StopSearch();
@@ -136,8 +132,6 @@ void DocumentSearchEngine::SetTargetDocument(Document* doc) {
 	document = doc;
 
 	if (document != 0) {
-		QObject::connect(document, SIGNAL(sg_ItemRegistered(Note*)),
-						 this, SLOT(sl_Document_NoteAdded(Note*)));
 		QObject::connect(document, SIGNAL(sg_ItemUnregistered(Note*)),
 						 this, SLOT(sl_Document_NoteDeleted(Note*)));
 		QObject::connect(document, SIGNAL(destroyed()),
