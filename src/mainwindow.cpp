@@ -525,6 +525,7 @@ void MainWindow::sl_GlobalSearchAction_Triggered() {
 						 this, SLOT(sl_SearchResults_ShowRequest()));
 		searchResultsWidget->hide();
 		rightPanelSplitter->addWidget(searchResultsWidget);
+		rightPanelSplitter->setStretchFactor(0, 3);
 	}
 	searchWidget->show();
 }
