@@ -66,6 +66,8 @@ bool DocumentSearchEngine::IsQueryValid(QString query, bool useRegExp) const {
 
 void DocumentSearchEngine::StartSearch(QString query, bool matchCase, bool searchWholeWord,
 								  bool useRegexp) {
+	if (document == 0) {return;}
+
 	if (thread->isRunning()) {
 		WARNING("Thread is already running");
 		return;
