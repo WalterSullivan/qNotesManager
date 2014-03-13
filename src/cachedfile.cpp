@@ -22,6 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QFile>
 #include <QFileInfo>
+#include <QTemporaryFile>
 
 using namespace qNotesManager;
 
@@ -79,6 +80,21 @@ bool CachedFile::Save(const QString& fileName) const {
 	if (result != Data.size()) {return false;}
 
 	return true;
+}
+
+QString CachedFile::SaveToTempFolder() const {
+	if (Data.size() == 0) {return QString();}
+
+	QTemporaryFile file;
+	file.setAutoRemove(false);
+
+	if (!file.open()) {return QString();}
+	qint64 result = file.write(Data);
+	file.close();
+
+	if (result != Data.size()) {return QString();}
+
+	return file.fileName();
 }
 
 // static

@@ -45,6 +45,7 @@ namespace qNotesManager {
 		bool HasSameDataAs(const CachedFile* other) const;
 
 		bool Save(const QString& fileName) const;
+		QString SaveToTempFolder() const;
 
 		static CachedFile* FromFile(const QString& fileName);
 	};
