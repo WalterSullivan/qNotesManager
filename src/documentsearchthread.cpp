@@ -217,9 +217,9 @@ void DocumentSearchThread::run() {
 		// Search in text
 		currentPos = 0;
 		const QString elide = "...";
+		text = currentNote->GetText();
 		while (true) {
 			// FIXME: fix situation when capturedText.length() > symbolsForSample
-			text = currentNote->GetText();
 			textMatchStart = regexp.indexIn(text, currentPos);
 			textMatchLength = regexp.matchedLength();
 			if (textMatchStart != -1 && textMatchLength != -1) {
@@ -271,12 +271,12 @@ void DocumentSearchThread::SetRegexp(const QRegExp& regexp) {
 	this->regexp = regexp;
 }
 
-void DocumentSearchThread::AddNote(Note* n) {
+void DocumentSearchThread::AddNote(const Note* n) {
 	QWriteLocker locker(&listLock);
 	searchQueue.append(n);
 }
 
-void DocumentSearchThread::RemoveNote(Note* n) {
+void DocumentSearchThread::RemoveNote(const Note* n) {
 	QWriteLocker locker(&listLock);
 	searchQueue.removeOne(n);
 }

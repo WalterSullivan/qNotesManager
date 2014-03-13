@@ -57,8 +57,8 @@ namespace qNotesManager {
 			const Note* CurrentNote() const;
 
 			void SetRegexp(const QRegExp& regexp);
-			void AddNote(Note*);
-			void RemoveNote(Note*);
+			void AddNote(const Note*);
+			void RemoveNote(const Note*);
 			void ClearNotesList();
 
 		signals:
