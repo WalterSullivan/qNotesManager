@@ -34,7 +34,7 @@ namespace qNotesManager {
 			QRegExp regexp;
 			volatile bool isActive;
 			const Note* currentNote;
-			QList<Note*> searchQueue;
+			QList<const Note*> searchQueue;
 
 			mutable QReadWriteLock isActiveLock;
 			mutable QReadWriteLock listLock;
