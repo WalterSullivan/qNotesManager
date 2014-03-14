@@ -700,7 +700,7 @@ bool TextEditWidget::eventFilter (QObject* watched, QEvent* event) {
 }
 
 void TextEditWidget::continueSearch() {
-	QString searchText = searchEdit->text().trimmed();
+	QString searchText = searchEdit->text();
 	if (searchText.isEmpty()) {return;}
 	if (!searchRegex->isChecked()) {
 		searchText = QRegExp::escape(searchText);
