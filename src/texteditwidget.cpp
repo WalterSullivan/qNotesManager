@@ -316,7 +316,7 @@ void TextEditWidget::CreateControls() {
 	searchFrame->setFrameShadow(QFrame::Sunken);
 	searchEdit = new QLineEdit();
 	searchEdit->installEventFilter(this);
-	searchRegex = new QCheckBox("Use regex");
+	searchRegex = new QCheckBox("Use regexp");
 	searchMatchCase = new QCheckBox("Match case");
 	searchWholeWord = new QCheckBox("Search whole word");
 	QHBoxLayout* searchl = new QHBoxLayout();
