@@ -360,18 +360,6 @@ void TextEditWidget::setPlainText (const QString& text) {
 	textField->setPlainText(text);
 }
 
-// test function
-QVariant TextEditWidget::GetResource(QString id) {
-	return textField->document()->resource(QTextDocument::ImageResource, QUrl(id));
-}
-
-// test function
-void TextEditWidget::SetResource (QString id, QVariant resource) {
-	// you can replace resource data (for specific url) this way
-	textField->document()->addResource(QTextDocument::ImageResource, QUrl(id), resource);
-	textField->setLineWrapColumnOrWidth ( 0 );
-}
-
 void TextEditWidget::SetReadOnly(bool ro) {
 	if (readOnly == ro) {return;}
 

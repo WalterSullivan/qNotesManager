@@ -113,8 +113,6 @@ namespace qNotesManager {
 		void setHtml (const QString& text);
 		void setPlainText (const QString& text);
 
-		QVariant GetResource(QString id);
-		void SetResource (QString id, QVariant resource);
 		/*virtual*/ bool eventFilter (QObject* watched, QEvent* event);
 
 		void ScrollTo(int position);
