@@ -924,5 +924,7 @@
         <file alias="star-plus">icons/gui/star--plus.png</file>
         <file alias="star-minus">icons/gui/star--minus.png</file>
         <file alias="clip">icons/gui/paper-clip.png</file>
+        <file alias="chain">icons/gui/chain.png</file>
+        <file alias="image-resize">icons/gui/image-resize.png</file>
     </qresource>
 </RCC>

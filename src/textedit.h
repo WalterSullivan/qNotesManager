@@ -91,6 +91,8 @@ namespace qNotesManager {
 
 		void AnalyzeText();
 
+		HyperlinkEditWidget* linkEditDialog;
+		QTimer	anchorTooltipTimer;
 		QAction* followLinkAction;
 		QAction* removeLinkAction;
 		QAction* editLinkAction;
@@ -104,14 +106,8 @@ namespace qNotesManager {
 		QMenu* imagePropertiesMenu;
 		QAction* saveImageAction;
 		QAction* resizeImageAction;
-		QAction* resizeImageCanvasAction;
 
 		QTextFormat formatToCopy;
-
-
-
-		HyperlinkEditWidget* linkEditDialog;
-		QTimer	anchorTooltipTimer;
 
 		QTextFragment findFragmentAtPos(QPoint pos);
 		void applyCharFormatting(const QTextCharFormat& format, const CharFormatApplyMode = Merge);
@@ -142,7 +138,6 @@ namespace qNotesManager {
 
 		void sl_SaveImageAction_Triggered();
 		void sl_ResizeImageAction_Triggered();
-		void sl_ResizeImageCanvasAction_Triggered();
 
 		void sl_AnchorTooltipTimer_Timeout();
 

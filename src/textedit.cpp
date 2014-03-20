@@ -22,6 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "global.h"
 #include "edittablewidthconstraintswidget.h"
 #include "custommessagebox.h"
+#include "sizeeditwidget.h"
 
 #include <QMimeData>
 #include <QDebug>
@@ -129,19 +130,16 @@ TextEdit::TextEdit(QWidget *parent) :
 	insertMenu->addAction(InsertDateTimeAction);
 
 	imagePropertiesMenu = new QMenu("Image", this);
-	saveImageAction = new QAction("Save image", this);
+	saveImageAction = new QAction(QIcon(":/gui/disk-black"), "Save image", this);
 	QObject::connect(saveImageAction, SIGNAL(triggered()),
 					 this, SLOT(sl_SaveImageAction_Triggered()));
-	resizeImageAction = new QAction("Resize image", this);
+	resizeImageAction = new QAction(QIcon(":/gui/image-resize"), "Resize image", this);
 	QObject::connect(resizeImageAction, SIGNAL(triggered()),
 					 this, SLOT(sl_ResizeImageAction_Triggered()));
-	resizeImageCanvasAction = new QAction("Resize image canvas", this);
-	QObject::connect(resizeImageCanvasAction, SIGNAL(triggered()),
-					 this, SLOT(sl_ResizeImageCanvasAction_Triggered()));
+
 
 	imagePropertiesMenu->addAction(saveImageAction);
 	imagePropertiesMenu->addAction(resizeImageAction);
-	imagePropertiesMenu->addAction(resizeImageCanvasAction);
 
 	QObject::connect(EditTableWidthConstraintsAction, SIGNAL(triggered()),
 					 this, SLOT(sl_EditTableWidthConstraintsAction_Triggered()));
@@ -552,15 +550,13 @@ void TextEdit::contextMenuEvent (QContextMenuEvent* event) {
 		menu->addAction(EditTableWidthConstraintsAction);
 	}
 
-	/* NOT IMPLEMENTED YET
 	QTextFragment fragment = findFragmentAtPos(event->pos());
 	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
 		menu->addSeparator();
 		menu->addMenu(imagePropertiesMenu);
 		saveImageAction->setData(event->pos());
 		resizeImageAction->setData(event->pos());
-		resizeImageCanvasAction->setData(event->pos());
-	}*/
+	}
 
 	menu->exec(event->globalPos());
 	menu->deleteLater();
@@ -992,20 +988,69 @@ void TextEdit::sl_CopyCurrentFormat(bool copy) {
 }
 
 void TextEdit::sl_SaveImageAction_Triggered() {
+	QAction* action = qobject_cast<QAction*>(QObject::sender());
+	if (action == 0) {return;}
 
+	QPoint pos = action->data().toPoint();
+	QTextFragment fragment = findFragmentAtPos(pos);
+	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
+		QTextImageFormat format = fragment.charFormat().toImageFormat();
+		const QString imageName = QString(format.name().toUtf8());
+
+		const TextDocument* textDocument = dynamic_cast<TextDocument*>(document());
+		CachedImageFile* image = textDocument->GetResourceImage(imageName);
+		if (image == 0) {return;}
+
+		QString filename = QFileDialog::getSaveFileName(this, "Select a name", image->GetFileName(),
+			"");
+		if (filename.isNull()) {return;}
+
+		image->Save(filename);
+	}
 }
 
 void TextEdit::sl_ResizeImageAction_Triggered() {
+	QAction* action = qobject_cast<QAction*>(QObject::sender());
+	if (action == 0) {return;}
 
-}
-
-void TextEdit::sl_ResizeImageCanvasAction_Triggered() {
-	QAction* act = qobject_cast<QAction*>(QObject::sender());
-	QPoint pos = act->data().toPoint();
-
+	QPoint pos = action->data().toPoint();
 	QTextFragment fragment = findFragmentAtPos(pos);
 	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
+		QTextImageFormat format = fragment.charFormat().toImageFormat();
 
+		const QString imageName = QString(format.name().toUtf8());
+
+		const TextDocument* textDocument = dynamic_cast<TextDocument*>(document());
+		CachedImageFile* image = textDocument->GetResourceImage(imageName);
+		if (image == 0) {return;}
+
+		SizeEditWidget resizeWidget(this);
+		QSize currentImageSize = QSize();
+		if (format.hasProperty(QTextFormat::ImageWidth) &&
+				format.hasProperty(QTextFormat::ImageHeight)) {
+			currentImageSize = QSize((int)format.width(), (int)format.height());
+		}
+
+		resizeWidget.SetData(currentImageSize, image->ImageSize());
+		resizeWidget.exec();
+
+		if (resizeWidget.result() == QDialog::Accepted) {
+			QSize newSize = resizeWidget.NewSize;
+			if (newSize.isValid() && newSize != image->ImageSize()) {
+				format.setWidth(newSize.width());
+				format.setHeight(newSize.height());
+			} else {
+				format.clearProperty(QTextFormat::ImageWidth);
+				format.clearProperty(QTextFormat::ImageHeight);
+			}
+
+			QTextCursor tempCursor(textCursor());
+			tempCursor.beginEditBlock();
+			tempCursor.setPosition(fragment.position());
+			tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, fragment.length());
+			tempCursor.setCharFormat(format);
+			tempCursor.endEditBlock();
+		}
 	}
 }
 
