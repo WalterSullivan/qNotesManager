@@ -121,6 +121,7 @@ namespace qNotesManager {
 		void UpdateActionsStatus(bool enabled);
 
 		void SetReadOnly(bool);
+		void FocusTextEdit();
 
 
 	signals:
@@ -166,4 +167,4 @@ namespace qNotesManager {
 }
 
 #endif // TEXTEDITWIDGET_H
- 
+

@@ -437,3 +437,7 @@ bool NoteEditWidget::eventFilter (QObject* watched, QEvent* event) {
 QList<QAction*> NoteEditWidget::EditActionsList() const {
 	return textEditWidget->EditActionsList();
 }
+
+void NoteEditWidget::FocusTextEdit() {
+	textEditWidget->FocusTextEdit();
+}

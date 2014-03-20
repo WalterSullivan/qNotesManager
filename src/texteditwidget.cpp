@@ -352,6 +352,10 @@ void TextEditWidget::SetReadOnly(bool ro) {
 	textField->setReadOnly(readOnly);
 }
 
+void TextEditWidget::FocusTextEdit() {
+	textField->setFocus();
+}
+
 // Event handlers ======================================================================================
 
 void TextEditWidget::sl_ClearFormattingAction_Clicked() {

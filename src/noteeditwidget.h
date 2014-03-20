@@ -77,6 +77,7 @@ namespace qNotesManager {
 		void ShowFragment(const NoteFragment& fragment);
 		int CurrentPosition() const;
 		QList<QAction*> EditActionsList() const;
+		void FocusTextEdit();
 
 	protected:
 		// virtual

@@ -75,6 +75,7 @@ void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 
 	if (hash.contains(note)) {
 		QWidget* noteWidget = hash.value(note);
+		qobject_cast<NoteEditWidget*>(noteWidget)->FocusTextEdit();
 		tabWidget->setCurrentWidget(noteWidget);
 		return;
 	}
@@ -94,6 +95,7 @@ void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 
 	tabWidget->addTab(w, note->GetIcon(), cropStringForTabCaption(note->GetName()));
 	tabWidget->setCurrentWidget(w);
+	w->FocusTextEdit();
 	w->ScrollTo(position);
 }
 
