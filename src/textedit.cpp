@@ -118,6 +118,7 @@ TextEdit::TextEdit(QWidget *parent) :
 
 	linkEditDialog = new HyperlinkEditWidget(this);
 	linkEditDialog->resize(400, 50);
+	anchorTooltipTimer.setSingleShot(true);
 	QObject::connect(&anchorTooltipTimer, SIGNAL(timeout()),
 					 this, SLOT(sl_AnchorTooltipTimer_Timeout()));
 
@@ -567,7 +568,7 @@ void TextEdit::mouseMoveEvent (QMouseEvent* event) {
 	QTextEdit::mouseMoveEvent(event);
 
 	QString href = anchorAt(event->pos());
-	if (!href.isEmpty()) {
+	if (!href.isEmpty() && this->hasFocus()) {
 		anchorTooltipTimer.start(1000);
 
 		if (event->modifiers() == Qt::ControlModifier &&
@@ -576,7 +577,6 @@ void TextEdit::mouseMoveEvent (QMouseEvent* event) {
 		}
 	} else {
 		if (viewport()->cursor().shape() != Qt::IBeamCursor) {
-
 			viewport()->setCursor(Qt::IBeamCursor);
 		}
 		if (anchorTooltipTimer.isActive()) {anchorTooltipTimer.stop();}
