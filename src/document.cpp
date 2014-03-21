@@ -34,9 +34,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QFileInfo>
 #include <QBuffer>
 #include <QDebug>
-#include <QStack>
 #include <QInputDialog>
-#include <QMessageBox>
 #include <QThread>
 #include <QCoreApplication>
 

@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "hyperlinkeditwidget.h"
 #include "global.h"
 #include "edittablewidthconstraintswidget.h"
+#include "custommessagebox.h"
 
 #include <QMimeData>
 #include <QDebug>
@@ -32,7 +33,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QFileInfo>
 #include <QClipboard>
 #include <QApplication>
-#include <QMessageBox>
 #include <QImageReader>
 #include <QToolTip>
 #include <QInputDialog>
@@ -360,7 +360,8 @@ void TextEdit::sl_InsertImageFromUrlAction_Triggered() {
 	if (ok && !text.isEmpty()) {
 		QUrl url(text);
 		if (!url.isValid()) {
-			QMessageBox::information(this, "Insert image", "Specified URL is not valid");
+			CustomMessageBox msg("Specified URL is not valid", "Insert image", QMessageBox::Information);
+			msg.show();
 			return;
 		}
 		textCursor().insertImage(url.toString());

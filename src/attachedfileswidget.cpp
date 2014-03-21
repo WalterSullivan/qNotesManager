@@ -2,12 +2,12 @@
 
 #include <QScrollArea>
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QFileIconProvider>
 #include <QDebug>
 
 #include "note.h"
 #include "cachedfile.h"
+#include "custommessagebox.h"
 
 using namespace qNotesManager;
 
@@ -82,7 +82,8 @@ void AttachedFilesWidget::sl_AddButton_Clicked() {
 
 		QFile file(fileName);
 		if (fileName.isEmpty() || !file.exists()) {
-			QMessageBox::warning(this, "Warning", "Select file to open");
+			CustomMessageBox msg("Select file to open", "Warning", QMessageBox::Warning);
+			msg.show();
 		} else {
 			break;
 		}
@@ -90,7 +91,8 @@ void AttachedFilesWidget::sl_AddButton_Clicked() {
 
 	CachedFile* newFile = CachedFile::FromFile(fileName);
 	if (newFile == 0 || newFile->Size() == 0) {
-		QMessageBox::warning(this, "Warning", "Failed to open file");
+		CustomMessageBox msg("Failed to open file", "Warning", QMessageBox::Warning);
+		msg.show();
 		delete newFile;
 		return;
 	}
@@ -101,11 +103,10 @@ void AttachedFilesWidget::sl_AddButton_Clicked() {
 		const CachedFile* file = currentNote->GetAttachedFile(i);
 		quint32 fileCRC = file->GetCRC32();
 		if (newFileCRC == fileCRC && newFile->HasSameDataAs(file)) {
-			QMessageBox::StandardButton answer = QMessageBox::question(this,
-												"Warning",
-												"Selected file is already attached. Proceed anyway?",
-												QMessageBox::Yes | QMessageBox::No);
-			if (answer == QMessageBox::No) {
+			CustomMessageBox msg("Selected file is already attached. Proceed anyway?", "Warning",
+						   QMessageBox::Question, QMessageBox::Yes | QMessageBox::No);
+			QMessageBox::StandardButton answer = msg.show();
+			if (answer != QMessageBox::Yes) {
 				delete newFile;
 				return;
 			} else {
@@ -134,24 +135,14 @@ void AttachedFilesWidget::sl_SaveButton_Clicked() {
 	QString fileName = QString();
 
 	while(fileName.isEmpty()) {
-		fileName = QFileDialog::getSaveFileName(this, "Save as", attachedFile->GetFileName(),
-												"");
+		fileName = QFileDialog::getSaveFileName(this, "Save as", attachedFile->GetFileName(), "");
 		if (fileName.isNull()) {return;}
-
-		const QFile file(fileName);
-
-		if (fileName.isEmpty()) {
-			QMessageBox::warning(this, QString(), "Error");
-		} else if (file.exists()) {
-			QMessageBox::warning(this, QString(), "Error");
-		} else {
-			break;
-		}
 	}
 
 	bool result = attachedFile->Save(fileName);
 	if (!result) {
-		QMessageBox::warning(this, QString(), "Error saving");
+		CustomMessageBox msg("Error happened during saving file", "Error", QMessageBox::Warning);
+		msg.show();
 	}
 }
 
@@ -161,11 +152,11 @@ void AttachedFilesWidget::sl_DeleteButton_Clicked() {
 	QList<QListWidgetItem*> selectedItems = listWidget->selectedItems();
 	if (selectedItems.size() == 0) {return;}
 
-	QMessageBox::StandardButton answer = QMessageBox::question(this,
-										"Warning",
-										"Delete selected files?",
-										QMessageBox::Yes | QMessageBox::No);
-	if (answer == QMessageBox::No) {
+	CustomMessageBox msg("Delete selected files?", "Warning", QMessageBox::Question,
+				   QMessageBox::Yes | QMessageBox::No);
+	QMessageBox::StandardButton answer = msg.show();
+
+	if (answer != QMessageBox::Yes) {
 		return;
 	}
 

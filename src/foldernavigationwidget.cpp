@@ -29,10 +29,10 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "folderitempropertieswidget.h"
 #include "modelitemdelegate.h"
 #include "global.h"
+#include "custommessagebox.h"
 
 #include <QVBoxLayout>
 #include <QColorDialog>
-#include <QMessageBox>
 #include <QKeyEvent>
 #include <QRegExp>
 #include <QStack>
@@ -839,13 +839,15 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 
 	QString message = permanently ? "Delete these items?" : "Put these items to Bin?";
 
-	if (QMessageBox::question(0, "Confirm deletion", message + details, QMessageBox::Yes | QMessageBox::No)
-		!= QMessageBox::Yes) {
+
+	CustomMessageBox box(message + details, "Confirm deletion", QMessageBox::Question,
+				   QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+	if (box.show() != QMessageBox::Yes) {
 		return;
 	}
 
 	// FIXME: fix situation when parent folder was deleted and we try to delete child item
-
 	deleteChildIndexes(indexesList);
 
 	foreach (QModelIndex index, indexesList) {
@@ -862,7 +864,8 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 			itemToDelete = fmi->GetStoredData();
 			if (itemToDelete == Application::I()->CurrentDocument()->GetTempFolder() ||
 				itemToDelete == Application::I()->CurrentDocument()->GetTrashFolder()) {
-				QMessageBox::information(0, "Information", "You cannot delete system folders");
+				CustomMessageBox msg("You cannot delete system folders", "Information", QMessageBox::Information);
+				msg.show();
 				continue;
 			}
 		} else if (modelItemToDelete->DataType() == BaseModelItem::note) {
