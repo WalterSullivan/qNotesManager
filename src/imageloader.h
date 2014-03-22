@@ -34,10 +34,9 @@ namespace qNotesManager {
 
 	public:
 		explicit ImageLoader(QObject *parent);
-		~ImageLoader(){};
+		~ImageLoader(){}
 
 		void Download(const QUrl);
-		void CancelDownload(const QUrl);
 		void CancelAllDownloads();
 
 	signals:

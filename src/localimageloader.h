@@ -31,12 +31,18 @@ namespace qNotesManager {
 		Q_OBJECT
 	private:
 		QList<QUrl> queue;
-		QReadWriteLock lock;
+		mutable QReadWriteLock lock;
+
+		mutable bool needRestart;
+		mutable QReadWriteLock NRlock;
 
 	public:
-		explicit LocalImageLoadWorker(QObject* parent) : QObject(parent) {}
-		void AddUrl(const QUrl);
+		explicit LocalImageLoadWorker() : QObject(0), needRestart(true) {}
+		void AddUrl(const QUrl&);
 		void CancelAllDownloads();
+
+		bool NeedRestart() const;
+		void SetNeedRestart(bool);
 
 	signals:
 		void sg_DownloadFinished (QUrl url, CachedImageFile* image);
@@ -51,7 +57,6 @@ namespace qNotesManager {
 	class LocalImageLoader : public QObject {
 	Q_OBJECT
 	private:
-		QList<QUrl> queue;
 		QThread* thread;
 		LocalImageLoadWorker* worker;
 
@@ -59,8 +64,7 @@ namespace qNotesManager {
 		explicit LocalImageLoader(QObject *parent);
 		~LocalImageLoader();
 
-		void Download(const QUrl);
-		void CancelDownload(const QUrl);
+		void Download(const QUrl&);
 		void CancelAllDownloads();
 
 	signals:
