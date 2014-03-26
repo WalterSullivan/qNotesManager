@@ -87,6 +87,9 @@ namespace qNotesManager {
 		QStringList GetRecentFiles() const;
 		void SetRecentFiles(const QStringList&);
 
+		bool GetConfirmItemDeletion() const;
+		void SetConfirmItemDeletion(bool v);
+
 	private:
 		QSettings* settings;
 	};

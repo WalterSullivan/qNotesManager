@@ -172,4 +172,12 @@ void ApplicationSettings::SetRecentFiles(const QStringList& list) {
 	settings->setValue("app/recentfiles", list);
 }
 
+bool ApplicationSettings::GetConfirmItemDeletion() const {
+	return settings->value("app/confirm/itemdeletion", true).toBool();
+}
+
+void ApplicationSettings::SetConfirmItemDeletion(bool v) {
+	settings->setValue("app/confirm/itemdeletion", v);
+}
+
 

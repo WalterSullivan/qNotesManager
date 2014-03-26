@@ -36,6 +36,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QKeyEvent>
 #include <QRegExp>
 #include <QStack>
+#include <QCheckBox>
 #include <QDebug>
 
 using namespace qNotesManager;
@@ -837,14 +838,21 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 		details.append("\n").append(index.model()->data(index, Qt::DisplayRole).toString());
 	}
 
-	QString message = permanently ? "Delete these items?" : "Put these items to Bin?";
+	if (Application::I()->Settings.GetConfirmItemDeletion() == true) {
+		QCheckBox* checkBox = new QCheckBox("Do not show this message again");
+		QString message = permanently ? "Delete these items?" : "Put these items to Bin?";
+		CustomMessageBox box(message + details, "Confirm deletion", QMessageBox::Question,
+					   QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		box.AddCustomWidget(checkBox);
+		QMessageBox::StandardButton result = box.show();
 
+		if (result != QMessageBox::Yes) {
+			return;
+		}
 
-	CustomMessageBox box(message + details, "Confirm deletion", QMessageBox::Question,
-				   QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
-	if (box.show() != QMessageBox::Yes) {
-		return;
+		if (checkBox->isChecked()) {
+			Application::I()->Settings.SetConfirmItemDeletion(false);
+		}
 	}
 
 	// FIXME: fix situation when parent folder was deleted and we try to delete child item
