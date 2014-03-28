@@ -28,6 +28,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QAction>
 #include <QComboBox>
 #include <QFontComboBox>
+#include <QLabel>
 
 
 /*
@@ -46,6 +47,7 @@ namespace qNotesManager {
 	class ColorPickerButton;
 	class TextEdit;
 	class TextDocument;
+	class SearchPanelWidget;
 
 	class TextEditWidget : public QWidget {
 	Q_OBJECT
@@ -72,11 +74,7 @@ namespace qNotesManager {
 		QFontComboBox*		fontComboBox;
 		QComboBox*			fontSizeComboBox;
 
-		QFrame*				searchFrame;
-		QLineEdit*			searchEdit;
-		QCheckBox*			searchRegex;
-		QCheckBox*			searchMatchCase;
-		QCheckBox*			searchWholeWord;
+		SearchPanelWidget*	searchPanel;
 
 		QToolButton*		listButton;
 		QAction*			increaseListIndentAction;
@@ -100,7 +98,6 @@ namespace qNotesManager {
 		QList<QAction*> publicActionsList;
 
 		void CreateControls();
-		void continueSearch();
 
 		bool readOnly;
 

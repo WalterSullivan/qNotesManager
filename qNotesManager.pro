@@ -121,7 +121,9 @@ HEADERS += src/tag.h \
     src/serializer.h \
     src/bookmarksmenu.h \
     src/attachedfileswidget.h \
-    src/custommessagebox.h
+    src/custommessagebox.h \
+    src/searchpanelwidget.h
+
 SOURCES += src/tagownerscollection.cpp \
     src/tag.cpp \
     src/notetagscollection.cpp \
@@ -186,5 +188,7 @@ SOURCES += src/tagownerscollection.cpp \
     src/serializer.cpp \
     src/bookmarksmenu.cpp \
     src/attachedfileswidget.cpp \
-    src/custommessagebox.cpp
+    src/custommessagebox.cpp \
+    src/searchpanelwidget.cpp
+
 RESOURCES += icons.qrc

@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "textdocument.h"
 #include "colorpickerbutton.h"
 #include "global.h"
+#include "searchpanelwidget.h"
 
 #include <QVBoxLayout>
 #include <QAction>
@@ -311,32 +312,14 @@ void TextEditWidget::CreateControls() {
 	publicActionsList.append(textField->InsertDateTimeAction);
 
 	// Create search widget
-	searchFrame = new QFrame();
-	searchFrame->setFrameShape(QFrame::Box);
-	searchFrame->setFrameShadow(QFrame::Sunken);
-	searchEdit = new QLineEdit();
-	searchEdit->installEventFilter(this);
-	searchRegex = new QCheckBox("Use regexp");
-	searchMatchCase = new QCheckBox("Match case");
-	searchWholeWord = new QCheckBox("Search whole word");
-	QHBoxLayout* searchl = new QHBoxLayout();
-#if QT_VERSION < 0x040300
-	searchl->setMargin(2);
-#else
-	searchl->setContentsMargins(2, 2, 2, 2);
-#endif
-	searchl->addWidget(searchEdit);
-	searchl->addWidget(searchRegex);
-	searchl->addWidget(searchMatchCase);
-	searchl->addWidget(searchWholeWord);
-	searchFrame->setLayout(searchl);
+	searchPanel = new SearchPanelWidget(textField);
 
 	// Create layout
 	QVBoxLayout *layout = new QVBoxLayout();
 	layout->addWidget(TBRMainBar);
 	layout->addWidget(textField);
-	layout->addWidget(searchFrame);
-	searchFrame->setVisible(false);
+	layout->addWidget(searchPanel);
+	searchPanel->setVisible(false);
 	layout->setSpacing(3);
 	layout->setContentsMargins(1, 1, 1, 1);
 	setLayout(layout);
@@ -640,86 +623,52 @@ void TextEditWidget::sl_TextEdit_SelectionChanged() {
 
 /* virtual */
 bool TextEditWidget::eventFilter (QObject* watched, QEvent* event) {
-	if (watched != textField && watched != searchEdit) {
+	if (watched != textField) {
 		return QObject::eventFilter(watched, event);
 	}
 
-	if (event->type() == QEvent::KeyPress) {
-		QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
-		if (!e) {
-			WARNING("Casting error");
-			return false;
-		}
-		if (watched == textField) { // intercept Ctrl+F event for search
-			if (e->key() == Qt::Key_F && e->modifiers() == Qt::ControlModifier) {
-				// open search widget
-				searchFrame->setVisible(true);
-				searchEdit->setFocus();
-				searchEdit->selectAll();
+	if (event->type() != QEvent::KeyPress) {
+		return QObject::eventFilter(watched, event);
+	}
 
-				return true;
-			} else if (e->key() == Qt::Key_F4) {
-				// continue search
-				continueSearch();
+	QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
+	if (!e) {
+		WARNING("Casting error");
+		return false;
+	}
 
-				return true;
+	QKeySequence keySequence(e->key() + e->modifiers());
+
+	if (watched == textField) {
+		if (keySequence == QKeySequence(QKeySequence::Find) ||
+			keySequence == QKeySequence(QKeySequence::Replace)) {
+			searchPanel->setVisible(true);
+
+			if (searchPanel->SearchText().isEmpty() &&
+				!textField->textCursor().selectedText().isEmpty()) {
+				searchPanel->sl_SetSearchText(textField->textCursor().selectedText());
 			}
-		} else if (watched == searchEdit) {
-			if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
-				// start search
-				if (!searchEdit->text().isEmpty()) {
-					searchFrame->setVisible(false);
-					textField->setFocus();
-					continueSearch();
-				}
+			searchPanel->sl_SelectAllAndFocusSearchBox();
 
-				return true;
-			} else if ((e->key() == Qt::Key_Escape) ||
-					   (e->key() == Qt::Key_F && e->modifiers() == Qt::ControlModifier)) {
-				searchFrame->setVisible(false);
-				textField->setFocus();
-
-				return true;
+			if (keySequence == QKeySequence(QKeySequence::Replace) &&
+				!searchPanel->SearchText().isEmpty()) {
+				searchPanel->sl_SelectAllAndFocusReplaceBox();
 			}
+
+			return true;
 		}
+	}
+
+	if (keySequence == QKeySequence(QKeySequence::FindNext)) {
+		searchPanel->sl_FindNext();
+		return true;
+
+	} else if (keySequence == QKeySequence(QKeySequence::FindPrevious)) {
+		searchPanel->sl_FindPrevious();
+		return true;
 	}
 
 	return QObject::eventFilter(watched, event);
-}
-
-void TextEditWidget::continueSearch() {
-	QString searchText = searchEdit->text();
-	if (searchText.isEmpty()) {return;}
-	if (!searchRegex->isChecked()) {
-		searchText = QRegExp::escape(searchText);
-	}
-	if (searchWholeWord->isChecked()) {
-		searchText.prepend("\\b");
-		searchText.append("\\b");
-	}
-
-	int searchPos = textField->textCursor().selectionEnd();
-
-	Qt::CaseSensitivity cs = searchMatchCase->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive;
-	QRegExp regexp (searchText, cs);
-	if (!regexp.isValid()) {
-		searchFrame->setVisible(true);
-		QToolTip::showText(searchEdit->mapToGlobal(QPoint(0, 0)), "Regexp is invalid", searchEdit);
-		searchEdit->setFocus();
-		searchEdit->selectAll();
-		return;
-	}
-
-
-	int newPos = regexp.indexIn(textField->toPlainText(), searchPos);
-	int newLength = regexp.matchedLength();
-
-	if (newPos == -1 || newLength == -1) {return;}
-
-	QTextCursor cursor(textField->document());
-	cursor.setPosition(newPos);
-	cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, newLength);
-	textField->setTextCursor(cursor);
 }
 
 void TextEditWidget::ScrollTo(int position) {
