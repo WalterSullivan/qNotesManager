@@ -56,7 +56,7 @@ namespace qNotesManager {
 		void sl_TabWidget_CurrentChanged(int);
 
 	public slots:
-		void sl_NoteActivated(Note*);
+		void sl_SelectNoteInTree(Note*, bool activateNavigationTab = false);
 
 	};
 }

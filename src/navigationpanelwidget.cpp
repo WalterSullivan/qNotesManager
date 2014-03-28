@@ -83,10 +83,11 @@ void NavigationPanelWidget::SetCurrentTab(int index) {
 	tabWidget->setCurrentIndex(index);
 }
 
-void NavigationPanelWidget::sl_NoteActivated(Note* note) {
-	if (tabWidget->currentWidget() == hierarchyWidget) {
-		hierarchyWidget->SetCurrentItem(note);
+void NavigationPanelWidget::sl_SelectNoteInTree(Note* note, bool activateNavigationTab) {
+	if (activateNavigationTab) {
+		tabWidget->setCurrentWidget(hierarchyWidget);
 	}
+	hierarchyWidget->SetCurrentItem(note);
 }
 
 void NavigationPanelWidget::sl_TabWidget_CurrentChanged(int) {
