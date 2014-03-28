@@ -56,6 +56,13 @@ NotesTabWidget::NotesTabWidget(QWidget *parent) : QWidget(parent) {
 	layout->addWidget(tabWidget);
 
 	setLayout(layout);
+
+	closeTabAction = new QAction("Close tab", this);
+	this->addAction(closeTabAction);
+	closeTabAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_W));
+	closeTabAction->setShortcutContext(Qt::WindowShortcut);
+	QObject::connect(closeTabAction, SIGNAL(triggered()),
+					 this, SLOT(sl_CloseCurrentTab()));
 }
 
 void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
@@ -238,6 +245,13 @@ void NotesTabWidget::closeTab(int index) {
 	const Note* note = noteWidget->CurrentNote();
 
 	CloseNote(note);
+}
+
+void NotesTabWidget::sl_CloseCurrentTab() {
+	int currentTabIndex = tabWidget->currentIndex();
+	if (currentTabIndex != -1) {
+		closeTab(currentTabIndex);
+	}
 }
 
 QList<QAction*> NotesTabWidget::GetCurrentEditActionsList() const {

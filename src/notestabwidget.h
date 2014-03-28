@@ -50,6 +50,8 @@ namespace qNotesManager {
 		void closeTab(int);
 		QString cropStringForTabCaption(QString) const;
 
+		QAction* closeTabAction;
+
 	public:
 		explicit NotesTabWidget(QWidget *parent = 0);
 
@@ -67,7 +69,6 @@ namespace qNotesManager {
 	signals:
 		void sg_CurrentNoteChanged(Note*);
 
-	public slots:
 	private slots:
 		void sl_Note_PropertiesChanged();
 		void sl_TabWidget_CurrentChanged(int);
@@ -76,6 +77,7 @@ namespace qNotesManager {
 	#else
 		void sl_TabWidget_TabCloseRequested(int);
 	#endif
+		void sl_CloseCurrentTab();
 
 	};
 }
