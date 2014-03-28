@@ -197,7 +197,9 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 }
 
 void FolderNavigationWidget::SetCurrentItem(Note* note) {
+	if (!note) {return;}
 
+	model->sl_RequestEmitApplySelection(note);
 }
 
 void FolderNavigationWidget::sl_TreeView_ContextMenuRequested(const QPoint& p) {

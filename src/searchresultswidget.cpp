@@ -23,6 +23,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "documentsearchengine.h"
 #include "searchmodelitem.h"
 #include "global.h"
+#include "notemodelitem.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -38,8 +39,11 @@ SearchResultsWidget::SearchResultsWidget(DocumentSearchEngine* eng, QWidget *par
 	treeView->setModel(searchResultsModel);
 	treeView->setItemDelegate(new SearchResultItemDelegate());
 	treeView->setHeaderHidden(true);
+	treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 	QObject::connect(treeView, SIGNAL(doubleClicked(const QModelIndex&)),
 					 this, SLOT(sl_ListView_DoubleClicked(const QModelIndex&)));
+	QObject::connect(treeView, SIGNAL(customContextMenuRequested(QPoint)),
+					 this, SLOT(sl_TreeView_ContextMenuRequested(QPoint)));
 
 	clearButton = new QPushButton("Clear results");
 	clearButton->setToolTip("Clear search results");
@@ -108,6 +112,12 @@ SearchResultsWidget::SearchResultsWidget(DocumentSearchEngine* eng, QWidget *par
 	expandAllButton->setEnabled(false);
 
 	setLayout(vl);
+
+	contextMenu = new QMenu(this);
+	showInTreeAction = new QAction("Show in tree", this);
+	QObject::connect(showInTreeAction, SIGNAL(triggered()),
+					 this, SLOT(sl_ShowInTreeAction_Triggered()));
+
 }
 
 void SearchResultsWidget::sl_SearchResult(const NoteFragment& fragment) {
@@ -145,6 +155,46 @@ void SearchResultsWidget::sl_ListView_DoubleClicked(const QModelIndex& index) {
 			return;
 		}
 		emit sg_ShowSearchResults(si->Fragment());
+	}
+}
+
+void SearchResultsWidget::sl_TreeView_ContextMenuRequested(const QPoint& point) {
+	contextMenu->clear();
+
+	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
+	if (indexesList.size() == 1) {
+		BaseModelItem* modelItem =
+				static_cast<BaseModelItem*>(indexesList.at(0).internalPointer());
+		if (modelItem->DataType() == BaseModelItem::note) {
+			contextMenu->addAction(showInTreeAction);
+		}
+
+		contextMenu->exec(treeView->viewport()->mapToGlobal(point));
+	}
+}
+
+void SearchResultsWidget::sl_ShowInTreeAction_Triggered() {
+	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
+
+	if (indexesList.size() != 1) {
+		return;
+	}
+
+	QModelIndex itemIndex = indexesList.at(0);
+	if (!itemIndex.isValid()) {
+		return;
+	}
+
+	BaseModelItem* modelItem =
+			static_cast<BaseModelItem*>(itemIndex.internalPointer());
+
+	if (modelItem->DataType() == BaseModelItem::note) {
+		Note* n = (dynamic_cast<NoteModelItem*>(modelItem))->GetStoredData();
+		if (!n) {
+			return;
+		}
+
+		emit sg_NoteHighlightRequest(n);
 	}
 }
 

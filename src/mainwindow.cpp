@@ -524,6 +524,8 @@ void MainWindow::sl_GlobalSearchAction_Triggered() {
 						 this, SLOT(sl_SearchResults_CloseRequest()));
 		QObject::connect(searchResultsWidget, SIGNAL(sg_ShowRequest()),
 						 this, SLOT(sl_SearchResults_ShowRequest()));
+		QObject::connect(searchResultsWidget, SIGNAL(sg_NoteHighlightRequest(Note*)),
+						 navigationPanel, SLOT(sl_SelectNoteInTree(Note*)));
 		searchResultsWidget->hide();
 		rightPanelSplitter->addWidget(searchResultsWidget);
 		rightPanelSplitter->setStretchFactor(0, 3);

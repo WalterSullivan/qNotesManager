@@ -572,3 +572,17 @@ QStringList HierarchyModel::mimeTypes () const {
 	types << "application/ami.pointer";
 	return types;
 }
+
+void HierarchyModel::sl_RequestEmitApplySelection(AbstractFolderItem* item) {
+	if (!item) {return;}
+
+	BaseModelItem* modelItem = _bridge.value(item);
+	BaseModelItem* parentItem = modelItem->parent();
+
+	if (!parentItem) {return;}
+
+	QModelIndexList list;
+	QModelIndex newItemIndex = createIndex(parentItem->IndexOfChild(modelItem), 0, modelItem);
+	list << newItemIndex;
+	emit sg_ApplySelection(list);
+}

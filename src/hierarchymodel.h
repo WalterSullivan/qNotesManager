@@ -62,6 +62,9 @@ namespace qNotesManager {
 
 		void sl_Item_DataChanged(BaseModelItem*);
 
+	public slots:
+		void sl_RequestEmitApplySelection(AbstractFolderItem*);
+
 	};
 }
 

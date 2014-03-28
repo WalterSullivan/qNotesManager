@@ -24,6 +24,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTreeView>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QAction>
+#include <QMenu>
 
 namespace qNotesManager {
 	class DocumentSearchEngine;
@@ -39,6 +41,9 @@ namespace qNotesManager {
 		QProgressBar* progressBar;
 		SearchResultsModel* searchResultsModel;
 
+		QMenu* contextMenu;
+		QAction* showInTreeAction;
+
 	public:
 		explicit SearchResultsWidget(DocumentSearchEngine* eng, QWidget *parent = 0);
 
@@ -50,6 +55,7 @@ namespace qNotesManager {
 		void sg_ShowSearchResults(NoteFragment);
 		void sg_CloseRequest();
 		void sg_ShowRequest();
+		void sg_NoteHighlightRequest(Note*);
 
 	private slots:
 		void sl_ClearButton_Clicked();
@@ -63,6 +69,9 @@ namespace qNotesManager {
 
 		void sl_Document_NoteDeleted(Note*);
 		void sl_ListView_DoubleClicked(const QModelIndex&);
+		void sl_TreeView_ContextMenuRequested(const QPoint&);
+
+		void sl_ShowInTreeAction_Triggered();
 
 	};
 }
