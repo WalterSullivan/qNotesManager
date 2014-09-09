@@ -461,7 +461,7 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 
 	// Modify row variable to ensure 3 system items are always at the botton of the list
 	// Not a final version, just dirty hack
-	if (GetDisplayRootItem() == GetRootItem() && row >= 0 && row > GetRootItem()->ChildrenCount() - 3) {
+	if (newParentModelItem == GetRootItem() && row >= 0 && row > GetRootItem()->ChildrenCount() - 3) {
 		row = GetRootItem()->ChildrenCount() - 3;
 	}
 
