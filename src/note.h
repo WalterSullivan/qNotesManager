@@ -69,6 +69,7 @@ namespace qNotesManager {
 
 		QString GetName() const;
 		void SetName (QString s);
+		void TryToExtractCaption();
 
 		QDateTime GetCreationDate() const;
 		QDateTime GetModificationDate() const;

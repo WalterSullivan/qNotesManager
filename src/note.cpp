@@ -107,6 +107,23 @@ void Note::SetName (QString s) {
 	onChange();
 }
 
+void Note::TryToExtractCaption() {
+	const int maxCaptionSize = 20;
+
+	QString caption = GetTextDocument()->toPlainText().mid(0, maxCaptionSize);
+	caption = caption.trimmed();
+
+	if (caption.indexOf('\n') > 0) {
+		caption = caption.mid(0, caption.indexOf('\n'));
+	} else {
+		caption.append("...");
+	}
+
+	caption = caption.simplified();
+
+	SetName(caption);
+}
+
 QDateTime Note::GetCreationDate() const {
 	return creationDate;
 }

@@ -782,8 +782,6 @@ void MainWindow::sl_Clipboard_DataChanged() {
 }
 
 void MainWindow::sl_QuickNoteAction_Triggered() {
-	const int maxCaptionSize = 16;
-
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc == 0) {
 		WARNING("Current document not set");
@@ -794,15 +792,14 @@ void MainWindow::sl_QuickNoteAction_Triggered() {
 	if (!(data->hasText() || data->hasHtml())) {return;}
 
 	Note* n = new Note("");
-	QString caption = data->text().mid(0, maxCaptionSize) + "...";
-	caption.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-	n->SetName(caption);
 
 	if (data->hasHtml()) {
 		n->SetHtml(data->html());
 	} else if (data->hasText()) {
 		n->SetText(data->text());
 	}
+
+	n->TryToExtractCaption();
 
 	doc->GetTempFolder()->Items.Add(n);
 }
