@@ -1,5 +1,6 @@
 TARGET = qnotesmanager
 TEMPLATE = app
+CONFIG += debug
 RC_FILE = qnm.rc
 QT += network
 CONFIG += crypto
