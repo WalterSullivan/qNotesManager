@@ -310,6 +310,7 @@ bool TextEdit::canInsertFromMimeData(const QMimeData* source) const {
 	}
 }
 
+#if 0
 QMimeData* TextEdit::createMimeDataFromSelection() const {
 	const TextDocument* d = qobject_cast<TextDocument*>(document());
 	if (d == 0) {
@@ -348,6 +349,7 @@ QMimeData* TextEdit::createMimeDataFromSelection() const {
 
 	return data;
 }
+#endif
 
 void TextEdit::insertImageFromFile(QString fileName) {
 	textCursor().insertImage(QUrl::fromLocalFile(fileName).toString());
