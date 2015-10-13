@@ -45,6 +45,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QClipboard>
 #include <QTimer>
 #include <QInputDialog>
+#include <QMimeData>
 
 using namespace qNotesManager;
 
