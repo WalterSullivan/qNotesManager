@@ -154,7 +154,11 @@ void DocumentPropertiesWidget::sl_OKButton_Clicked() {
 	quint8 cipherID = 0;
 	if (useEncryptionCheckbox->isChecked()) {
 		QVariant data = encryptionAlg->itemData(encryptionAlg->currentIndex(), Qt::UserRole);
+#if QT_VERSION >= 0x050000
+		cipherID = data.value<quint8>();
+#else
 		cipherID = qVariantValue<quint8>(data);
+#endif
 	}
 	if (currentDocument->GetCipherID() != cipherID ||
 		currentDocument->GetPassword() != passwordLineEdit->text()) {
