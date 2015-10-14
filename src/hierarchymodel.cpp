@@ -421,7 +421,7 @@ Qt::ItemFlags HierarchyModel::flags (const QModelIndex& index ) const {
 
 	if (index.isValid()) {
 		BaseModelItem* modelItem = static_cast<BaseModelItem*>(index.internalPointer());
-		if (modelItem->DataType() == BaseModelItem::folder) {
+		if (modelItem->DataType() == BaseModelItem::folder && Application::I()->CurrentDocument() != nullptr) {
 			FolderModelItem* folderItem = dynamic_cast<FolderModelItem*>(modelItem);
 			if (folderItem->GetStoredData() == Application::I()->CurrentDocument()->GetTempFolder() ||
 				folderItem->GetStoredData() == Application::I()->CurrentDocument()->GetTrashFolder()) {
