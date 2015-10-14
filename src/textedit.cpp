@@ -324,6 +324,7 @@ QMimeData* TextEdit::createMimeDataFromSelection() const {
 	}
 
 	QString html = selection.toHtml();
+	QString text = selection.toPlainText();
 
 	QRegExp regexp("(<img src=\")([^\"]*)(\")");
 	int index = 0;
@@ -344,7 +345,9 @@ QMimeData* TextEdit::createMimeDataFromSelection() const {
 
 		index += regexp.matchedLength();
 	}
+
 	data->setHtml(html);
+	data->setText(text);
 
 	return data;
 }
