@@ -51,7 +51,7 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 		return QByteArray();
 	}
 
-	QCA::Initializer init;
+
 	QCA::SecureArray arg = data;
 
 	QString cipherType = avaliableCipherTypes.value(cipherID);
@@ -102,13 +102,11 @@ QList<int> Cipherer::GetAvaliableCipherIDs() {
 }
 
 bool Cipherer::IsCipherTypeSupported(QString type) {
-	QCA::Initializer init;
 	QString str(type + "-cbc-pkcs7");
 	return QCA::isSupported(str.toStdString().c_str());
 }
 
 bool Cipherer::IsFeatureSupported(const char* feature) {
-	QCA::Initializer init;
 	return QCA::isSupported(feature);
 }
 
@@ -127,7 +125,6 @@ QByteArray Cipherer::GetHash(const QByteArray& str, quint8 hashID) {
 	const int iterations = 1000;
 	const QString hashType = "sha256";
 
-	QCA::Initializer init;
 	if (!QCA::isSupported(hashType.toStdString().c_str())) {
 		return QByteArray();
 	}
@@ -154,7 +151,6 @@ QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
 	const int iterations = 1000;
 	const QString hashType = "hmac(sha256)";
 
-	QCA::Initializer init;
 	if (!QCA::isSupported(hashType.toStdString().c_str())) {
 		return QByteArray();
 	}
@@ -176,7 +172,6 @@ bool Cipherer::IsSecureHashSupported(quint8 i) {
 }
 
 QString Cipherer::GetMD5Hash(const QByteArray& data) {
-	QCA::Initializer init;
 	if (!QCA::isSupported("md5")) {
 		return QString();
 	}

@@ -19,6 +19,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTextCodec>
 #include <QFileInfo>
 #include <QtGlobal>
+#include <QtCrypto>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,6 +40,11 @@ void myMessageOutput(QtMsgType type, const char *msg);
 bool errorOutput;
 
 int main(int argc, char** argv) {
+	QCA::Initializer init;
+
+	QApplication app(argc, argv);
+	app.setQuitOnLastWindowClosed(false);
+
 	QString helpScreenText = QString().append("Usage: \n").append(VER_PRODUCTNAME_STR).append(
 			" [-v] [-h] [options] [file]\n"
 			"-v, --version				Print version and exit.\n"
@@ -49,8 +55,6 @@ int main(int argc, char** argv) {
 			"file					File to open\n");
 	errorOutput = true;
 
-	QApplication app(argc, argv);
-	app.setQuitOnLastWindowClosed(false);
 	QStringList arguments = QCoreApplication::arguments();
 
 	if (arguments.count() > 1) {
