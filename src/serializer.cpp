@@ -269,9 +269,9 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 				emit sg_LoadingAborted();
 				return;
 			} else {
-				QByteArray testPasswordHash = c.GetSecureHash(password.toAscii(), r_secureHashID);
+				QByteArray testPasswordHash = c.GetSecureHash(password.toLatin1(), r_secureHashID);
 				if (passwordHash == testPasswordHash) {
-					r_cipherKey = password.toAscii();
+					r_cipherKey = password.toLatin1();
 					break;
 				} else {
 					wrongPassword = true;
@@ -578,12 +578,12 @@ void Serializer::saveDocument_v1() {
 		dataBuffer.write(docCreationDate);
 		dataBuffer.write(docModificationDate);
 
-		const QByteArray defFolderIcon = doc->DefaultFolderIcon.toAscii();
+		const QByteArray defFolderIcon = doc->DefaultFolderIcon.toLatin1();
 		const quint32 defFolderIconLength = defFolderIcon.length();
 		dataBuffer.write(defFolderIconLength);
 		dataBuffer.write(defFolderIcon.constData(), defFolderIconLength);
 
-		const QByteArray defNoteIcon = doc->DefaultNoteIcon.toAscii();
+		const QByteArray defNoteIcon = doc->DefaultNoteIcon.toLatin1();
 		const quint32 defNoteIconLength = defNoteIcon.length();
 		dataBuffer.write(defNoteIconLength);
 		dataBuffer.write(defNoteIcon.constData(), defNoteIconLength);
@@ -964,7 +964,7 @@ void Serializer::saveNote_v1(const Note* note, BOIBuffer& buffer) {
 	const quint32 w_creationDate = note->creationDate.toTime_t();
 	const quint32 w_modificationDate = note->modificationDate.toTime_t();
 	const quint32 w_textDate = note->textDate.isValid() ? note->textDate.toTime_t() : 0;
-	const QByteArray w_iconID = note->iconID.toAscii();
+	const QByteArray w_iconID = note->iconID.toLatin1();
 	const quint32 w_iconIDSize = w_iconID.size();
 	const QByteArray w_authorArray = note->author.toUtf8();
 	const quint32 w_authorSize = w_authorArray.size();
@@ -998,7 +998,7 @@ void Serializer::saveNote_v1(const Note* note, BOIBuffer& buffer) {
 		QByteArray imageNameArray = image->GetFileName().toUtf8();
 		const quint32 imageNameSize = imageNameArray.size();
 
-		const QByteArray formatArray = image->GetFormat().toAscii();
+		const QByteArray formatArray = image->GetFormat().toLatin1();
 		const quint32 formatArraySize = formatArray.size();
 
 		// writing data
@@ -1111,7 +1111,7 @@ void Serializer::saveFolder_v1(const Folder* folder, BOIBuffer& buffer) {
 	const quint32 s_captionSize = s_caption.size();
 	const quint32 s_creationDate = folder->creationDate.toTime_t();
 	const quint32 s_modificationDate = folder->modificationDate.toTime_t();
-	const QByteArray s_iconID = folder->iconID.toAscii();
+	const QByteArray s_iconID = folder->iconID.toLatin1();
 	const quint32 s_iconIDSize = s_iconID.size();
 	const quint32 s_backColor = folder->nameBackColor.rgba();
 	const quint32 s_foreColor = folder->nameForeColor.rgba();
@@ -1225,9 +1225,9 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 				emit sg_LoadingAborted();
 				return;
 			} else {
-				QByteArray testPasswordHash = c.GetSecureHash(password.toAscii(), r_secureHashID);
+				QByteArray testPasswordHash = c.GetSecureHash(password.toLatin1(), r_secureHashID);
 				if (passwordHash == testPasswordHash) {
-					r_cipherKey = password.toAscii();
+					r_cipherKey = password.toLatin1();
 					break;
 				} else {
 					wrongPassword = true;
@@ -1546,12 +1546,12 @@ void Serializer::saveDocument_v2() {
 		dataBuffer.write(docCreationDate);
 		dataBuffer.write(docModificationDate);
 
-		const QByteArray defFolderIcon = doc->DefaultFolderIcon.toAscii();
+		const QByteArray defFolderIcon = doc->DefaultFolderIcon.toLatin1();
 		const quint32 defFolderIconLength = defFolderIcon.length();
 		dataBuffer.write(defFolderIconLength);
 		dataBuffer.write(defFolderIcon.constData(), defFolderIconLength);
 
-		const QByteArray defNoteIcon = doc->DefaultNoteIcon.toAscii();
+		const QByteArray defNoteIcon = doc->DefaultNoteIcon.toLatin1();
 		const quint32 defNoteIconLength = defNoteIcon.length();
 		dataBuffer.write(defNoteIconLength);
 		dataBuffer.write(defNoteIcon.constData(), defNoteIconLength);
@@ -1948,7 +1948,7 @@ void Serializer::saveNote_v2(const Note* note, BOIBuffer& buffer) {
 	const quint32 w_creationDate = note->creationDate.toTime_t();
 	const quint32 w_modificationDate = note->modificationDate.toTime_t();
 	const quint32 w_textDate = note->textDate.isValid() ? note->textDate.toTime_t() : 0;
-	const QByteArray w_iconID = note->iconID.toAscii();
+	const QByteArray w_iconID = note->iconID.toLatin1();
 	const quint32 w_iconIDSize = w_iconID.size();
 	const QByteArray w_authorArray = note->author.toUtf8();
 	const quint32 w_authorSize = w_authorArray.size();
@@ -1982,7 +1982,7 @@ void Serializer::saveNote_v2(const Note* note, BOIBuffer& buffer) {
 		QByteArray imageNameArray = image->GetFileName().toUtf8();
 		const quint32 imageNameSize = imageNameArray.size();
 
-		const QByteArray formatArray = image->GetFormat().toAscii();
+		const QByteArray formatArray = image->GetFormat().toLatin1();
 		const quint32 formatArraySize = formatArray.size();
 
 		// writing data

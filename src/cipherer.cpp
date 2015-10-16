@@ -65,7 +65,7 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 
 	QString initVectorData = "aes128-cbc-pkcs7-sn93-sh21-jks-12";
 
-	QCA::InitializationVector initVector(initVectorData.toAscii());
+	QCA::InitializationVector initVector(initVectorData.toLatin1());
 
 	QCA::Cipher cipher(cipherType, defaultCipherMode,
 					   defaultCipherPadding,
