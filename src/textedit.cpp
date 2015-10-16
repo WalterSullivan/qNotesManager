@@ -708,7 +708,20 @@ void TextEdit::sl_EditLinkActionTriggered() {
 }
 
 void TextEdit::sl_InsertHyperlinkAction_Triggered() {
-	linkEditDialog->Set("", "");
+	QString selectedText = textCursor().selection().toPlainText();
+
+	QString urlText = "";
+	const QMimeData* data = QApplication::clipboard()->mimeData();
+	if (data->hasText()) {
+		urlText = data->text();
+	} else if (data->hasUrls()) {
+		QUrl url = data->urls().at(0);
+		urlText = url.toString();
+	}
+
+	if (selectedText.isEmpty()) {selectedText = urlText;}
+
+	linkEditDialog->Set(selectedText, urlText);
 	if (linkEditDialog->exec() == QDialog::Rejected) {return;}
 
 	QTextCursor cursor = textCursor();
