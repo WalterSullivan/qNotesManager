@@ -41,6 +41,9 @@ namespace qNotesManager {
 		QString GetName() const;
 		QString GetUrl() const;
 
+	protected:
+		virtual void showEvent(QShowEvent* event);
+
 	signals:
 
 	public slots:

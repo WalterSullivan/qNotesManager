@@ -81,3 +81,13 @@ void HyperlinkEditWidget::sl_OKButton_Clicked() {
 void HyperlinkEditWidget::sl_CancelButton_Clicked() {
 	reject();
 }
+
+void HyperlinkEditWidget::showEvent(QShowEvent* event) {
+	if (linkNameEdit->text().isEmpty()) {
+		linkNameEdit->setFocus(Qt::OtherFocusReason);
+	} else if (linkUrlEdit->text().isEmpty()) {
+		linkUrlEdit->setFocus(Qt::OtherFocusReason);
+	}
+
+	QWidget::showEvent(event);
+}
