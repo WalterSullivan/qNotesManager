@@ -51,8 +51,6 @@ int main(int argc, char** argv) {
 
 	QApplication app(argc, argv);
 	app.setQuitOnLastWindowClosed(false);
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-
 	QStringList arguments = QCoreApplication::arguments();
 
 	if (arguments.count() > 1) {
