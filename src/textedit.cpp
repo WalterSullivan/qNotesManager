@@ -116,6 +116,7 @@ TextEdit::TextEdit(QWidget *parent) :
 					 this, SLOT(sl_currentCharFormatChanged(QTextCharFormat)));
 
 	linkEditDialog = new HyperlinkEditWidget(this);
+	linkEditDialog->resize(400, 50);
 	QObject::connect(&anchorTooltipTimer, SIGNAL(timeout()),
 					 this, SLOT(sl_AnchorTooltipTimer_Timeout()));
 
