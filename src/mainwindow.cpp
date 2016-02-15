@@ -656,16 +656,14 @@ void MainWindow::sl_OpenRecentFileAction_Triggered() {
 		CustomMessageBox msg("Selected file not found. Delete it from history?", "File not found",
 							 QMessageBox::Question, QMessageBox::Yes | QMessageBox::No);
 		QMessageBox::StandardButton result = msg.show();
-		if (result == QMessageBox::No) {
+		if (result != QMessageBox::Yes) {
 			return;
 		}
-		if (result == QMessageBox::Yes) {
-			QStringList recentFilesList = Application::I()->Settings.GetRecentFiles();
-			recentFilesList.removeAll(fileName);
-			Application::I()->Settings.SetRecentFiles(recentFilesList);
-			updateRecentFilesMenu();
-			return;
-		}
+		QStringList recentFilesList = Application::I()->Settings.GetRecentFiles();
+		recentFilesList.removeAll(fileName);
+		Application::I()->Settings.SetRecentFiles(recentFilesList);
+		updateRecentFilesMenu();
+		return;
 	}
 
 	Document* doc = Application::I()->CurrentDocument();
