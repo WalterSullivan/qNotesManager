@@ -301,11 +301,6 @@ void MainWindow::createControls() {
 
 }
 
-/*virtual*/
-bool MainWindow::eventFilter (QObject* watched, QEvent* event) {
-	return false;
-}
-
 /*virtal*/
 void MainWindow::closeEvent (QCloseEvent* event) {
 	event->ignore();
