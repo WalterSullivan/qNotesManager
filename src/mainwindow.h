@@ -134,8 +134,6 @@ namespace qNotesManager {
 	protected:
 		/*virtual*/ void closeEvent (QCloseEvent* event);
 		/*virtual*/ void changeEvent (QEvent* event);
-		/*virtual*/ void resizeEvent (QResizeEvent* event);
-		/*virtual*/ void moveEvent (QMoveEvent* event);
 
 	signals:
 

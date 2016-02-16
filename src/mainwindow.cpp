@@ -324,18 +324,6 @@ void MainWindow::changeEvent (QEvent* event) {
 	}
 }
 
-void MainWindow::resizeEvent (QResizeEvent* event) {
-	QMainWindow::resizeEvent(event);
-
-	if (!isMaximized()) {Application::I()->Settings.SetWindowSize(size());}
-}
-
-void MainWindow::moveEvent (QMoveEvent* event) {
-	QMainWindow::moveEvent(event);
-
-	if (!isMaximized()) {Application::I()->Settings.SetWindowPos(pos());}
-}
-
 void MainWindow::sl_NoteDoubleClicked(Note* note) {
 	if (!note) {
 		WARNING("Null pointer recieved");
@@ -825,6 +813,8 @@ void MainWindow::sl_EditMenuContentChanged() {
 }
 
 void MainWindow::sl_QApplication_AboutToQuit() {
+	Application::I()->Settings.SetWindowPos(normalGeometry().topLeft());
+	Application::I()->Settings.SetWindowSize(normalGeometry().size());
 	Application::I()->Settings.SetWindowState(windowState());
 }
 
