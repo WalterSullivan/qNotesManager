@@ -25,7 +25,6 @@ namespace qNotesManager {
 	class FolderNavigationWidget;
 	class TagsNavigationWidget;
 	class DateNavigationWidget;
-	class SearchWidget;
 	class Note;
 	class Document;
 
