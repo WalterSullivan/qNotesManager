@@ -498,7 +498,7 @@ void MainWindow::sl_DocumentPropertiesAction_Triggered() {
 
 void MainWindow::sl_GlobalSearchAction_Triggered() {
 	if (!searchWidget) {
-		searchWidget = new SearchWidget(engine);
+		searchWidget = new SearchWidget(engine, this);
 	}
 	if (!searchResultsWidget) {
 		searchResultsWidget = new SearchResultsWidget(engine);
@@ -856,7 +856,7 @@ void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p, bool la
 					  "This document is protected. Enter password";
 
 	while (password.isEmpty()) {
-		password = QInputDialog::getText(0, "Enter password",
+		password = QInputDialog::getText(this, "Enter password",
 										 message,
 										 QLineEdit::Password, "", &ok);
 		if (!ok) {

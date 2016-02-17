@@ -28,10 +28,12 @@ HyperlinkEditWidget::HyperlinkEditWidget(QWidget *parent) : QDialog(parent) {
 	linkNameEdit = new QLineEdit();
 	linkUrlLabel= new QLabel("Url:");
 	linkUrlEdit = new QLineEdit();
+
 	okButton = new QPushButton("OK");
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(sl_OKButton_Clicked()));
+	okButton->setDefault(true);
+	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	cancelButton = new QPushButton("Cancel");
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(sl_CancelButton_Clicked()));
+	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	QGridLayout* gridLayout = new QGridLayout();
 	gridLayout->addWidget(linkNameLabel, 0, 0);
@@ -53,7 +55,7 @@ HyperlinkEditWidget::HyperlinkEditWidget(QWidget *parent) : QDialog(parent) {
 	setWindowIcon(QIcon(":/gui/globe-network"));
 }
 
-void HyperlinkEditWidget::Set(QString name, QString url) {
+void HyperlinkEditWidget::Set(const QString& name, const QString& url) {
 	linkNameEdit->setText(name);
 	linkUrlEdit->setText(url);
 }
@@ -66,7 +68,7 @@ QString HyperlinkEditWidget::GetUrl() const {
 	return linkUrlEdit->text();
 }
 
-void HyperlinkEditWidget::sl_OKButton_Clicked() {
+void HyperlinkEditWidget::accept() {
 	if (linkNameEdit->text().isEmpty()) {
 		linkNameEdit->setFocus(Qt::OtherFocusReason);
 		QToolTip::showText(linkNameEdit->mapToGlobal(linkNameEdit->pos()), "Enter link name", linkNameEdit);
@@ -74,12 +76,8 @@ void HyperlinkEditWidget::sl_OKButton_Clicked() {
 		linkUrlEdit->setFocus(Qt::OtherFocusReason);
 		QToolTip::showText(linkUrlEdit->mapToGlobal(linkUrlEdit->pos()), "Enter link url", linkUrlEdit);
 	} else {
-		accept();
+		QDialog::accept();
 	}
-}
-
-void HyperlinkEditWidget::sl_CancelButton_Clicked() {
-	reject();
 }
 
 void HyperlinkEditWidget::showEvent(QShowEvent* event) {

@@ -1034,7 +1034,7 @@ void TextEdit::sl_EditTableWidthConstraintsAction_Triggered() {
 
 	QTextTableFormat format = table->format();
 
-	EditTableWidthConstraintsWidget* widget = new EditTableWidthConstraintsWidget(format, table->columns(), 0);
+	EditTableWidthConstraintsWidget* widget = new EditTableWidthConstraintsWidget(format, table->columns(), this);
 	widget->exec();
 	if (widget->result() == QDialog::Accepted) {
 		format.setWidth(widget->TableWidthConstraint);

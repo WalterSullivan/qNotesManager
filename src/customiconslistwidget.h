@@ -39,6 +39,9 @@ namespace qNotesManager {
 		QAbstractItemModel* iconsModel;
 		QSortFilterProxyModel* filterModel;
 
+		const int IconIDRole = Qt::UserRole + 1;
+		const int IconGroupRole = Qt::UserRole + 2;
+
 		int FindButtonIndexByName(const QString& name) const;
 
 	public:
@@ -50,9 +53,10 @@ namespace qNotesManager {
 	signals:
 
 	public slots:
+		virtual void accept();
+
 	private slots:
-		void sl_OKButton_Clicked();
-		void sl_CancelButton_Clicked();
+		void sl_Rejected();
 		void sl_AddIconButton_Clicked();
 		void sl_ListView_DoubleClicked (const QModelIndex& index);
 		void sl_ButtonGroup_ButtonClicked(QAbstractButton* button);

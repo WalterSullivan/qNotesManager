@@ -58,9 +58,6 @@ namespace qNotesManager {
 		QVector<QTextLength> ColumnWidthConstraints;
 
 	private slots:
-		void sl_OKButton_Clicked();
-		void sl_CancelButton_Clicked();
-
 		void sl_MinimalSizeRadioButton_Toggled();
 		void sl_FixedSizeRadioButton_Toggled();
 		void sl_PercentageSizeRadioButton_Toggled();

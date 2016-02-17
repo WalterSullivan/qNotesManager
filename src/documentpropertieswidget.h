@@ -54,11 +54,13 @@ namespace qNotesManager {
 		explicit DocumentPropertiesWidget(QWidget *parent = 0);
 		void SetDocument(Document* d);
 
+	public slots:
+		virtual void accept();
+
 	private slots:
 		void sl_UseEncryptionCB_StateChanged(int = 0);
-		void sl_OKButton_Clicked();
-		void sl_CancelButton_Clicked();
-
+		void sl_Accepted();
+		void sl_Rejected();
 	};
 }
 

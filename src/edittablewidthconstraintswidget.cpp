@@ -90,10 +90,10 @@ EditTableWidthConstraintsWidget::EditTableWidthConstraintsWidget(const QTextTabl
 
 	okButton = new QPushButton("OK");
 	QObject::connect(okButton, SIGNAL(clicked()),
-					 this, SLOT(sl_OKButton_Clicked()));
+					 this, SLOT(accept()));
 	cancelButton = new QPushButton("Cancel");
 	QObject::connect(cancelButton, SIGNAL(clicked()),
-					 this, SLOT(sl_CancelButton_Clicked()));
+					 this, SLOT(reject()));
 	QHBoxLayout* buttonsLayout = new QHBoxLayout();
 	buttonsLayout->addStretch();
 	buttonsLayout->addWidget(okButton);
@@ -166,14 +166,6 @@ void EditTableWidthConstraintsWidget::addMissingColumnWidthConstraints() {
 			ColumnWidthConstraints.push_back(QTextLength());
 		}
 	}
-}
-
-void EditTableWidthConstraintsWidget::sl_OKButton_Clicked() {
-	accept();
-}
-
-void EditTableWidthConstraintsWidget::sl_CancelButton_Clicked() {
-	reject();
 }
 
 void EditTableWidthConstraintsWidget::sl_MinimalSizeRadioButton_Toggled() {

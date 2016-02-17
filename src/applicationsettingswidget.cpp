@@ -43,9 +43,10 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	openLastDocumentOnStartCheckbox = new QCheckBox("Open last document on start", this);
 
 	okButton = new QPushButton("OK", this);
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(sl_OKButton_Clicked()));
+	okButton->setDefault(true);
+	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	cancelButton = new QPushButton("Cancel", this);
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(sl_CancelButton_Clicked()));
+	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout();
 	buttonsLayout->addWidget(okButton);
@@ -86,7 +87,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	openLastDocumentOnStartCheckbox->setChecked(Application::I()->Settings.GetOpenLastDocumentOnStart());
 }
 
-void ApplicationSettingsWidget::sl_OKButton_Clicked() {
+void ApplicationSettingsWidget::accept() {
 	Application::I()->Settings.SetShowNumberOfItems(showNumberOfItemsCheckbox->isChecked());
 	Application::I()->Settings.SetShowTagsTreeView(showTagsTreeViewCheckbox->isChecked());
 	Application::I()->Settings.SetShowDatesTreeView(showDatesTreeViewCheckbox->isChecked());
@@ -99,11 +100,7 @@ void ApplicationSettingsWidget::sl_OKButton_Clicked() {
 	Application::I()->Settings.SetShowWindowOnStart(showWindowOnStartCheckbox->isChecked());
 	Application::I()->Settings.SetOpenLastDocumentOnStart(openLastDocumentOnStartCheckbox->isChecked());
 
-	accept();
-}
-
-void ApplicationSettingsWidget::sl_CancelButton_Clicked() {
-	reject();
+	QDialog::accept();
 }
 
 void ApplicationSettingsWidget::sl_ShowSystemTrayCheckbox_StateChanged(int) {

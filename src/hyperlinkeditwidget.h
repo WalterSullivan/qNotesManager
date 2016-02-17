@@ -37,7 +37,7 @@ namespace qNotesManager {
 	public:
 		explicit HyperlinkEditWidget(QWidget *parent = 0);
 
-		void Set(QString name, QString url);
+		void Set(const QString& name, const QString& url);
 		QString GetName() const;
 		QString GetUrl() const;
 
@@ -47,10 +47,7 @@ namespace qNotesManager {
 	signals:
 
 	public slots:
-	private slots:
-		void sl_OKButton_Clicked();
-		void sl_CancelButton_Clicked();
-
+		virtual void accept();
 	};
 }
 
