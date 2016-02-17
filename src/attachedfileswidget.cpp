@@ -82,7 +82,7 @@ void AttachedFilesWidget::sl_AddButton_Clicked() {
 
 		QFile file(fileName);
 		if (fileName.isEmpty() || !file.exists()) {
-			CustomMessageBox msg("Select file to open", "Warning", QMessageBox::Warning);
+			CustomMessageBox msg(this, "Select file to open", "Warning", QMessageBox::Warning);
 			msg.show();
 		} else {
 			break;
@@ -91,7 +91,7 @@ void AttachedFilesWidget::sl_AddButton_Clicked() {
 
 	CachedFile* newFile = CachedFile::FromFile(fileName);
 	if (newFile == 0 || newFile->Size() == 0) {
-		CustomMessageBox msg("Failed to open file", "Warning", QMessageBox::Warning);
+		CustomMessageBox msg(this, "Failed to open file", "Warning", QMessageBox::Warning);
 		msg.show();
 		delete newFile;
 		return;
@@ -103,7 +103,7 @@ void AttachedFilesWidget::sl_AddButton_Clicked() {
 		const CachedFile* file = currentNote->GetAttachedFile(i);
 		quint32 fileCRC = file->GetCRC32();
 		if (newFileCRC == fileCRC && newFile->HasSameDataAs(file)) {
-			CustomMessageBox msg("Selected file is already attached. Proceed anyway?", "Warning",
+			CustomMessageBox msg(this, "Selected file is already attached. Proceed anyway?", "Warning",
 						   QMessageBox::Question, QMessageBox::Yes | QMessageBox::No);
 			QMessageBox::StandardButton answer = msg.show();
 			if (answer != QMessageBox::Yes) {
@@ -141,7 +141,7 @@ void AttachedFilesWidget::sl_SaveButton_Clicked() {
 
 	bool result = attachedFile->Save(fileName);
 	if (!result) {
-		CustomMessageBox msg("Error happened during saving file", "Error", QMessageBox::Warning);
+		CustomMessageBox msg(this, "Error happened during saving file", "Error", QMessageBox::Warning);
 		msg.show();
 	}
 }
@@ -152,7 +152,7 @@ void AttachedFilesWidget::sl_DeleteButton_Clicked() {
 	QList<QListWidgetItem*> selectedItems = listWidget->selectedItems();
 	if (selectedItems.size() == 0) {return;}
 
-	CustomMessageBox msg("Delete selected files?", "Warning", QMessageBox::Question,
+	CustomMessageBox msg(this, "Delete selected files?", "Warning", QMessageBox::Question,
 				   QMessageBox::Yes | QMessageBox::No);
 	QMessageBox::StandardButton answer = msg.show();
 

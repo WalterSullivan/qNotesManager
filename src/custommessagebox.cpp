@@ -25,12 +25,11 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-CustomMessageBox::CustomMessageBox(const QString& text,
+CustomMessageBox::CustomMessageBox(QWidget* parent, const QString& text,
 					   const QString& caption,
 					   QMessageBox::Icon Icon,
 					   QMessageBox::StandardButtons buttons,
-					   QMessageBox::StandardButton defaultButton,
-					   QWidget* parent) :
+					   QMessageBox::StandardButton defaultButton) :
 	QDialog(parent, Qt::MSWindowsFixedSizeDialogHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint) {
 	clickedButton = 0;
 

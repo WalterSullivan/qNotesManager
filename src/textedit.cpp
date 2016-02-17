@@ -364,7 +364,7 @@ void TextEdit::sl_InsertImageFromUrlAction_Triggered() {
 	if (ok && !text.isEmpty()) {
 		QUrl url(text);
 		if (!url.isValid()) {
-			CustomMessageBox msg("Specified URL is not valid", "Insert image", QMessageBox::Information);
+			CustomMessageBox msg(this, "Specified URL is not valid", "Insert image", QMessageBox::Information);
 			msg.show();
 			return;
 		}

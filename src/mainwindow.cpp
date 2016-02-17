@@ -363,7 +363,7 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 
 		QFile file(fileName);
 		if (fileName.isEmpty() || !file.exists()) {
-			CustomMessageBox msg("Select a valid file to open", "Warning", QMessageBox::Warning);
+			CustomMessageBox msg(this, "Select a valid file to open", "Warning", QMessageBox::Warning);
 			msg.show();
 		} else {
 			break;
@@ -452,7 +452,7 @@ void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled, bool* a
 	}
 
 	if (oldDoc->HasUnsavedData()) {
-		CustomMessageBox msg("Current document has been changed. Save it?", "Save document?",
+		CustomMessageBox msg(this, "Current document has been changed. Save it?", "Save document?",
 					   QMessageBox::Question, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 		QMessageBox::StandardButton result = msg.show();
 
@@ -636,7 +636,7 @@ void MainWindow::sl_OpenRecentFileAction_Triggered() {
 	// Chech if file exists
 	QFileInfo fileInfo(fileName);
 	if (!fileInfo.exists()) {
-		CustomMessageBox msg("Selected file not found. Delete it from history?", "File not found",
+		CustomMessageBox msg(this, "Selected file not found. Delete it from history?", "File not found",
 							 QMessageBox::Question, QMessageBox::Yes | QMessageBox::No);
 		QMessageBox::StandardButton result = msg.show();
 		if (result != QMessageBox::Yes) {
@@ -869,7 +869,7 @@ void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p, bool la
 }
 
 void MainWindow::sl_Document_ConfirmationRequest(QSemaphore* s, QString str, bool* abort) {
-	CustomMessageBox msg(str, "Warning", QMessageBox::Question, QMessageBox::Yes | QMessageBox::No);
+	CustomMessageBox msg(this, str, "Warning", QMessageBox::Question, QMessageBox::Yes | QMessageBox::No);
 	QMessageBox::StandardButton result = msg.show();
 
 	if (result == QMessageBox::No) {
@@ -879,12 +879,12 @@ void MainWindow::sl_Document_ConfirmationRequest(QSemaphore* s, QString str, boo
 }
 
 void MainWindow::sl_Document_Message(QString str) {
-	CustomMessageBox msg(str, QString(), QMessageBox::Information);
+	CustomMessageBox msg(this, str, QString(), QMessageBox::Information);
 	msg.show();
 }
 
 void MainWindow::sl_Document_LoadingFailed(QString errorString) {
-	CustomMessageBox msg(errorString, "Error", QMessageBox::Critical);
+	CustomMessageBox msg(this, errorString, "Error", QMessageBox::Critical);
 	msg.show();
 
 	sl_Document_LoadingAborted();
@@ -951,7 +951,7 @@ void MainWindow::sl_Document_SavingFinished() {
 }
 
 void MainWindow::sl_Document_SavingFailed(QString errorString) {
-	CustomMessageBox msg(errorString, "Error", QMessageBox::Critical);
+	CustomMessageBox msg(this, errorString, "Error", QMessageBox::Critical);
 	msg.show();
 
 	sl_Document_SavingAborted();

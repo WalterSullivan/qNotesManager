@@ -843,7 +843,7 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 	if (Application::I()->Settings.GetConfirmItemDeletion() == true) {
 		QCheckBox* checkBox = new QCheckBox("Do not show this message again");
 		QString message = permanently ? "Delete these items?" : "Put these items to Bin?";
-		CustomMessageBox box(message + details, "Confirm deletion", QMessageBox::Question,
+		CustomMessageBox box(this, message + details, "Confirm deletion", QMessageBox::Question,
 					   QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 		box.AddCustomWidget(checkBox);
 		QMessageBox::StandardButton result = box.show();
@@ -874,7 +874,7 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 			itemToDelete = fmi->GetStoredData();
 			if (itemToDelete == Application::I()->CurrentDocument()->GetTempFolder() ||
 				itemToDelete == Application::I()->CurrentDocument()->GetTrashFolder()) {
-				CustomMessageBox msg("You cannot delete system folders", "Information", QMessageBox::Information);
+				CustomMessageBox msg(this, "You cannot delete system folders", "Information", QMessageBox::Information);
 				msg.show();
 				continue;
 			}
