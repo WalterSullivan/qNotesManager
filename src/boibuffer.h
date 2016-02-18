@@ -80,8 +80,8 @@ namespace qNotesManager {
 		QIODevice* device;
 		bool noswap;
 
-		BOIBuffer(const BOIBuffer&) : QObject(0) {} // Prevent construction by copying
-		BOIBuffer& operator=(const BOIBuffer&){return *this;} // Prevent assignment
+		BOIBuffer(const BOIBuffer&) = delete;
+		BOIBuffer& operator=(const BOIBuffer&) = delete;
 
 	};
 }

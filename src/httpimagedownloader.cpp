@@ -248,9 +248,7 @@ void HttpImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
 		qDebug() << "Recognized file suffix: " << fileSuffix;
 	}
 
-	if ((fileSuffix.isEmpty())
-		 ||
-		 ((!fileSuffix.isEmpty()) && (!QImageReader::supportedImageFormats().contains(fileSuffix)))) {
+	if ((fileSuffix.isEmpty()) || (!QImageReader::supportedImageFormats().contains(fileSuffix))) {
 		// If suffix is empty or suffix is not empty, but Qt doesn't support this file type
 		qDebug() << "ERROR: Unknown or unsupported file type";
 #ifdef DEBUG

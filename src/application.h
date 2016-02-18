@@ -35,8 +35,8 @@ namespace qNotesManager {
 	Q_OBJECT
 	private:
 		explicit Application();
-		Application(const Application&) : QObject(0) {} // Prevent construction by copying
-		Application& operator=(const Application&){return *this;} // Prevent assignment
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
 		~Application(){} // Prevent unwanted destruction
 
 		Document*		_currentDocument;

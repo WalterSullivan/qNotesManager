@@ -138,9 +138,8 @@ void TagsModel::sl_Tag_OwnersRemoved() {
 	QModelIndex tagIndex = createIndex(root->IndexOfChild(tagItem), 0, tagItem);
 
 	beginRemoveRows(tagIndex, 0, tagItem->ChildrenCount());
-		BaseModelItem* childItem = 0;
 		for (int i = 0; i < tagItem->ChildrenCount(); ++i) {
-			childItem = tagItem->ChildAt(i);
+			BaseModelItem* childItem = tagItem->ChildAt(i);
 			if (childItem->DataType() != BaseModelItem::note) {
 				WARNING("Item has wrong type");
 				continue;

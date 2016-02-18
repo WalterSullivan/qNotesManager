@@ -93,6 +93,7 @@ void LocalImageLoader::Download(const QUrl url) {
 }
 
 void LocalImageLoader::CancelDownload(const QUrl url) {
+	(void)url;
 }
 
 void LocalImageLoader::CancelAllDownloads() {

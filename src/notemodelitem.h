@@ -30,7 +30,7 @@ namespace qNotesManager {
 		void drawLock(QPixmap&) const;
 
 	public:
-		NoteModelItem(Note*);
+		explicit NoteModelItem(Note*);
 
 		Note*	GetStoredData() const;
 

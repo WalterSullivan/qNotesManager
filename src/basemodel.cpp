@@ -62,7 +62,7 @@ void BaseModel::SetDisplayRootItem(BaseModelItem* item) {
 	emit sg_DisplayRootItemChanged();
 }
 
-BaseModelItem* const BaseModel::GetDisplayRootItem() const {
+BaseModelItem* BaseModel::GetDisplayRootItem() const {
 	return displayRootItem;
 }
 
@@ -128,6 +128,7 @@ int BaseModel::rowCount(const QModelIndex& parent) const {
 
 /*virtual*/
 int BaseModel::columnCount(const QModelIndex& parent) const {
+	(void)parent;
 	return 1;
 }
 

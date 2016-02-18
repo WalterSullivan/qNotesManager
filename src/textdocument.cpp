@@ -161,7 +161,7 @@ void TextDocument::replaceImageUrl(const QUrl &oldName, const QString &newName) 
 
 	while(block.isValid()) {
 		QTextBlock::iterator iterator;
-		for(iterator = block.begin(); !(iterator.atEnd()); iterator++) {
+		for(iterator = block.begin(); !(iterator.atEnd()); ++iterator) {
 			QTextFragment fragment = iterator.fragment();
 			if(fragment.isValid() && fragment.charFormat().isImageFormat()) {
 				QTextImageFormat format = fragment.charFormat().toImageFormat();

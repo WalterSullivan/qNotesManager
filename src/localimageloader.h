@@ -34,7 +34,7 @@ namespace qNotesManager {
 		QReadWriteLock lock;
 
 	public:
-		explicit LocalImageLoadWorker(QObject* parent) {};
+		explicit LocalImageLoadWorker(QObject* parent) : QObject(parent) {}
 		void AddUrl(const QUrl);
 		void CancelAllDownloads();
 

@@ -29,7 +29,7 @@ namespace qNotesManager {
 		bool expired;
 
 	public:
-		SearchModelItem(const NoteFragment& f);
+		explicit SearchModelItem(const NoteFragment& f);
 		/*virtual*/ QVariant data(int role) const;
 		/*virtual*/ Qt::ItemFlags flags () const;
 		NoteFragment Fragment() const;

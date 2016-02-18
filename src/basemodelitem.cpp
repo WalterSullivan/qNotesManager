@@ -150,6 +150,7 @@ BaseModelItem::ItemType BaseModelItem::DataType() const {
 }
 
 QVariant BaseModelItem::data(int role) const {
+	(void)role;
 	return QVariant();
 }
 
@@ -234,6 +235,7 @@ int BaseModelItem::findInsertIndex_Sorted(const BaseModelItem* item) const {
 
 // Returns index for a new item when list is not sorted
 int BaseModelItem::findInsertIndex_Simple(const BaseModelItem* item) const {
+	(void)item;
 	// TODO: add anchors handling
 	return ChildrenCount();
 }
