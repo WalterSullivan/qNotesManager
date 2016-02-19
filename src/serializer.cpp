@@ -99,6 +99,9 @@ void Serializer::loadDocument() {
 		return;
 	}
 
+	const QFileInfo fileInfo(filename);
+	doc->fileTimeStamp = fileInfo.lastModified();
+
 	qint64 readResult = 0;
 
 	QByteArray fileDataArray(file.size(), 0x0);
@@ -204,6 +207,9 @@ void Serializer::saveDocument() {
 			WARNING("Wrong case branch");
 			emit sg_SavingFailed("Unknown file version");
 	}
+
+	const QFileInfo fileInfo(filename);
+	doc->fileTimeStamp = fileInfo.lastModified();
 }
 
 void Serializer::sendProgressSignal(BOIBuffer* buffer) {

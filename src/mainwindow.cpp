@@ -83,6 +83,9 @@ MainWindow::MainWindow() : QMainWindow(0) {
 	resize(Application::I()->Settings.GetWindowSize());
 	move(Application::I()->Settings.GetWindowPos());
 	setWindowState(Application::I()->Settings.GetWindowState());
+
+	documentUpdateCheckTimer.setInterval(5000);
+	QObject::connect(&documentUpdateCheckTimer, SIGNAL(timeout()), this, SLOT(sl_DocumentUpdateTimer_Timeout()), Qt::QueuedConnection);
 }
 
 void MainWindow::createActions() {
@@ -444,14 +447,14 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 	doc->Save(filename);
 }
 
-void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled, bool* actionDelayed) {
+void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled, bool* actionDelayed, bool suppressSaving) {
 	Document* oldDoc = Application::I()->CurrentDocument();
 	if (oldDoc == 0) {
 		WARNING("No current document set");
 		return;
 	}
 
-	if (oldDoc->HasUnsavedData()) {
+	if (oldDoc->HasUnsavedData() && (suppressSaving == false)) {
 		CustomMessageBox msg(this, "Current document has been changed. Save it?", "Save document?",
 					   QMessageBox::Question, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 		QMessageBox::StandardButton result = msg.show();
@@ -476,6 +479,7 @@ void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled, bool* a
 		}
 	}
 
+	documentUpdateCheckTimer.stop();
 	Application::I()->SetCurrentDocument(0);
 	notesTabWidget->Clear();
 	delete oldDoc;
@@ -846,6 +850,10 @@ void MainWindow::sl_Document_LoadingFinished() {
 	mainSplitter->setEnabled(true);
 	toolbar->setEnabled(true);
 	menuBar->setEnabled(true);
+
+	if (!Application::I()->CurrentDocument()->DoNotReload()) {
+		documentUpdateCheckTimer.start();
+	}
 }
 
 void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p, bool lastTryFailed) {
@@ -928,6 +936,8 @@ void MainWindow::sl_Document_SavingFinished() {
 	setWindowModified(false);
 	updateWindowTitle();
 
+	documentUpdateCheckTimer.start();
+
 	if (closeDocumentAfterSave) {
 		closeDocumentAfterSave = false;
 		sl_CloseDocumentAction_Triggered();
@@ -971,4 +981,46 @@ void MainWindow::sl_Document_SavingAborted() {
 	openDocumentAfterSave = false;
 	newDocumentAfterSave = false;
 	delayedDocumentToOpenFileName = "";
+}
+
+void MainWindow::sl_DocumentUpdateTimer_Timeout() {
+	Document* doc = Application::I()->CurrentDocument();
+	if (doc == nullptr) {return;}
+
+	if (doc->GetFilename().isEmpty()) {return;}
+
+	QFileInfo fileInfo(doc->GetFilename());
+	if (fileInfo.lastModified() <= doc->GetFileTimeStamp()) {
+		return;
+	}
+
+	documentUpdateCheckTimer.stop();
+
+	CustomMessageBox msg(this, "File has been changed outside of the program. Reload?", "", QMessageBox::Question, QMessageBox::Yes | QMessageBox::No);
+	QMessageBox::StandardButton result = msg.show();
+
+	if (result != QMessageBox::Yes) {
+		doc->SetDoNotReload(true);
+		return;
+	}
+
+	if (doc->HasUnsavedData()) {
+		CustomMessageBox msg(this, "Document has unsaved data. Reload anyway?", "", QMessageBox::Question, QMessageBox::Yes | QMessageBox::No);
+		result = msg.show();
+		if (result != QMessageBox::Yes) {
+			doc->SetDoNotReload(true);
+			return;
+		}
+	}
+
+	// Close all dialog windows
+	QList<QDialog*> allDialogs = this->findChildren<QDialog*>();
+	foreach(QDialog* dialog, allDialogs) {
+		dialog->reject();
+	}
+
+	const QString filename = doc->GetFilename();
+
+	sl_CloseDocumentAction_Triggered(0, 0, true);
+	OpenDocument(filename);
 }
