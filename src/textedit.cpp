@@ -1011,47 +1011,47 @@ void TextEdit::sl_SaveImageAction_Triggered() {
 
 void TextEdit::sl_ResizeImageAction_Triggered() {
 	QAction* action = qobject_cast<QAction*>(QObject::sender());
-	if (action == 0) {return;}
+	if (action == nullptr) {return;}
 
 	QPoint pos = action->data().toPoint();
 	QTextFragment fragment = findFragmentAtPos(pos);
-	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
-		QTextImageFormat format = fragment.charFormat().toImageFormat();
+	if (!fragment.isValid() || !fragment.charFormat().isImageFormat()) {return;}
 
-		const QString imageName = QString(format.name().toUtf8());
+	QTextImageFormat format = fragment.charFormat().toImageFormat();
 
-		const TextDocument* textDocument = dynamic_cast<TextDocument*>(document());
-		CachedImageFile* image = textDocument->GetResourceImage(imageName);
-		if (image == 0) {return;}
+	const QString imageName = QString(format.name().toUtf8());
 
-		SizeEditWidget resizeWidget(this);
-		QSize currentImageSize = QSize();
-		if (format.hasProperty(QTextFormat::ImageWidth) &&
-				format.hasProperty(QTextFormat::ImageHeight)) {
-			currentImageSize = QSize((int)format.width(), (int)format.height());
-		}
+	const TextDocument* textDocument = dynamic_cast<TextDocument*>(document());
+	CachedImageFile* image = textDocument->GetResourceImage(imageName);
+	if (image == nullptr) {return;}
 
-		resizeWidget.SetData(currentImageSize, image->ImageSize());
-		resizeWidget.exec();
-
-		if (resizeWidget.result() == QDialog::Accepted) {
-			QSize newSize = resizeWidget.NewSize;
-			if (newSize.isValid() && newSize != image->ImageSize()) {
-				format.setWidth(newSize.width());
-				format.setHeight(newSize.height());
-			} else {
-				format.clearProperty(QTextFormat::ImageWidth);
-				format.clearProperty(QTextFormat::ImageHeight);
-			}
-
-			QTextCursor tempCursor(textCursor());
-			tempCursor.beginEditBlock();
-			tempCursor.setPosition(fragment.position());
-			tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, fragment.length());
-			tempCursor.setCharFormat(format);
-			tempCursor.endEditBlock();
-		}
+	SizeEditWidget resizeWidget(this);
+	QSize currentImageSize = QSize();
+	if (format.hasProperty(QTextFormat::ImageWidth) &&
+			format.hasProperty(QTextFormat::ImageHeight)) {
+		currentImageSize = QSize((int)format.width(), (int)format.height());
 	}
+
+	resizeWidget.SetData(currentImageSize, image->ImageSize());
+	resizeWidget.exec();
+
+	if (resizeWidget.result() != QDialog::Accepted) {return;}
+
+	QSize newSize = resizeWidget.NewSize;
+	if (newSize.isValid() && newSize != image->ImageSize()) {
+		format.setWidth(newSize.width());
+		format.setHeight(newSize.height());
+	} else {
+		format.clearProperty(QTextFormat::ImageWidth);
+		format.clearProperty(QTextFormat::ImageHeight);
+	}
+
+	QTextCursor tempCursor(textCursor());
+	tempCursor.beginEditBlock();
+	tempCursor.setPosition(fragment.position());
+	tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, fragment.length());
+	tempCursor.setCharFormat(format);
+	tempCursor.endEditBlock();
 }
 
 void TextEdit::sl_InsertPlainTextAction_Triggered() {
