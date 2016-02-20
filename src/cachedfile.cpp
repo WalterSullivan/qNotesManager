@@ -18,11 +18,11 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "cachedfile.h"
 
 #include "crc32.h"
-#include "cipherer.h"
 
 #include <QFile>
 #include <QFileInfo>
 #include <QTemporaryFile>
+#include <QCryptographicHash>
 
 using namespace qNotesManager;
 
@@ -41,9 +41,10 @@ quint32 CachedFile::GetCRC32() const {
 }
 
 QString CachedFile::GetMD5() const {
-	Cipherer c;
 	if (cachedMD5.isEmpty()) {
-		cachedMD5 = c.GetMD5Hash(Data);
+		QCryptographicHash hash(QCryptographicHash::Md5);
+		hash.addData(Data);
+		cachedMD5 = QString(hash.result().toHex());
 	}
 	return cachedMD5;
 }

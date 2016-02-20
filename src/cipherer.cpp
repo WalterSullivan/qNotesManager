@@ -170,15 +170,3 @@ QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
 bool Cipherer::IsSecureHashSupported(quint8 i) {
 	return (i == 0); // FIXME
 }
-
-QString Cipherer::GetMD5Hash(const QByteArray& data) {
-	if (!QCA::isSupported("md5")) {
-		return QString();
-	}
-
-	QCA::Hash hash("md5");
-	hash.update(data);
-	QString result = QCA::arrayToHex(hash.final().toByteArray());
-
-	return result;
-}
