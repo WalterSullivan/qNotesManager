@@ -46,9 +46,9 @@ namespace qNotesManager {
 
 		void LoadIconsFromDir(const QString&);
 
-		QPixmap loadingDummyImage;
-		QPixmap errorDummyImage;
-		void createDummyImages();
+		QPixmap createImage(const QSize& size, const QString& text) const ;
+		mutable QHash<QSize, QPixmap> loadingThumbnails;
+		mutable QHash<QSize, QPixmap> errorThumbnails;
 
 	public:
 		static Application* I();
@@ -63,8 +63,8 @@ namespace qNotesManager {
 		QPixmap GetStandardIcon(const QString& name) ;
 		QStandardItemModel* GetIconsModel();
 
-		QPixmap GetErrorImage() const;
-		QPixmap GetLoadingImage() const;
+		QPixmap GetErrorImage(const QSize&) const;
+		QPixmap GetLoadingImage(const QSize&) const;
 
 
 		const QString DefaultNoteIcon;

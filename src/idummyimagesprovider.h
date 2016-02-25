@@ -23,8 +23,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 namespace qNotesManager {
 	class IDummyImagesProvider {
 	public:
-		virtual QPixmap GetErrorImage() const = 0;
-		virtual QPixmap GetLoadingImage() const = 0;
+		virtual QPixmap GetErrorImage(const QSize&) const = 0;
+		virtual QPixmap GetLoadingImage(const QSize&) const = 0;
 		virtual ~IDummyImagesProvider() {}
 	};
 }

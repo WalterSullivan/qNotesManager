@@ -38,8 +38,6 @@ Application::Application() :
 	LoadIconsFromDir(":/icons/standard/Document");
 	LoadIconsFromDir(":/icons/standard/Folder");
 	LoadIconsFromDir(":/icons/standard/Misc");
-
-	createDummyImages();
 }
 
 void Application::LoadIconsFromDir(const QString& dirName) {
@@ -86,33 +84,57 @@ QPixmap Application::GetStandardIcon(const QString& name)  {
 	return standardIcons.value(name);
 }
 
-void Application::createDummyImages() {
-	const QSize dummyImageSize = QSize(150, 150);
-	loadingDummyImage = QPixmap(dummyImageSize);
-	errorDummyImage = QPixmap(dummyImageSize);
+QPixmap Application::createImage(const QSize& size, const QString& text) const {
 	QPainter painter;
-	const QString loadingDummyImageText = "Loading image...";
-	const QString errorDummyImageText = "Error loading image";
 	const QBrush backgroundBrush(Qt::lightGray);
-	const QRect rect(QPoint(0,0), dummyImageSize);
+	const QRect back(QPoint(0,0), size);
+	const QRect border(0, 0, size.width() - 1, size.height() - 1);
+	QPixmap image {size};
 
-	painter.begin(&loadingDummyImage);
+	painter.begin(&image);
 	painter.setBrush(backgroundBrush);
-	painter.drawRect(rect);
-	painter.drawText(rect, Qt::AlignCenter, loadingDummyImageText);
+	painter.setPen(Qt::NoPen);
+	painter.drawRect(back);
+
+	painter.setBrush(Qt::NoBrush);
+	painter.setPen(Qt::black);
+	painter.drawRect(border);
+
+	painter.drawText(back, Qt::AlignCenter, text);
 	painter.end();
 
-	painter.begin(&errorDummyImage);
-	painter.setBrush(backgroundBrush);
-	painter.drawRect(rect);
-	painter.drawText(rect, Qt::AlignCenter, errorDummyImageText);
-	painter.end();
+	return image;
 }
 
-QPixmap Application::GetErrorImage() const {
-	return errorDummyImage;
+QPixmap Application::GetErrorImage(const QSize& size) const {
+	const QSize minimalSize {150, 150};
+	QSize newSize = size;
+	if (!newSize.isValid()) {newSize = minimalSize;}
+	if (newSize.width() < minimalSize.width()) {newSize.setWidth(minimalSize.width());}
+	if (newSize.height() < minimalSize.height()) {newSize.setHeight(minimalSize.height());}
+
+
+	if (!errorThumbnails.contains(newSize)) {
+		QPixmap image {createImage(newSize, "Error loading image")};
+		errorThumbnails.insert(newSize, image);
+	}
+	return errorThumbnails[newSize];
 }
 
-QPixmap Application::GetLoadingImage() const {
-	return loadingDummyImage;
+QPixmap Application::GetLoadingImage(const QSize& size) const {
+	const QSize minimalSize {150, 150};
+	QSize newSize = size;
+	if (!newSize.isValid()) {newSize = minimalSize;}
+	if (newSize.width() < minimalSize.width()) {newSize.setWidth(minimalSize.width());}
+	if (newSize.height() < minimalSize.height()) {newSize.setHeight(minimalSize.height());}
+
+	if (!loadingThumbnails.contains(newSize)) {
+		QPixmap image {createImage(newSize, "Loading image...")};
+		loadingThumbnails.insert(newSize, image);
+	}
+	return loadingThumbnails[newSize];
+}
+
+inline uint qHash(const QSize& size, uint seed) {
+	return qHash(size.width(), seed) ^ size.height();
 }

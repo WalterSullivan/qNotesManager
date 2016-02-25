@@ -41,6 +41,7 @@ namespace qNotesManager {
 		QList<QUrl> activeDownloads;
 		QList<QUrl> errorDownloads;
 		void replaceImageUrl(const QUrl& oldName, const QString& newName);
+		QSize findImageSize(const QString& resourceID);
 
 		QTimer restartDownloadsTimer;
 
