@@ -20,7 +20,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "textdocument.h"
 #include "hyperlinkeditwidget.h"
 #include "global.h"
-#include "edittablewidthconstraintswidget.h"
 #include "custommessagebox.h"
 #include "sizeeditwidget.h"
 
@@ -55,9 +54,7 @@ TextEdit::TextEdit(QWidget *parent) :
 	InsertImageFromFileAction(new QAction("Insert image from file", this)),
 	InsertPlainTextAction(new QAction("Insert plain text", this)),
 	InsertLineAction(new QAction("Insert line", this)),
-	InsertDateTimeAction(new QAction("Insert date and time", this)),
-	EditTableWidthConstraintsAction(new QAction(QIcon(":gui/resize"), "Edit table width...", this)),
-	TableAlignMenu(new QMenu("Table alignment", this))
+	InsertDateTimeAction(new QAction("Insert date and time", this))
 {
 	followLinkAction = new QAction(tr("Follow Link"),this);
 	QObject::connect(followLinkAction, SIGNAL(triggered()),
@@ -70,20 +67,6 @@ TextEdit::TextEdit(QWidget *parent) :
 	editLinkAction = new QAction("Edit link", this);
 	QObject::connect(editLinkAction, SIGNAL(triggered()),
 					 this, SLOT(sl_EditLinkActionTriggered()));
-
-	tableAlignLeft = new QAction(QIcon(":/gui/edit-alignment"), "Left", this);
-	QObject::connect(tableAlignLeft, SIGNAL(triggered()),
-					 this, SLOT(sl_TableAlignAction_Triggered()));
-	tableAlignRight = new QAction(QIcon(":/gui/edit-alignment-right"), "Right", this);
-	QObject::connect(tableAlignRight, SIGNAL(triggered()),
-					 this, SLOT(sl_TableAlignAction_Triggered()));
-	tableAlignCenter = new QAction(QIcon(":/gui/edit-alignment-center"), "Center", this);
-	QObject::connect(tableAlignCenter, SIGNAL(triggered()),
-					 this, SLOT(sl_TableAlignAction_Triggered()));
-	TableAlignMenu->addAction(tableAlignLeft);
-	TableAlignMenu->addAction(tableAlignRight);
-	TableAlignMenu->addAction(tableAlignCenter);
-
 
 	addAction(InsertHyperlinkAction);
 	QObject::connect(InsertHyperlinkAction, SIGNAL(triggered()),
@@ -141,9 +124,6 @@ TextEdit::TextEdit(QWidget *parent) :
 
 	imagePropertiesMenu->addAction(saveImageAction);
 	imagePropertiesMenu->addAction(resizeImageAction);
-
-	QObject::connect(EditTableWidthConstraintsAction, SIGNAL(triggered()),
-					 this, SLOT(sl_EditTableWidthConstraintsAction_Triggered()));
 }
 
 void TextEdit::SetDocument(TextDocument* newDocument) {
@@ -544,12 +524,6 @@ void TextEdit::contextMenuEvent (QContextMenuEvent* event) {
 
 	menu->addMenu(insertMenu);
 
-	if (textCursor().currentTable()) {
-		menu->addSeparator();
-		menu->addMenu(TableAlignMenu);
-		menu->addSeparator();
-		menu->addAction(EditTableWidthConstraintsAction);
-	}
 
 	QTextFragment fragment = findFragmentAtPos(event->pos());
 	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
@@ -724,29 +698,6 @@ void TextEdit::sl_InsertHyperlinkAction_Triggered() {
 	QTextCursor cursor = textCursor();
 	QString html = QString("<a href=\"%1\">%2</a>").arg(linkEditDialog->GetUrl()).arg(linkEditDialog->GetName());
 	cursor.insertHtml(html);
-}
-
-void TextEdit::sl_TableAlignAction_Triggered() {
-	QAction* const act = qobject_cast<QAction*>(QObject::sender());
-	Qt::Alignment a;
-	if (act == tableAlignLeft) {
-		a = Qt::AlignLeft;
-	} else if (act == tableAlignRight) {
-		a = Qt::AlignRight;
-	} else if (act == tableAlignCenter) {
-		a = Qt::AlignHCenter;
-	} else {
-		WARNING("Unknown sender");
-		return;
-	}
-
-
-	QTextTable* table = textCursor().currentTable();
-	if (!table) {return;}
-
-	QTextTableFormat format = table->format();
-	format.setAlignment(a);
-	table->setFormat(format);
 }
 
 QTextFragment TextEdit::findFragmentAtPos(QPoint pos) {
@@ -1068,24 +1019,4 @@ void TextEdit::sl_InsertDateTimeAction_Triggered() {
 			QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate)
 			).arg("<br>");
 	textCursor().insertHtml(text);
-}
-
-void TextEdit::sl_EditTableWidthConstraintsAction_Triggered() {
-	QTextTable* table = textCursor().currentTable();
-	if (!table) {
-		WARNING("No table");
-		return;
-	}
-
-	QTextTableFormat format = table->format();
-
-	EditTableWidthConstraintsWidget* widget = new EditTableWidthConstraintsWidget(format, table->columns(), this);
-	widget->exec();
-	if (widget->result() == QDialog::Accepted) {
-		format.setWidth(widget->TableWidthConstraint);
-		format.setColumnWidthConstraints(widget->ColumnWidthConstraints);
-		table->setFormat(format);
-	}
-
-	delete widget;
 }

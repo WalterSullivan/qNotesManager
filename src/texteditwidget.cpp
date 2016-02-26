@@ -22,6 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "colorpickerbutton.h"
 #include "global.h"
 #include "searchpanelwidget.h"
+#include "tablepropertieswidget.h"
 
 #include <QVBoxLayout>
 #include <QAction>
@@ -214,6 +215,9 @@ void TextEditWidget::CreateControls() {
 	QObject::connect(mergeCellsAction, SIGNAL(triggered()),
 					 this, SLOT(sl_MergeCellsAction_Triggered()));
 
+	tablePropertiesAction = new QAction(QIcon(":/gui/table-edit"), "Table properties", this);
+	QObject::connect(tablePropertiesAction, SIGNAL(triggered()), this, SLOT(sl_TablePropertiesAction_Triggered()));
+
 	createTableButton = new QToolButton();
 	createTableButton->setFocusPolicy(Qt::NoFocus);
 	createTableButton->setPopupMode(QToolButton::MenuButtonPopup);
@@ -226,9 +230,7 @@ void TextEditWidget::CreateControls() {
 	createTableButtonMenu->addAction(removeRowAction);
 	createTableButtonMenu->addAction(removeColumnAction);
 	createTableButtonMenu->addAction(mergeCellsAction);
-	createTableButtonMenu->addSeparator();
-	createTableButtonMenu->addMenu(textField->TableAlignMenu);
-	createTableButtonMenu->addAction(textField->EditTableWidthConstraintsAction);
+	createTableButtonMenu->addAction(tablePropertiesAction);
 	createTableButton->setMenu(createTableButtonMenu);
 
 	TBRMainBar->addWidget(createTableButton);
@@ -493,6 +495,7 @@ void TextEditWidget::sl_CreateTableAction_Triggered() {
 
 	format.setCellSpacing(0);
 	format.setCellPadding(3);
+	format.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 
 	QTextLength tableWidth(QTextLength::PercentageLength, 50);
 	format.setWidth(tableWidth);
@@ -539,6 +542,15 @@ void TextEditWidget::sl_RemoveRowAction_Triggered() {
 
 	int rowNumber = table->cellAt(textField->textCursor()).row();
 	table->removeRows(rowNumber, 1);
+}
+
+void TextEditWidget::sl_TablePropertiesAction_Triggered() {
+	QTextTable* table = textField->textCursor().currentTable();
+
+	if (table == nullptr) {return;}
+
+	TablePropertiesWidget widget {table, this};
+	widget.exec();
 }
 
 void TextEditWidget::sl_RemoveColumnAction_Triggered() {
@@ -612,8 +624,7 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 	removeRowAction->setEnabled(tablePresent);
 	removeColumnAction->setEnabled(tablePresent);
 	mergeCellsAction->setEnabled(tablePresent);
-	textField->EditTableWidthConstraintsAction->setEnabled(tablePresent);
-	textField->TableAlignMenu->setEnabled(tablePresent);
+	tablePropertiesAction->setEnabled(tablePresent);
 	if (tablePresent) {
 		createTableAction->setText("Edit table...");
 	} else {

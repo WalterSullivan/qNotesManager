@@ -926,5 +926,6 @@
         <file alias="clip">icons/gui/paper-clip.png</file>
         <file alias="chain">icons/gui/chain.png</file>
         <file alias="image-resize">icons/gui/image-resize.png</file>
+        <file alias="table-edit">icons/gui/table--pencil.png</file>
     </qresource>
 </RCC>

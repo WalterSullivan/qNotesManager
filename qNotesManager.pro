@@ -119,7 +119,7 @@ HEADERS += src/tag.h \
 	src/httpimagedownloader.h \
 	src/iconitemdelegate.h \
 	src/idummyimagesprovider.h \
-	src/edittablewidthconstraintswidget.h \
+	src/tablepropertieswidget.h \
 	src/appinfo.h \
 	src/modelitemdelegate.h \
 	src/serializer.h \
@@ -128,7 +128,6 @@ HEADERS += src/tag.h \
 	src/custommessagebox.h \
 	src/searchpanelwidget.h \
 	src/sizeeditwidget.h
-	
 
 SOURCES += src/tagownerscollection.cpp \
 	src/tag.cpp \
@@ -189,7 +188,7 @@ SOURCES += src/tagownerscollection.cpp \
 	src/imageloader.cpp \
 	src/httpimagedownloader.cpp \
 	src/iconitemdelegate.cpp \
-	src/edittablewidthconstraintswidget.cpp \
+	src/tablepropertieswidget.cpp \
 	src/modelitemdelegate.cpp \
 	src/serializer.cpp \
 	src/bookmarksmenu.cpp \
