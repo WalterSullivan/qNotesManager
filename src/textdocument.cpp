@@ -128,13 +128,13 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 	}
 
 	if (type == QTextDocument::ImageResource) {
-		QString stringUrl = url.toString();
+		QString stringUrl = url.toEncoded();
 		if (originalImages.contains(stringUrl)) {
 			CachedImageFile* image = originalImages[stringUrl];
 			addResource(QTextDocument::ImageResource, url, image->GetPixmap());
 			return image->GetPixmap();
 		}
-		QSize imageSize = findImageSize(url.toString());
+		QSize imageSize = findImageSize(url.toEncoded());
 		if (errorDownloads.contains(url)) {
 			return DummyImagesProvider->GetErrorImage(imageSize);
 		}
