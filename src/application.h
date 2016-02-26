@@ -46,7 +46,7 @@ namespace qNotesManager {
 
 		void LoadIconsFromDir(const QString&);
 
-		QPixmap createImage(const QSize& size, const QString& text) const ;
+		QPixmap createImage(const QSize& size, const QString& text, bool loading = false) const ;
 		mutable QHash<QSize, QPixmap> loadingThumbnails;
 		mutable QHash<QSize, QPixmap> errorThumbnails;
 

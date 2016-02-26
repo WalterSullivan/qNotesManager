@@ -84,35 +84,71 @@ QPixmap Application::GetStandardIcon(const QString& name)  {
 	return standardIcons.value(name);
 }
 
-QPixmap Application::createImage(const QSize& size, const QString& text) const {
+QPixmap Application::createImage(const QSize& size, const QString& text, bool loading) const {
 	QPainter painter;
-	const QBrush backgroundBrush(Qt::lightGray);
-	const QRect back(QPoint(0,0), size);
+	const QBrush backgroundBrush {Qt::lightGray};
+	const QRect back {QPoint(0,0), size};
 	const QRect border(0, 0, size.width() - 1, size.height() - 1);
 	QPixmap image {size};
+	const bool smallImage {((size.width() < 100) || (size.height() < 20))};
 
-	painter.begin(&image);
-	painter.setBrush(backgroundBrush);
-	painter.setPen(Qt::NoPen);
-	painter.drawRect(back);
+	if (loading) {
+		const int smallestSide {qMin(size.width(), size.height())};
+		const int wheelSize {(int)(smallestSide * 0.6)};
+
+		painter.begin(&image);
+		painter.setBrush(backgroundBrush);
+		painter.setPen(Qt::NoPen);
+		painter.drawRect(back);
+
+		// Draw loading icon
+		if (wheelSize > 6) {
+			const int dotsCount {12};
+			const int dotSize {(int)(smallestSide * 0.1)};
+			int alpha = 160;
+			QColor dotColor {0, 0, 0, alpha};
+			const int alphaStep {200 / dotsCount};
+			const qreal angle {360.0 / (qreal)dotsCount};
+			QBrush dotBrush {dotColor};
+
+			painter.setRenderHint(QPainter::Antialiasing, true);
+			painter.save();
+			painter.translate(size.width() / 2, size.height() / 2);
+			painter.rotate(angle);
+			for (int i = 1; i <= dotsCount; ++i) {
+				painter.setBrush(dotBrush);
+
+				painter.drawEllipse(0, -size.height() / 3, dotSize, dotSize);
+
+				alpha = alpha - alphaStep;
+				alpha = qMax(alpha, 0);
+				dotColor.setAlpha(alpha);
+				dotBrush.setColor(dotColor);
+				painter.rotate(-angle);
+			}
+			painter.restore();
+			painter.setRenderHint(QPainter::Antialiasing, false);
+		}
+	}
+
 
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(Qt::black);
 	painter.drawRect(border);
 
-	painter.drawText(back, Qt::AlignCenter, text);
+	if (!smallImage) {
+		painter.drawText(back, Qt::AlignCenter, text);
+	}
+
 	painter.end();
 
 	return image;
 }
 
 QPixmap Application::GetErrorImage(const QSize& size) const {
-	const QSize minimalSize {150, 150};
+	const QSize defaultSize {100, 100};
 	QSize newSize = size;
-	if (!newSize.isValid()) {newSize = minimalSize;}
-	if (newSize.width() < minimalSize.width()) {newSize.setWidth(minimalSize.width());}
-	if (newSize.height() < minimalSize.height()) {newSize.setHeight(minimalSize.height());}
-
+	if (!newSize.isValid() || newSize.isEmpty()) {newSize = defaultSize;}
 
 	if (!errorThumbnails.contains(newSize)) {
 		QPixmap image {createImage(newSize, "Error loading image")};
@@ -122,14 +158,12 @@ QPixmap Application::GetErrorImage(const QSize& size) const {
 }
 
 QPixmap Application::GetLoadingImage(const QSize& size) const {
-	const QSize minimalSize {150, 150};
+	const QSize defaultSize {100, 100};
 	QSize newSize = size;
-	if (!newSize.isValid()) {newSize = minimalSize;}
-	if (newSize.width() < minimalSize.width()) {newSize.setWidth(minimalSize.width());}
-	if (newSize.height() < minimalSize.height()) {newSize.setHeight(minimalSize.height());}
+	if (!newSize.isValid() || newSize.isEmpty()) {newSize = defaultSize;}
 
 	if (!loadingThumbnails.contains(newSize)) {
-		QPixmap image {createImage(newSize, "Loading image...")};
+		QPixmap image {createImage(newSize, "Loading image...", true)};
 		loadingThumbnails.insert(newSize, image);
 	}
 	return loadingThumbnails[newSize];
