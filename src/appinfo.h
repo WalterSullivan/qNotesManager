@@ -8,7 +8,7 @@
 #define V_MINOR		9
 #define V_BUILD		7
 #define V_REVISION	0
-#define V_ALPHA		1
+#define V_ALPHA		0
 
 #define V_VERSION  V_MAJOR.V_MINOR.V_BUILD.V_REVISION
 #define V_SVERSION  V_MAJOR.V_MINOR.V_BUILD
