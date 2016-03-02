@@ -10,6 +10,18 @@ BUILD_PATH = ./build
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 
+win32 {
+	OPENSSLPATH = $(OPENSSL_ROOT_DIR)
+
+	!exists($${OPENSSLPATH}): error ("OpenSSL not configured")
+	DEPENDPATH += $${OPENSSLPATH}/include
+	INCLUDEPATH += $${OPENSSLPATH}/include
+	LIBS += -L$${OPENSSLPATH}/bin
+	LIBS += -leay32MD
+} else {
+	PKGCONFIG += openssl
+}
+
 CONFIG(debug, debug|release) { 
 	# Debug
 	QMAKE_CXXFLAGS += -O0
@@ -39,24 +51,6 @@ else {
 	UI_DIR = $${BUILD_PATH}/release/.ui
 	MOC_DIR = $${BUILD_PATH}/release/.moc
 	RCC_DIR = $${BUILD_PATH}/release/.rcc
-}
-
-win32 {
-	contains(DEFINES, USE_CUSTOM_QCA_FILES) {
-		DEPENDPATH += $${_PRO_FILE_PWD_}/src/qca/QtCrypto
-		INCLUDEPATH += $${_PRO_FILE_PWD_}/src/qca/QtCrypto
-		CONFIG(debug, debug|release) {
-			LIBS += -L$${_PRO_FILE_PWD_}/libs/win32
-			LIBS += -lqcad2
-		} else {
-			LIBS += -L$${_PRO_FILE_PWD_}/libs/win32
-			LIBS += -lqca2
-		}
-	} else {
-		CONFIG += crypto
-	}
-} else {
-	CONFIG += crypto
 }
 
 HEADERS += src/tag.h \

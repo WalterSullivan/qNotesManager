@@ -17,13 +17,18 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "cipherer.h"
 
+#include <openssl/aes.h>
+#include <openssl/sha.h>
+#include <openssl/hmac.h>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+
 #include <QDebug>
 
 using namespace qNotesManager;
 
 Cipherer::Cipherer() :
-		defaultCipherMode(QCA::Cipher::CBC),
-		defaultCipherPadding(QCA::Cipher::PKCS7),
 		DefaultHashID(0),
 		DefaultSecureHashID(0)
 
@@ -32,15 +37,16 @@ Cipherer::Cipherer() :
 }
 
 QByteArray Cipherer::Encrypt(const QByteArray& data, const QByteArray& keyData, int cipherID) {
-	return process(data, keyData, QCA::Encode, cipherID);
+	return process(data, keyData, Direction::Encode, cipherID);
 }
 
 QByteArray Cipherer::Decrypt(const QByteArray& data, const QByteArray& keyData, int cipherID) {
-	return process(data, keyData, QCA::Decode, cipherID);
+	return process(data, keyData, Direction::Decode, cipherID);
 }
 
 QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
-							QCA::Direction direction, int cipherID) {
+							Direction direction, int cipherID) {
+
 	if (data.isEmpty()) {
 		return QByteArray();
 	}
@@ -51,63 +57,100 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 		return QByteArray();
 	}
 
+	QByteArray initVectorData ("aes128-cbc-pkcs7", 16);
 
-	QCA::SecureArray arg = data;
+	QByteArray formalizedKey = keyData.leftJustified(16, '\0', true);
+	unsigned char aesKey[16];
+	memset(aesKey, 0, 16);
+	memcpy(aesKey, formalizedKey.data(), 16);
 
-	QString cipherType = avaliableCipherTypes.value(cipherID);
-	QString fullCipherType = QString(cipherType + "-cbc-pkcs7");
+	const unsigned char* inputData = (const unsigned char*)data.data();
+	size_t inputLength = data.length();
 
-	if (!QCA::isSupported(fullCipherType.toStdString().c_str())) {
-		return QByteArray();
-	}
-
-	QCA::SymmetricKey key(keyData);
-
-	QString initVectorData = "aes128-cbc-pkcs7-sn93-sh21-jks-12";
-
-	QCA::InitializationVector initVector(initVectorData.toLatin1());
-
-	QCA::Cipher cipher(cipherType, defaultCipherMode,
-					   defaultCipherPadding,
-					   direction,
-					   key, initVector);
 
 	QByteArray resultArray;
-	if (direction == QCA::Encode) {
-		QCA::SecureArray u = cipher.update(arg);
-		if (!cipher.ok()) {
+
+	EVP_CIPHER_CTX *ctx;
+
+	if (direction == Direction::Encode) {
+		const size_t approximateEncodedDataLength = ((inputLength + AES_BLOCK_SIZE) / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
+		unsigned char* encodedData = new unsigned char[approximateEncodedDataLength];
+		memset(encodedData, 0, approximateEncodedDataLength);
+
+
+		int len;
+		int actualEncodedDataLength;
+
+		/* Create and initialise the context */
+		if(!(ctx = EVP_CIPHER_CTX_new())) {
+			delete[] encodedData;
 			return QByteArray();
 		}
 
-		QCA::SecureArray f = cipher.final();
-		if (!cipher.ok()) {
+		if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, aesKey, (uchar*)initVectorData.data())) {
+			delete[] encodedData;
 			return QByteArray();
 		}
 
-		u.append(f);
-		resultArray = QByteArray(u.data(), u.size());
+		if(1 != EVP_EncryptUpdate(ctx, encodedData, &len, inputData, inputLength)) {
+			delete[] encodedData;
+			return QByteArray();
+		}
+		actualEncodedDataLength = len;
+
+		if(1 != EVP_EncryptFinal_ex(ctx, encodedData + len, &len)) {
+			delete[] encodedData;
+			return QByteArray();
+		}
+		actualEncodedDataLength += len;
+
+		EVP_CIPHER_CTX_free(ctx);
+
+		resultArray = QByteArray((const char*)encodedData, actualEncodedDataLength);
+		delete[] encodedData;
+
 	} else {
-		QCA::SecureArray f = cipher.process(data);
-		if (!cipher.ok()) {
+
+		unsigned char* decodedData = new unsigned char[inputLength];
+		memset(decodedData, 0, inputLength);
+
+		int len;
+		int actualDecodedDataLength;
+
+		if(!(ctx = EVP_CIPHER_CTX_new())) {
+			delete[] decodedData;
+			 return QByteArray();
+		}
+
+		if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, aesKey, (uchar*)initVectorData.data())) {
+			delete[] decodedData;
 			return QByteArray();
 		}
-		resultArray = QByteArray(f.data(), f.size());
+
+		if(1 != EVP_DecryptUpdate(ctx, decodedData, &len, inputData, inputLength)) {
+			delete[] decodedData;
+			return QByteArray();
+		}
+		actualDecodedDataLength = len;
+
+		if(1 != EVP_DecryptFinal_ex(ctx, decodedData + len, &len)) {
+			delete[] decodedData;
+			return QByteArray();
+		}
+		actualDecodedDataLength += len;
+
+		EVP_CIPHER_CTX_free(ctx);
+
+		resultArray = QByteArray((const char*)decodedData, actualDecodedDataLength);
+		delete[] decodedData;
 	}
+
 
 	return resultArray;
 }
 
 QList<int> Cipherer::GetAvaliableCipherIDs() {
 	return avaliableCipherTypes.keys();
-}
-
-bool Cipherer::IsCipherTypeSupported(QString type) {
-	QString str(type + "-cbc-pkcs7");
-	return QCA::isSupported(str.toStdString().c_str());
-}
-
-bool Cipherer::IsFeatureSupported(const char* feature) {
-	return QCA::isSupported(feature);
 }
 
 QString Cipherer::GetCipherName(int cipherID) {
@@ -118,23 +161,19 @@ QString Cipherer::GetCipherName(int cipherID) {
 }
 
 QByteArray Cipherer::GetHash(const QByteArray& str, quint8 hashID) {
-	if (!IsHashSupported(hashID)) {
-		return QByteArray();
-	}
+	(void)hashID;
+	const int iterations {1000};
 
-	const int iterations = 1000;
-	const QString hashType = "sha256";
+	unsigned char hash[SHA256_DIGEST_LENGTH];
+	SHA256_CTX sha256;
+	SHA256_Init(&sha256);
 
-	if (!QCA::isSupported(hashType.toStdString().c_str())) {
-		return QByteArray();
-	}
-
-	QCA::Hash shaHash(hashType);
 	for (int i = 0; i < iterations; i++) {
-		shaHash.update(str);
+		SHA256_Update(&sha256, str.data(), str.size());
 	}
+	SHA256_Final(hash, &sha256);
 
-	QByteArray finalHash = shaHash.final().toByteArray();
+	QByteArray finalHash {(char*)hash};
 
 	return finalHash;
 }
@@ -144,25 +183,25 @@ bool Cipherer::IsHashSupported(quint8 i) {
 }
 
 QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
-	if (!IsSecureHashSupported(hashID)) {
-		return QByteArray();
-	}
+	(void)hashID;
+	const int iterations {1000};
 
-	const int iterations = 1000;
-	const QString hashType = "hmac(sha256)";
+	unsigned int len {SHA256_DIGEST_LENGTH};
+	unsigned char hash[SHA256_DIGEST_LENGTH];
 
-	if (!QCA::isSupported(hashType.toStdString().c_str())) {
-		return QByteArray();
-	}
+	HMAC_CTX ctx;
+	HMAC_CTX_init(&ctx);
 
-	QCA::SymmetricKey key(data);
-	QCA::MessageAuthenticationCode mac(hashType, key);
 
+	HMAC_Init_ex(&ctx, data.data(), data.size(), EVP_sha256(), NULL);
 	for (int i = 0; i < iterations; i++) {
-		mac.update(data);
+		HMAC_Update(&ctx, (const uchar*)data.data(), data.size());
 	}
+	HMAC_Final(&ctx, hash, &len);
+	HMAC_CTX_cleanup(&ctx);
 
-	QByteArray finalHash = mac.final().toByteArray();
+
+	QByteArray finalHash {(char*)hash};
 
 	return finalHash;
 }

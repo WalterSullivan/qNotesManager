@@ -18,19 +18,18 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #ifndef CIPHERER_H
 #define CIPHERER_H
 
-#include <QtCrypto>
 #include <QByteArray>
 #include <QHash>
 
 namespace qNotesManager {
+	enum class Direction {Encode, Decode};
+
 	class Cipherer {
 	private:
 		QByteArray process(const QByteArray& data, const QByteArray& keyData,
-						   QCA::Direction direction, int cipherID);
+						   Direction direction, int cipherID);
 
 		QHash<int, QString> avaliableCipherTypes;
-		const QCA::Cipher::Mode defaultCipherMode;
-		const QCA::Cipher::Padding defaultCipherPadding;
 
 	public:
 		Cipherer();
@@ -44,9 +43,6 @@ namespace qNotesManager {
 
 		QByteArray GetSecureHash(const QByteArray& data, quint8 hashID);
 		bool IsSecureHashSupported(quint8);
-
-		bool IsCipherTypeSupported(QString);
-		bool IsFeatureSupported(const char* feature);
 
 		QString GetCipherName(int cipherID);
 

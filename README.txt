@@ -52,18 +52,16 @@
 	   - Mac OS (maybe, not tested).
 	   
        This program requeries following libraries:
-	   - Qt4 libraries (4.4 or above)
+	   - Qt4 libraries (4.6 or above)
 	   - openssl
-	   - qca2
-	   - qca-ossl2
+
 	   
 	   Building on Windows 32:
-	   All required libraries are located in libs/win32 directory. To run 
-	   executable, make sure excutable's directory contains these files:
-	   -libeay32.dll
-	   -ssleay32.dll
-	   -qca2.dll
-	   -crypto/qca-ossl2.dll
+	   qNotesManager requires openssl library to build. Make sure you have 
+	   OPENSSL_ROOT_DIR system variable defined or change OPENSSLPATH local 
+	   variable in qNotesManager.pro file. You can find precompiled
+	   openssl libraries at 
+	   http://www.npcglib.org/~stathis/blog/precompiled-openssl/.
 	   
 	   Building on Linux:
 	   Install required libraries with your package manager.

@@ -19,7 +19,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTextCodec>
 #include <QFileInfo>
 #include <QtGlobal>
-#include <QtCrypto>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,8 +39,6 @@ void myMessageOutput(QtMsgType type, const char *msg);
 bool errorOutput;
 
 int main(int argc, char** argv) {
-	QCA::Initializer init;
-
 	QApplication app(argc, argv);
 	app.setQuitOnLastWindowClosed(false);
 
