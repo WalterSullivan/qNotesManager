@@ -169,6 +169,13 @@ QPixmap Application::GetLoadingImage(const QSize& size) const {
 	return loadingThumbnails[newSize];
 }
 
-inline uint qHash(const QSize& size, uint seed) {
-	return qHash(size.width(), seed) ^ size.height();
-}
+#if QT_VERSION >= 0x050000
+	inline uint qHash(const QSize& size, uint seed) {
+		return qHash(size.width(), seed) ^ size.height();
+	}
+#else
+	inline uint qHash(const QSize& size) {
+		return qHash(size.width()) ^ size.height();
+	}
+#endif
+
