@@ -118,7 +118,7 @@ QPixmap Application::createImage(const QSize& size, const QString& text, bool lo
 			for (int i = 1; i <= dotsCount; ++i) {
 				painter.setBrush(dotBrush);
 
-				painter.drawEllipse(0, -size.height() / 3, dotSize, dotSize);
+				painter.drawEllipse(0, -wheelSize / 2, dotSize, dotSize);
 
 				alpha = alpha - alphaStep;
 				alpha = qMax(alpha, 0);
