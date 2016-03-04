@@ -6,7 +6,7 @@
 
 #define V_MAJOR		0
 #define V_MINOR		9
-#define V_BUILD		7
+#define V_BUILD		8
 #define V_REVISION	0
 #define V_ALPHA		0
 

@@ -1,4 +1,8 @@
-﻿0.9.7
+﻿0.9.8
+	- Removed QCA dependency
+	- Fixed loading image's icon generation for tall but narrow images.
+
+0.9.7
 	- New features:
 		- Added 'Show in tree' action to search results. Triggering it will highlight selected note in the notes tree;
 		- Reworked local search panel: added 'Replace' field, added 'Greedy search' option, added backreference support;
