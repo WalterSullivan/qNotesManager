@@ -77,6 +77,9 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 	QObject::connect(cancelButton, SIGNAL(clicked()),
 					 this, SLOT(reject()));
 
+	QObject::connect(this, SIGNAL(accepted()), this, SLOT(sl_Accepted()));
+	QObject::connect(this, SIGNAL(rejected()), this, SLOT(sl_Rejected()));
+
 	QGridLayout* controlsLayout = new QGridLayout();
 	controlsLayout->addWidget(creationDateLabel, 0, 0);
 	controlsLayout->addWidget(creationDateLabelD, 0, 1);
