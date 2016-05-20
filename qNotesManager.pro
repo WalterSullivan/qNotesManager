@@ -3,7 +3,7 @@ TEMPLATE = app
 CONFIG += debug
 RC_FILE = qnm.rc
 QT += network
-CONFIG += crypto
+CONFIG += crypto ssl
 QMAKE_CXXFLAGS += -Wall
 QMAKE_CXXFLAGS += -isystem \
 	$(QTDIR)/include
@@ -11,6 +11,7 @@ DEFINES += ENABLE_LOG_TRACE
 BUILD_PATH = ./build
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++11
 
 win32 {
 	OPENSSLPATH = $(OPENSSL_ROOT_DIR)
@@ -22,6 +23,7 @@ win32 {
 	LIBS += -leay32MD
 } else {
 	PKGCONFIG += openssl
+    LIBS  += -lssl -lcrypto
 }
 
 CONFIG(debug, debug|release) { 

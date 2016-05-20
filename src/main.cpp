@@ -52,6 +52,8 @@ int main(int argc, char** argv) {
 			"file					File to open\n");
 	errorOutput = true;
 
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+
 	QStringList arguments = QCoreApplication::arguments();
 
 	if (arguments.count() > 1) {
