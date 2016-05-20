@@ -36,6 +36,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QSystemTrayIcon>
 #include <QSemaphore>
 #include <QProgressBar>
+#include <QTimer>
 
 namespace qNotesManager {
 	class NavigationPanelWidget;
@@ -127,16 +128,15 @@ namespace qNotesManager {
 		// this flag indicates whether application should be closed after saving
 		bool exitAppAfterSave;
 
+		QTimer documentUpdateCheckTimer;
+
 	public:
 		explicit MainWindow();
 		void OpenDocument(QString fileName);
 
 	protected:
-		/*virtual*/ bool eventFilter (QObject* watched, QEvent* event);
 		/*virtual*/ void closeEvent (QCloseEvent* event);
 		/*virtual*/ void changeEvent (QEvent* event);
-		/*virtual*/ void resizeEvent (QResizeEvent* event);
-		/*virtual*/ void moveEvent (QMoveEvent* event);
 
 	signals:
 
@@ -159,7 +159,7 @@ namespace qNotesManager {
 		void sl_OpenDocumentAction_Triggered();
 		void sl_SaveDocumentAction_Triggered(bool* actionCancelled = 0);
 		void sl_SaveDocumentAsAction_Triggered();
-		void sl_CloseDocumentAction_Triggered(bool* actionCancelled = 0, bool* actionDelayed = 0);
+		void sl_CloseDocumentAction_Triggered(bool* actionCancelled = 0, bool* actionDelayed = 0, bool suppressSaving = false);
 		void sl_DocumentPropertiesAction_Triggered();
 		void sl_GlobalSearchAction_Triggered();
 		void sl_OpenRecentFileAction_Triggered();
@@ -199,6 +199,8 @@ namespace qNotesManager {
 		void sl_Document_PasswordRequired(QSemaphore*, QString*, bool);
 		void sl_Document_ConfirmationRequest(QSemaphore*, QString, bool*);
 		void sl_Document_Message(QString);
+
+		void sl_DocumentUpdateTimer_Timeout();
 	};
 }
 

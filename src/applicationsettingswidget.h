@@ -44,11 +44,11 @@ namespace qNotesManager {
 	public:
 		explicit ApplicationSettingsWidget(QWidget *parent = 0);
 
+	public slots:
+		virtual void accept();
+
 	private slots:
 		void sl_ShowSystemTrayCheckbox_StateChanged(int);
-		void sl_OKButton_Clicked();
-		void sl_CancelButton_Clicked();
-
 	};
 }
 

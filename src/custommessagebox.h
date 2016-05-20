@@ -39,12 +39,12 @@ namespace qNotesManager {
 		QPixmap standardIcon(QMessageBox::Icon icon);
 
 	public:
-		explicit CustomMessageBox(const QString& text,
-							const QString& caption = QString(),
-							QMessageBox::Icon Icon = QMessageBox::NoIcon,
-							QMessageBox::StandardButtons buttons = QMessageBox::Ok,
-							QMessageBox::StandardButton defaultButton = QMessageBox::NoButton,
-							QWidget* parent = 0);
+		explicit CustomMessageBox(QWidget* parent,
+								  const QString& text,
+								  const QString& caption = QString(),
+								  QMessageBox::Icon Icon = QMessageBox::NoIcon,
+								  QMessageBox::StandardButtons buttons = QMessageBox::Ok,
+								  QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
 
 		QMessageBox::StandardButton show();
 

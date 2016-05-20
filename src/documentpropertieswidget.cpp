@@ -61,9 +61,12 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 
 	okButton = new QPushButton("OK", this);
 	okButton->setDefault(true);
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(sl_OKButton_Clicked()));
+	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	cancelButton = new QPushButton("Cancel", this);
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(sl_CancelButton_Clicked()));
+	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+
+	QObject::connect(this, SIGNAL(accepted()), this, SLOT(sl_Accepted()));
+	QObject::connect(this, SIGNAL(rejected()), this, SLOT(sl_Rejected()));
 
 	QGridLayout* encryptionLayout = new QGridLayout();
 	encryptionLayout->addWidget(passwordLabel, 0, 0);
@@ -97,7 +100,7 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 }
 
 void DocumentPropertiesWidget::SetDocument(Document* d) {
-	if (!d) {
+	if (d == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -134,7 +137,7 @@ void DocumentPropertiesWidget::sl_UseEncryptionCB_StateChanged(int) {
 	if (encryptionAlg->currentIndex() == -1) {encryptionAlg->setCurrentIndex(0);}
 }
 
-void DocumentPropertiesWidget::sl_OKButton_Clicked() {
+void DocumentPropertiesWidget::accept() {
 	if (useEncryptionCheckbox->isChecked()) {
 		if (encryptionAlg->currentIndex() == -1) {
 			encryptionAlg->setFocus(Qt::OtherFocusReason);
@@ -151,19 +154,25 @@ void DocumentPropertiesWidget::sl_OKButton_Clicked() {
 		}
 	}
 
+	QDialog::accept();
+}
+
+void DocumentPropertiesWidget::sl_Accepted() {
 	quint8 cipherID = 0;
 	if (useEncryptionCheckbox->isChecked()) {
 		QVariant data = encryptionAlg->itemData(encryptionAlg->currentIndex(), Qt::UserRole);
+#if QT_VERSION >= 0x050000
+		cipherID = data.value<quint8>();
+#else
 		cipherID = qVariantValue<quint8>(data);
+#endif
 	}
 	if (currentDocument->GetCipherID() != cipherID ||
 		currentDocument->GetPassword() != passwordLineEdit->text()) {
 		currentDocument->SetCipherData(cipherID, passwordLineEdit->text());
 	}
-
-	accept();
 }
 
-void DocumentPropertiesWidget::sl_CancelButton_Clicked() {
-	reject();
+void DocumentPropertiesWidget::sl_Rejected() {
+	currentDocument = nullptr;
 }

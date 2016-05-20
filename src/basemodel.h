@@ -32,7 +32,7 @@ namespace qNotesManager {
 
 	protected:
 		void SetDisplayRootItem(BaseModelItem*);
-		BaseModelItem* const GetDisplayRootItem() const;
+		BaseModelItem* GetDisplayRootItem() const;
 		void SetRootItem(BaseModelItem*);
 		BaseModelItem* GetRootItem() const;
 

@@ -29,8 +29,8 @@ DateModelItem::DateModelItem(DateComponent c, int v) :
 		BaseModelItem(BaseModelItem::date),
 		value(v),
 		component(c) {
-	if (v < 0) {v = 0;}
-	if (component == Month && v > 11) {v = 11;}
+	if (value < 0) {value = 0;}
+	if (component == Month && value > 11) {value = 11;}
 }
 
 // virtual

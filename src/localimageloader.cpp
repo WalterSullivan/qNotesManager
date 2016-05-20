@@ -30,10 +30,12 @@ void LocalImageLoadWorker::sl_process() {
 	while(true) {
 		lock.lockForRead();
 		if (queue.isEmpty()) {
+			SetNeedRestart(true);
 			lock.unlock();
 			break;
 		}
 		lock.unlock();
+
 		lock.lockForWrite();
 		QUrl url = queue.takeFirst();
 		lock.unlock();
@@ -50,7 +52,7 @@ void LocalImageLoadWorker::sl_process() {
 	emit sg_finished();
 }
 
-void LocalImageLoadWorker::AddUrl(const QUrl url) {
+void LocalImageLoadWorker::AddUrl(const QUrl& url) {
 	lock.lockForWrite();
 	queue.append(url);
 	lock.unlock();
@@ -62,10 +64,20 @@ void LocalImageLoadWorker::CancelAllDownloads() {
 	lock.unlock();
 }
 
-LocalImageLoader::LocalImageLoader(QObject *parent) :
-	QObject (parent) {
+bool LocalImageLoadWorker::NeedRestart() const {
+	QReadLocker locker(&NRlock);
+	return needRestart;
+}
+
+void LocalImageLoadWorker::SetNeedRestart(bool v) {
+	QWriteLocker locker(&NRlock);
+	needRestart = v;
+}
+
+LocalImageLoader::LocalImageLoader(QObject *parent) : QObject (parent) {
 	thread = new QThread(this);
-	worker = new LocalImageLoadWorker(0);
+	worker = new LocalImageLoadWorker();
+	// do not set worker's parent because it will be moved to another thread
 	worker->moveToThread(thread);
 
 	QObject::connect(thread, SIGNAL(started()), worker, SLOT(sl_process()));
@@ -75,6 +87,7 @@ LocalImageLoader::LocalImageLoader(QObject *parent) :
 					 this, SIGNAL(sg_DownloadError(QUrl,QString)), Qt::QueuedConnection);
 	QObject::connect(worker, SIGNAL(sg_DownloadFinished(QUrl,CachedImageFile*)),
 					 this, SIGNAL(sg_DownloadFinished(QUrl,CachedImageFile*)), Qt::QueuedConnection);
+
 }
 
 LocalImageLoader::~LocalImageLoader() {
@@ -85,14 +98,13 @@ LocalImageLoader::~LocalImageLoader() {
 	delete worker;
 }
 
-void LocalImageLoader::Download(const QUrl url) {
+void LocalImageLoader::Download(const QUrl& url) {
 	worker->AddUrl(url);
-	if (!thread->isRunning()) {
+	if (worker->NeedRestart()) {
+		thread->wait();
+		worker->SetNeedRestart(false);
 		thread->start();
 	}
-}
-
-void LocalImageLoader::CancelDownload(const QUrl url) {
 }
 
 void LocalImageLoader::CancelAllDownloads() {

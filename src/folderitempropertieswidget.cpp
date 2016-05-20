@@ -71,11 +71,11 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 	okButton = new QPushButton("OK", this);
 	okButton->setDefault(true);
 	QObject::connect(okButton, SIGNAL(clicked()),
-					 this, SLOT(sl_OKButton_Clicked()));
+					 this, SLOT(accept()));
 
 	cancelButton = new QPushButton("Cancel", this);
 	QObject::connect(cancelButton, SIGNAL(clicked()),
-					 this, SLOT(sl_CancelButton_Clicked()));
+					 this, SLOT(reject()));
 
 	QGridLayout* controlsLayout = new QGridLayout();
 	controlsLayout->addWidget(creationDateLabel, 0, 0);
@@ -144,12 +144,16 @@ void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
 	nameLineEdit->selectAll();
 }
 
-void FolderItemPropertiesWidget::sl_OKButton_Clicked() {
+void FolderItemPropertiesWidget::accept() {
 	if (!itemToEdit) {
 		WARNING("Null pointer recieved");
 		reject();
 	}
 
+	QDialog::accept();
+}
+
+void FolderItemPropertiesWidget::sl_Accepted() {
 	if (nameLineEdit->text().isEmpty()) {nameLineEdit->setText("Noname");} // ?
 
 	if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Folder) {
@@ -163,12 +167,10 @@ void FolderItemPropertiesWidget::sl_OKButton_Clicked() {
 	}
 
 	itemToEdit = 0;
-	accept();
 }
 
-void FolderItemPropertiesWidget::sl_CancelButton_Clicked() {
+void FolderItemPropertiesWidget::sl_Rejected() {
 	itemToEdit = 0;
-	reject();
 }
 
 void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {

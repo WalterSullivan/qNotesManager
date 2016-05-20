@@ -147,9 +147,10 @@ void ColorPickerButton::sl_ActionTriggered(QAction* action) {
 	} else {
 		if (action == pickCustomColorAction) {
 			QColor newColor = QColorDialog::getColor(currentColor, this);
-			if (newColor.isValid()) {
-				c = newColor;
+			if (!newColor.isValid()) {
+				return;
 			}
+			c = newColor;
 		} else {
 			c = action->data().value<QColor>();
 		}

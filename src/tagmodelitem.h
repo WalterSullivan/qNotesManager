@@ -28,7 +28,7 @@ namespace qNotesManager {
 		const Tag*	_tag;
 
 	public:
-		TagModelItem(const Tag* tag);
+		explicit TagModelItem(const Tag* tag);
 
 		/*virtual*/ QVariant data(int role) const;
 		/*virtual*/ bool LessThan(const BaseModelItem*) const;

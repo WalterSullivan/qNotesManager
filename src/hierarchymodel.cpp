@@ -421,7 +421,7 @@ Qt::ItemFlags HierarchyModel::flags (const QModelIndex& index ) const {
 
 	if (index.isValid()) {
 		BaseModelItem* modelItem = static_cast<BaseModelItem*>(index.internalPointer());
-		if (modelItem->DataType() == BaseModelItem::folder) {
+		if (modelItem->DataType() == BaseModelItem::folder && Application::I()->CurrentDocument() != nullptr) {
 			FolderModelItem* folderItem = dynamic_cast<FolderModelItem*>(modelItem);
 			if (folderItem->GetStoredData() == Application::I()->CurrentDocument()->GetTempFolder() ||
 				folderItem->GetStoredData() == Application::I()->CurrentDocument()->GetTrashFolder()) {
@@ -461,7 +461,7 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 
 	// Modify row variable to ensure 3 system items are always at the botton of the list
 	// Not a final version, just dirty hack
-	if (GetDisplayRootItem() == GetRootItem() && row >= 0 && row > GetRootItem()->ChildrenCount() - 3) {
+	if (newParentModelItem == GetRootItem() && row >= 0 && row > GetRootItem()->ChildrenCount() - 3) {
 		row = GetRootItem()->ChildrenCount() - 3;
 	}
 

@@ -358,7 +358,7 @@ void NoteEditWidget::sl_TextCreationCheckbox_Toggled(bool toggle) {
 }
 
 void NoteEditWidget::sl_TextCreationDateTime_Changed(const QDateTime& newDateTime) {
-
+	(void)newDateTime;
 }
 
 void NoteEditWidget::sl_TagsEdit_CollectionChanged(QStringList newTags) {
@@ -436,4 +436,8 @@ bool NoteEditWidget::eventFilter (QObject* watched, QEvent* event) {
 
 QList<QAction*> NoteEditWidget::EditActionsList() const {
 	return textEditWidget->EditActionsList();
+}
+
+void NoteEditWidget::FocusTextEdit() {
+	textEditWidget->FocusTextEdit();
 }

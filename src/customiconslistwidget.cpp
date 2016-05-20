@@ -36,7 +36,7 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 
 	filterModel = new QSortFilterProxyModel(this);
 	filterModel->setSourceModel(iconsModel);
-	filterModel->setFilterRole(Qt::UserRole + 2);
+	filterModel->setFilterRole(IconGroupRole);
 
 	buttonGroup = new QButtonGroup(this);
 	QObject::connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
@@ -87,10 +87,11 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 					 this, SLOT(sl_ListView_DoubleClicked(QModelIndex)));
 
 	okButton = new QPushButton("Select");
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(sl_OKButton_Clicked()));
+	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 
 	cancelButton = new QPushButton("Cancel");
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(sl_CancelButton_Clicked()));
+	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	QObject::connect(this, SIGNAL(rejected()), this, SLOT(sl_Rejected()));
 
 	addIconButton = new QPushButton("Add custom icon");
 	QObject::connect(addIconButton, SIGNAL(clicked()), this, SLOT(sl_AddIconButton_Clicked()));
@@ -116,27 +117,26 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 	SelectedIconKey = "";
 }
 
-void CustomIconsListWidget::sl_OKButton_Clicked() {
+void CustomIconsListWidget::accept() {
 	QModelIndex index = listView->currentIndex();
-	if (!index.isValid()) {reject();}
+	if (!index.isValid()) {return;}
 
-	SelectedIconKey = index.data(Qt::UserRole + 1).toString();
+	SelectedIconKey = index.data(IconIDRole).toString();
 	if (SelectedIconKey.isEmpty()) {
 		WARNING("Selected icon key is empty");
 		return;
 	}
 
-	accept();
+	QDialog::accept();
 }
 
-void CustomIconsListWidget::sl_CancelButton_Clicked() {
+void CustomIconsListWidget::sl_Rejected() {
 	SelectedIconKey = "";
-	reject();
 }
 
 void CustomIconsListWidget::sl_AddIconButton_Clicked() {
 	QString filter = "Images (*.png)";
-	QStringList list = QFileDialog::getOpenFileNames (0, "Select icons to add", QString(),
+	QStringList list = QFileDialog::getOpenFileNames (this, "Select icons to add", QString(),
 													  filter);
 	if (list.isEmpty()) {return;}
 
@@ -170,7 +170,7 @@ void CustomIconsListWidget::SelectIcon(const QString& key) {
 
 	QModelIndex start = iconsModel->index(0, 0);
 
-	QModelIndexList list = iconsModel->match(start, Qt::UserRole + 1, key,
+	QModelIndexList list = iconsModel->match(start, IconIDRole, key,
 												1, Qt::MatchFixedString);
 
 	if (list.isEmpty()) {
@@ -179,7 +179,7 @@ void CustomIconsListWidget::SelectIcon(const QString& key) {
 	}
 
 	QModelIndex index = list[0];
-	QString group = index.data(Qt::UserRole + 2).toString();
+	QString group = index.data(IconGroupRole).toString();
 	int newIndex = FindButtonIndexByName(group);
 
 	if (newIndex == -1) {
@@ -202,7 +202,8 @@ void CustomIconsListWidget::SelectIcon(const QString& key) {
 }
 
 void CustomIconsListWidget::sl_ListView_DoubleClicked (const QModelIndex& index) {
-	sl_OKButton_Clicked();
+	(void)index;
+	accept();
 }
 
 void CustomIconsListWidget::sl_ButtonGroup_ButtonClicked(QAbstractButton*) {

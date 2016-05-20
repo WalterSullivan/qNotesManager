@@ -74,7 +74,7 @@ namespace qNotesManager {
 		IndexCache insertIndexCache;
 
 	public:
-		BaseModelItem(ItemType type = Null);
+		explicit BaseModelItem(ItemType type = Null);
 		virtual ~BaseModelItem();
 
 		ItemType DataType() const;

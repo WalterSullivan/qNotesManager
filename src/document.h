@@ -96,6 +96,9 @@ namespace qNotesManager {
 
 		QIcon tagIcon;
 
+		mutable QDateTime fileTimeStamp;
+		mutable bool doNotReloadFlag;
+
 	public:
 		explicit Document();
 		~Document();
@@ -155,6 +158,10 @@ namespace qNotesManager {
 		void AddBookmark(Note*);
 		void RemoveBookmark(Note*);
 		bool IsBookmark(Note*);
+
+		QDateTime GetFileTimeStamp() const;
+		bool DoNotReload() const;
+		void SetDoNotReload(bool v) const;
 
 	signals:
 		void sg_Changed();	// Emitted when document was changed

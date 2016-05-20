@@ -85,11 +85,9 @@ void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* im
 	QString name = image->GetMD5();
 	QUrl newUrl(name);
 	if (!originalImages.contains(name)) {
-		qDebug() << "Resource for id " << name << " not found. Adding resource";
 		addResource(QTextDocument::ImageResource, newUrl, image->GetPixmap());
 		originalImages.insert(name, image);
 	} else {
-		qDebug() << "!!!! Resource for id " << name << " found";
 		delete image;
 	}
 
@@ -98,7 +96,6 @@ void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* im
 	// 'replaceImageUrl' line a request for old url may be requested. If such request will come after
 	// 'activeDownloads.removeAll(url)' line, old url will be queued for downloading again.
 
-	qDebug() << "Removing " << url << "from active downloads list";
 	activeDownloads.removeAll(url);
 
 	emit sg_NeedRelayout();
@@ -131,23 +128,22 @@ QVariant TextDocument::loadResource (int type, const QUrl& url) {
 	}
 
 	if (type == QTextDocument::ImageResource) {
-		QString stringUrl = url.toString();
+		QString stringUrl = url.toEncoded();
 		if (originalImages.contains(stringUrl)) {
 			CachedImageFile* image = originalImages[stringUrl];
 			addResource(QTextDocument::ImageResource, url, image->GetPixmap());
 			return image->GetPixmap();
 		}
+		QSize imageSize = findImageSize(url.toEncoded());
 		if (errorDownloads.contains(url)) {
-			return DummyImagesProvider->GetErrorImage();
+			return DummyImagesProvider->GetErrorImage(imageSize);
 		}
 		if (!activeDownloads.contains(url)) {
-			qDebug() << "Creating download task";
 			activeDownloads.append(url);
 			loader->Download(url);
-			return DummyImagesProvider->GetLoadingImage();
+			return DummyImagesProvider->GetLoadingImage(imageSize);
 		} else {
-			qDebug() << "Url " << url << "is in active downloads list. Skipping";
-			return DummyImagesProvider->GetLoadingImage();
+			return DummyImagesProvider->GetLoadingImage(imageSize);
 		}
 	}
 
@@ -161,7 +157,7 @@ void TextDocument::replaceImageUrl(const QUrl &oldName, const QString &newName) 
 
 	while(block.isValid()) {
 		QTextBlock::iterator iterator;
-		for(iterator = block.begin(); !(iterator.atEnd()); iterator++) {
+		for(iterator = block.begin(); !(iterator.atEnd()); ++iterator) {
 			QTextFragment fragment = iterator.fragment();
 			if(fragment.isValid() && fragment.charFormat().isImageFormat()) {
 				QTextImageFormat format = fragment.charFormat().toImageFormat();
@@ -184,6 +180,25 @@ void TextDocument::replaceImageUrl(const QUrl &oldName, const QString &newName) 
 		cursor.mergeCharFormat(format);
 	}
 	cursor.endEditBlock();
+}
+
+QSize TextDocument::findImageSize(const QString& resourceID) {
+	QTextBlock block = begin();
+
+	while(block.isValid()) {
+		QTextBlock::iterator iterator;
+		for(iterator = block.begin(); !(iterator.atEnd()); ++iterator) {
+			QTextFragment fragment = iterator.fragment();
+			if(fragment.isValid() && fragment.charFormat().isImageFormat()) {
+				QTextImageFormat format = fragment.charFormat().toImageFormat();
+				if (format.name() == resourceID) {
+					return QSize(format.width(), format.height());
+				}
+			}
+		}
+		block = block.next();
+	}
+	return QSize();
 }
 
 QStringList TextDocument::GetImagesList() const {

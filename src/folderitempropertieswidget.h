@@ -63,9 +63,11 @@ namespace qNotesManager {
 	signals:
 
 	public slots:
+		virtual void accept();
+
 	private slots:
-		void sl_OKButton_Clicked();
-		void sl_CancelButton_Clicked();
+		void sl_Accepted();
+		void sl_Rejected();
 		void sl_ChooseIconButton_Clicked();
 		void sl_ResetIconToDefaultButton_Clicked();
 		void sl_SetDefaultIconButton_Clicked();

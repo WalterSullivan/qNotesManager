@@ -74,7 +74,7 @@ void SearchResultItemDelegate::paint (QPainter* painter, const QStyleOptionViewI
 	QStyle *style = QApplication::style();
 	style->drawControl(QStyle::CE_ItemViewItem, &option, painter, 0);
 
-	QPalette::ColorGroup cg = option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
+	QPalette::ColorGroup cg = (option.state & QStyle::State_Enabled) ? QPalette::Normal : QPalette::Disabled;
 	if (cg == QPalette::Normal && !(option.state & QStyle::State_Active)) {
 		cg = QPalette::Inactive;
 	}

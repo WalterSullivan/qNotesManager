@@ -35,8 +35,8 @@ namespace qNotesManager {
 		QList<Tag*> tags;
 		Note*	owner;
 
-		NoteTagsCollection(const NoteTagsCollection&) : QObject(0) {} // Prevent construction by copying
-		NoteTagsCollection& operator=(const NoteTagsCollection&){return *this;} // Prevent assignment
+		NoteTagsCollection(const NoteTagsCollection&) = delete;
+		NoteTagsCollection& operator=(const NoteTagsCollection&) = delete;
 
 	public:
 		explicit NoteTagsCollection(Note*);

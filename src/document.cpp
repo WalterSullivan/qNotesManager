@@ -101,6 +101,9 @@ Document::Document() : QObject(0) {
 	DefaultNoteIcon = Application::I()->DefaultNoteIcon;
 
 	tagIcon = QIcon(":/gui/tag");
+
+	fileTimeStamp = QDateTime::currentDateTime();
+	doNotReloadFlag = false;
 }
 
 Document::~Document() {
@@ -635,6 +638,17 @@ bool Document::IsBookmark(Note* note) {
 	if (note == 0) {return false;}
 
 	return bookmarks.contains(note);
+}
+
+QDateTime Document::GetFileTimeStamp() const {
+	return fileTimeStamp;
+}
+
+bool Document::DoNotReload() const {
+	return doNotReloadFlag;
+}
+void Document::SetDoNotReload(bool v) const {
+	doNotReloadFlag = v;
 }
 
 

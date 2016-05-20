@@ -59,15 +59,12 @@ namespace qNotesManager {
 		bool StrikedOut() const;
 		Qt::Alignment GetAlignment() const;
 
-
 		QAction* const InsertHyperlinkAction;
 		QAction* const InsertImageFromUrlAction;
 		QAction* const InsertImageFromFileAction;
 		QAction* const InsertPlainTextAction;
 		QAction* const InsertLineAction;
 		QAction* const InsertDateTimeAction;
-		QAction* const EditTableWidthConstraintsAction;
-		QMenu* const TableAlignMenu;
 
 	protected:
 		virtual void insertFromMimeData (const QMimeData * source);
@@ -91,6 +88,8 @@ namespace qNotesManager {
 
 		void AnalyzeText();
 
+		HyperlinkEditWidget* linkEditDialog;
+		QTimer	anchorTooltipTimer;
 		QAction* followLinkAction;
 		QAction* removeLinkAction;
 		QAction* editLinkAction;
@@ -104,14 +103,8 @@ namespace qNotesManager {
 		QMenu* imagePropertiesMenu;
 		QAction* saveImageAction;
 		QAction* resizeImageAction;
-		QAction* resizeImageCanvasAction;
 
 		QTextFormat formatToCopy;
-
-
-
-		HyperlinkEditWidget* linkEditDialog;
-		QTimer	anchorTooltipTimer;
 
 		QTextFragment findFragmentAtPos(QPoint pos);
 		void applyCharFormatting(const QTextCharFormat& format, const CharFormatApplyMode = Merge);
@@ -135,18 +128,14 @@ namespace qNotesManager {
 		void sl_InsertHyperlinkAction_Triggered();
 		void sl_InsertImageFromUrlAction_Triggered();
 		void sl_InsertImageFromFileAction_Triggered();
-		void sl_TableAlignAction_Triggered();
 		void sl_InsertPlainTextAction_Triggered();
 		void sl_InsertLineAction_Triggered();
 		void sl_InsertDateTimeAction_Triggered();
 
 		void sl_SaveImageAction_Triggered();
 		void sl_ResizeImageAction_Triggered();
-		void sl_ResizeImageCanvasAction_Triggered();
 
 		void sl_AnchorTooltipTimer_Timeout();
-
-		void sl_EditTableWidthConstraintsAction_Triggered();
 
 	public slots:
 		void sl_CopyCurrentFormat(bool);

@@ -88,6 +88,7 @@ namespace qNotesManager {
 		QAction*			removeRowAction;
 		QAction*			removeColumnAction;
 		QAction*			mergeCellsAction;
+		QAction*			tablePropertiesAction;
 
 		QAction*			undoAction;
 		QAction*			redoAction;
@@ -121,6 +122,7 @@ namespace qNotesManager {
 		void UpdateActionsStatus(bool enabled);
 
 		void SetReadOnly(bool);
+		void FocusTextEdit();
 
 
 	signals:
@@ -150,6 +152,7 @@ namespace qNotesManager {
 		void sl_RemoveRowAction_Triggered();
 		void sl_RemoveColumnAction_Triggered();
 		void sl_MergeCellsAction_Triggered();
+		void sl_TablePropertiesAction_Triggered();
 
 		void sl_ForegroundTextColorButton_Clicked();
 		void sl_BackgroundTextColorButton_Clicked();
@@ -166,4 +169,4 @@ namespace qNotesManager {
 }
 
 #endif // TEXTEDITWIDGET_H
- 
+

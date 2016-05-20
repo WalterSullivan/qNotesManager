@@ -23,9 +23,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-ImageLoader::ImageLoader(QObject *parent) :
-    QObject(parent)
-{
+ImageLoader::ImageLoader(QObject *parent) : QObject(parent) {
 	localImageLoader = new LocalImageLoader(this);
 	httpImageLoader = new HttpImageDownloader(this);
 
@@ -49,14 +47,6 @@ void ImageLoader::Download(const QUrl url) {
 		httpImageLoader->Download(url);
 	} else if (url.scheme() == "file") {
 		localImageLoader->Download(url);
-	}
-}
-
-void ImageLoader::CancelDownload(const QUrl url) {
-	if (url.scheme() == "http" || url.scheme() == "https") {
-		httpImageLoader->CancelDownload(url);
-	} else if (url.scheme() == "file") {
-		localImageLoader->CancelDownload(url);
 	}
 }
 

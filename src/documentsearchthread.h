@@ -48,7 +48,7 @@ namespace qNotesManager {
 			/*virtual*/ void run();
 
 		public:
-			DocumentSearchThread(QObject* parent);
+			explicit DocumentSearchThread(QObject* parent);
 
 			bool IsActive() const;
 			void Deactivate();

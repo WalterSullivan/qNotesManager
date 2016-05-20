@@ -20,8 +20,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "textdocument.h"
 #include "hyperlinkeditwidget.h"
 #include "global.h"
-#include "edittablewidthconstraintswidget.h"
 #include "custommessagebox.h"
+#include "sizeeditwidget.h"
 
 #include <QMimeData>
 #include <QDebug>
@@ -54,9 +54,7 @@ TextEdit::TextEdit(QWidget *parent) :
 	InsertImageFromFileAction(new QAction("Insert image from file", this)),
 	InsertPlainTextAction(new QAction("Insert plain text", this)),
 	InsertLineAction(new QAction("Insert line", this)),
-	InsertDateTimeAction(new QAction("Insert date and time", this)),
-	EditTableWidthConstraintsAction(new QAction(QIcon(":gui/resize"), "Edit table width...", this)),
-	TableAlignMenu(new QMenu("Table alignment", this))
+	InsertDateTimeAction(new QAction("Insert date and time", this))
 {
 	followLinkAction = new QAction(tr("Follow Link"),this);
 	QObject::connect(followLinkAction, SIGNAL(triggered()),
@@ -69,20 +67,6 @@ TextEdit::TextEdit(QWidget *parent) :
 	editLinkAction = new QAction("Edit link", this);
 	QObject::connect(editLinkAction, SIGNAL(triggered()),
 					 this, SLOT(sl_EditLinkActionTriggered()));
-
-	tableAlignLeft = new QAction(QIcon(":/gui/edit-alignment"), "Left", this);
-	QObject::connect(tableAlignLeft, SIGNAL(triggered()),
-					 this, SLOT(sl_TableAlignAction_Triggered()));
-	tableAlignRight = new QAction(QIcon(":/gui/edit-alignment-right"), "Right", this);
-	QObject::connect(tableAlignRight, SIGNAL(triggered()),
-					 this, SLOT(sl_TableAlignAction_Triggered()));
-	tableAlignCenter = new QAction(QIcon(":/gui/edit-alignment-center"), "Center", this);
-	QObject::connect(tableAlignCenter, SIGNAL(triggered()),
-					 this, SLOT(sl_TableAlignAction_Triggered()));
-	TableAlignMenu->addAction(tableAlignLeft);
-	TableAlignMenu->addAction(tableAlignRight);
-	TableAlignMenu->addAction(tableAlignCenter);
-
 
 	addAction(InsertHyperlinkAction);
 	QObject::connect(InsertHyperlinkAction, SIGNAL(triggered()),
@@ -116,6 +100,8 @@ TextEdit::TextEdit(QWidget *parent) :
 					 this, SLOT(sl_currentCharFormatChanged(QTextCharFormat)));
 
 	linkEditDialog = new HyperlinkEditWidget(this);
+	linkEditDialog->resize(400, 50);
+	anchorTooltipTimer.setSingleShot(true);
 	QObject::connect(&anchorTooltipTimer, SIGNAL(timeout()),
 					 this, SLOT(sl_AnchorTooltipTimer_Timeout()));
 
@@ -128,22 +114,16 @@ TextEdit::TextEdit(QWidget *parent) :
 	insertMenu->addAction(InsertDateTimeAction);
 
 	imagePropertiesMenu = new QMenu("Image", this);
-	saveImageAction = new QAction("Save image", this);
+	saveImageAction = new QAction(QIcon(":/gui/disk-black"), "Save image", this);
 	QObject::connect(saveImageAction, SIGNAL(triggered()),
 					 this, SLOT(sl_SaveImageAction_Triggered()));
-	resizeImageAction = new QAction("Resize image", this);
+	resizeImageAction = new QAction(QIcon(":/gui/image-resize"), "Resize image", this);
 	QObject::connect(resizeImageAction, SIGNAL(triggered()),
 					 this, SLOT(sl_ResizeImageAction_Triggered()));
-	resizeImageCanvasAction = new QAction("Resize image canvas", this);
-	QObject::connect(resizeImageCanvasAction, SIGNAL(triggered()),
-					 this, SLOT(sl_ResizeImageCanvasAction_Triggered()));
+
 
 	imagePropertiesMenu->addAction(saveImageAction);
 	imagePropertiesMenu->addAction(resizeImageAction);
-	imagePropertiesMenu->addAction(resizeImageCanvasAction);
-
-	QObject::connect(EditTableWidthConstraintsAction, SIGNAL(triggered()),
-					 this, SLOT(sl_EditTableWidthConstraintsAction_Triggered()));
 }
 
 void TextEdit::SetDocument(TextDocument* newDocument) {
@@ -325,6 +305,7 @@ QMimeData* TextEdit::createMimeDataFromSelection() const {
 	}
 
 	QString html = selection.toHtml();
+	QString text = selection.toPlainText();
 
 	QRegExp regexp("(<img src=\")([^\"]*)(\")");
 	int index = 0;
@@ -345,7 +326,9 @@ QMimeData* TextEdit::createMimeDataFromSelection() const {
 
 		index += regexp.matchedLength();
 	}
+
 	data->setHtml(html);
+	data->setText(text);
 
 	return data;
 }
@@ -362,7 +345,7 @@ void TextEdit::sl_InsertImageFromUrlAction_Triggered() {
 	if (ok && !text.isEmpty()) {
 		QUrl url(text);
 		if (!url.isValid()) {
-			CustomMessageBox msg("Specified URL is not valid", "Insert image", QMessageBox::Information);
+			CustomMessageBox msg(this, "Specified URL is not valid", "Insert image", QMessageBox::Information);
 			msg.show();
 			return;
 		}
@@ -543,22 +526,14 @@ void TextEdit::contextMenuEvent (QContextMenuEvent* event) {
 
 	menu->addMenu(insertMenu);
 
-	if (textCursor().currentTable()) {
-		menu->addSeparator();
-		menu->addMenu(TableAlignMenu);
-		menu->addSeparator();
-		menu->addAction(EditTableWidthConstraintsAction);
-	}
 
-	/* NOT IMPLEMENTED YET
 	QTextFragment fragment = findFragmentAtPos(event->pos());
 	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
 		menu->addSeparator();
 		menu->addMenu(imagePropertiesMenu);
 		saveImageAction->setData(event->pos());
 		resizeImageAction->setData(event->pos());
-		resizeImageCanvasAction->setData(event->pos());
-	}*/
+	}
 
 	menu->exec(event->globalPos());
 	menu->deleteLater();
@@ -569,7 +544,7 @@ void TextEdit::mouseMoveEvent (QMouseEvent* event) {
 	QTextEdit::mouseMoveEvent(event);
 
 	QString href = anchorAt(event->pos());
-	if (!href.isEmpty()) {
+	if (!href.isEmpty() && this->hasFocus()) {
 		anchorTooltipTimer.start(1000);
 
 		if (event->modifiers() == Qt::ControlModifier &&
@@ -578,7 +553,6 @@ void TextEdit::mouseMoveEvent (QMouseEvent* event) {
 		}
 	} else {
 		if (viewport()->cursor().shape() != Qt::IBeamCursor) {
-
 			viewport()->setCursor(Qt::IBeamCursor);
 		}
 		if (anchorTooltipTimer.isActive()) {anchorTooltipTimer.stop();}
@@ -707,35 +681,25 @@ void TextEdit::sl_EditLinkActionTriggered() {
 }
 
 void TextEdit::sl_InsertHyperlinkAction_Triggered() {
-	linkEditDialog->Set("", "");
+	QString selectedText = textCursor().selection().toPlainText();
+
+	QString urlText = "";
+	const QMimeData* data = QApplication::clipboard()->mimeData();
+	if (data->hasText()) {
+		urlText = data->text();
+	} else if (data->hasUrls()) {
+		QUrl url = data->urls().at(0);
+		urlText = url.toString();
+	}
+
+	if (selectedText.isEmpty()) {selectedText = urlText;}
+
+	linkEditDialog->Set(selectedText, urlText);
 	if (linkEditDialog->exec() == QDialog::Rejected) {return;}
 
 	QTextCursor cursor = textCursor();
 	QString html = QString("<a href=\"%1\">%2</a>").arg(linkEditDialog->GetUrl()).arg(linkEditDialog->GetName());
 	cursor.insertHtml(html);
-}
-
-void TextEdit::sl_TableAlignAction_Triggered() {
-	QAction* const act = qobject_cast<QAction*>(QObject::sender());
-	Qt::Alignment a;
-	if (act == tableAlignLeft) {
-		a = Qt::AlignLeft;
-	} else if (act == tableAlignRight) {
-		a = Qt::AlignRight;
-	} else if (act == tableAlignCenter) {
-		a = Qt::AlignHCenter;
-	} else {
-		WARNING("Unknown sender");
-		return;
-	}
-
-
-	QTextTable* table = textCursor().currentTable();
-	if (!table) {return;}
-
-	QTextTableFormat format = table->format();
-	format.setAlignment(a);
-	table->setFormat(format);
 }
 
 QTextFragment TextEdit::findFragmentAtPos(QPoint pos) {
@@ -977,21 +941,70 @@ void TextEdit::sl_CopyCurrentFormat(bool copy) {
 }
 
 void TextEdit::sl_SaveImageAction_Triggered() {
+	QAction* action = qobject_cast<QAction*>(QObject::sender());
+	if (action == 0) {return;}
 
+	QPoint pos = action->data().toPoint();
+	QTextFragment fragment = findFragmentAtPos(pos);
+	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
+		QTextImageFormat format = fragment.charFormat().toImageFormat();
+		const QString imageName = QString(format.name().toUtf8());
+
+		const TextDocument* textDocument = dynamic_cast<TextDocument*>(document());
+		CachedImageFile* image = textDocument->GetResourceImage(imageName);
+		if (image == 0) {return;}
+
+		QString filename = QFileDialog::getSaveFileName(this, "Select a name", image->GetFileName(),
+			"");
+		if (filename.isNull()) {return;}
+
+		image->Save(filename);
+	}
 }
 
 void TextEdit::sl_ResizeImageAction_Triggered() {
+	QAction* action = qobject_cast<QAction*>(QObject::sender());
+	if (action == nullptr) {return;}
 
-}
-
-void TextEdit::sl_ResizeImageCanvasAction_Triggered() {
-	QAction* act = qobject_cast<QAction*>(QObject::sender());
-	QPoint pos = act->data().toPoint();
-
+	QPoint pos = action->data().toPoint();
 	QTextFragment fragment = findFragmentAtPos(pos);
-	if (fragment.isValid() && fragment.charFormat().isImageFormat()) {
+	if (!fragment.isValid() || !fragment.charFormat().isImageFormat()) {return;}
 
+	QTextImageFormat format = fragment.charFormat().toImageFormat();
+
+	const QString imageName = QString(format.name().toUtf8());
+
+	const TextDocument* textDocument = dynamic_cast<TextDocument*>(document());
+	CachedImageFile* image = textDocument->GetResourceImage(imageName);
+	if (image == nullptr) {return;}
+
+	SizeEditWidget resizeWidget(this);
+	QSize currentImageSize = QSize();
+	if (format.hasProperty(QTextFormat::ImageWidth) &&
+			format.hasProperty(QTextFormat::ImageHeight)) {
+		currentImageSize = QSize((int)format.width(), (int)format.height());
 	}
+
+	resizeWidget.SetData(currentImageSize, image->ImageSize());
+	resizeWidget.exec();
+
+	if (resizeWidget.result() != QDialog::Accepted) {return;}
+
+	QSize newSize = resizeWidget.NewSize;
+	if (newSize.isValid() && newSize != image->ImageSize()) {
+		format.setWidth(newSize.width());
+		format.setHeight(newSize.height());
+	} else {
+		format.clearProperty(QTextFormat::ImageWidth);
+		format.clearProperty(QTextFormat::ImageHeight);
+	}
+
+	QTextCursor tempCursor(textCursor());
+	tempCursor.beginEditBlock();
+	tempCursor.setPosition(fragment.position());
+	tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, fragment.length());
+	tempCursor.setCharFormat(format);
+	tempCursor.endEditBlock();
 }
 
 void TextEdit::sl_InsertPlainTextAction_Triggered() {
@@ -1008,24 +1021,4 @@ void TextEdit::sl_InsertDateTimeAction_Triggered() {
 			QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate)
 			).arg("<br>");
 	textCursor().insertHtml(text);
-}
-
-void TextEdit::sl_EditTableWidthConstraintsAction_Triggered() {
-	QTextTable* table = textCursor().currentTable();
-	if (!table) {
-		WARNING("No table");
-		return;
-	}
-
-	QTextTableFormat format = table->format();
-
-	EditTableWidthConstraintsWidget* widget = new EditTableWidthConstraintsWidget(format, table->columns(), 0);
-	widget->exec();
-	if (widget->result() == QDialog::Accepted) {
-		format.setWidth(widget->TableWidthConstraint);
-		format.setColumnWidthConstraints(widget->ColumnWidthConstraints);
-		table->setFormat(format);
-	}
-
-	delete widget;
 }

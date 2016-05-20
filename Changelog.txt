@@ -1,4 +1,39 @@
-﻿0.9.6 (24.02.2014)
+﻿0.9.8
+	- Removed QCA dependency
+	- Fixed loading image's icon generation for tall but narrow images.
+
+0.9.7
+	- New features:
+		- Added 'Show in tree' action to search results. Triggering it will highlight selected note in the notes tree;
+		- Reworked local search panel: added 'Replace' field, added 'Greedy search' option, added backreference support;
+		- It is possible to disable deletion confirmation using 'do not ask anymore' checkbox;
+		- Added auto-reload feature : if an opened document has been changed outside of the program (using sync software), program offers user to reload it;
+		- Implemented 'Save image' and 'Resize image' features;
+		- Added 'Table Properties' window;
+		
+		
+	- Bug fixes:
+		- Fixed issue when editing note's tags would create duplicated tags;
+		- Fixed application crash when closing document with search results open;
+		- Fixed showing duplicated results in search results;
+		- Fixed application crash when trying to search in a closed document;
+		- Fixed application crash when trying to perform text search in a document;
+		- Fixed bug when double click on search result did not activate note's tab properly;
+		- Fixed bug when images were not copied to clipboard correctly;
+		- Fixed bug in notebook tree when after drag'n'drop item was always moved to second row;
+		- Fixed bug when note's text could not be copied to clipboard;
+		- Added shortcut (Ctrl+W) to close current note tab;
+		- Program now puts selected text to 'link name' field and text from clipboard to 'link' field in 'Insert hyperlink' dialog;
+		- New note caption extraction function reworked, caption now trimmed after first 'new line' character;
+		- Fixed lag when moving/resizing main window;
+		- Note's text field now receives focus when note's tab opened;
+		- Fixed obtrusive hyperlink tooltip that did not go away when window is hidden;
+		- Fixed bug when images from disk did not load propeerly;
+		- Improved thumbnails for images that in process of loading. Thumbnails now don't stretch, but have actual image's size.
+
+	
+
+0.9.6 (24.02.2014)
 	- New features:
 		- Bookmarks. Add frequently used notes to bookmarks for easy access;
 		- Files attachment. Attach files to your notes;

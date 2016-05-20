@@ -335,7 +335,7 @@ void SearchPanelWidget::sl_ReplaceAllButton_Pressed() {
 	}
 
 	QString message = QString("%1 occurrences were replaced").arg(counter);
-	CustomMessageBox msg(message, "Replace finished successfully", QMessageBox::Information);
+	CustomMessageBox msg(this, message, "Replace finished successfully", QMessageBox::Information);
 	msg.show();
 }
 

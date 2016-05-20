@@ -30,7 +30,7 @@ namespace qNotesManager {
 		void drawLockedIcon (QPixmap&) const;
 
 	public:
-		FolderModelItem(Folder*);
+		explicit FolderModelItem(Folder*);
 
 		Folder*	GetStoredData() const;
 
