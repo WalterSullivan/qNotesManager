@@ -111,8 +111,8 @@ void Serializer::loadDocument() {
 	BOIBuffer buffer(&fileDataArray);
 	buffer.open(QIODevice::ReadOnly);
 
-	const char s[9] = {0x89, 0x51, 0x4E, 0x4D, 0x53, 0x0D, 0x0A, 0x1A, 0x0A};
-	const QByteArray standardFileSignature(s, 9);
+	const unsigned char s[9] = {0x89, 0x51, 0x4E, 0x4D, 0x53, 0x0D, 0x0A, 0x1A, 0x0A};
+	const QByteArray standardFileSignature(reinterpret_cast<const char*>(s), 9);
 	QByteArray signature(9, 0x0);
 	readResult = buffer.read(signature.data(), 9);
 	if (signature != standardFileSignature) {
@@ -536,10 +536,10 @@ void Serializer::saveDocument_v1() {
 
 	qint64 writeResult = 0;
 
-	const char fileSignature[9] = {0x89, 0x51, 0x4E, 0x4D,
+	const unsigned char fileSignature[9] = {0x89, 0x51, 0x4E, 0x4D,
 							   0x53, 0x0D, 0x0A, 0x1A, 0x0A};
 
-	writeResult = fileDataBuffer.write(fileSignature, 9);
+	writeResult = fileDataBuffer.write(reinterpret_cast<const char*>(fileSignature), 9);
 
 	writeResult = fileDataBuffer.write(doc->fileVersion);
 	writeResult = fileDataBuffer.write(doc->compressionLevel);
@@ -1504,10 +1504,10 @@ void Serializer::saveDocument_v2() {
 
 	qint64 writeResult = 0;
 
-	const char fileSignature[9] = {0x89, 0x51, 0x4E, 0x4D,
+	const unsigned char fileSignature[9] = {0x89, 0x51, 0x4E, 0x4D,
 							   0x53, 0x0D, 0x0A, 0x1A, 0x0A};
 
-	writeResult = fileDataBuffer.write(fileSignature, 9);
+	writeResult = fileDataBuffer.write(reinterpret_cast<const char*>(fileSignature), 9);
 
 	writeResult = fileDataBuffer.write(doc->fileVersion);
 	writeResult = fileDataBuffer.write(doc->compressionLevel);
