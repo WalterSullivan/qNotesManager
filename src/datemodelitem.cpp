@@ -30,7 +30,7 @@ DateModelItem::DateModelItem(DateComponent c, int v) :
 		value(v),
 		component(c) {
 	if (value < 0) {value = 0;}
-	if (component == Month && value > 11) {value = 11;}
+	if (component == Month && value > 12) {value = 12;}
 }
 
 // virtual
