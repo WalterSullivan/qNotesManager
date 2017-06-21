@@ -97,7 +97,7 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 			return QByteArray();
 		}
 		actualEncodedDataLength = len;
-
+    
 		if(1 != EVP_EncryptFinal_ex(ctx, encodedData + len, &len)) {
 			delete[] encodedData;
 			return QByteArray();
@@ -189,17 +189,13 @@ QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
 	unsigned int len {SHA256_DIGEST_LENGTH};
 	unsigned char hash[SHA256_DIGEST_LENGTH];
 
-	HMAC_CTX ctx;
-	HMAC_CTX_init(&ctx);
-
-
-	HMAC_Init_ex(&ctx, data.data(), data.size(), EVP_sha256(), NULL);
+	HMAC_CTX *ctx = HMAC_CTX_new();
+	HMAC_Init_ex(ctx, data.data(), data.size(), EVP_sha256(), NULL);
 	for (int i = 0; i < iterations; i++) {
-		HMAC_Update(&ctx, (const uchar*)data.data(), data.size());
+		HMAC_Update(ctx, (const uchar*)data.data(), data.size());
 	}
-	HMAC_Final(&ctx, hash, &len);
-	HMAC_CTX_cleanup(&ctx);
-
+	HMAC_Final(ctx, hash, &len);
+    HMAC_CTX_free(ctx);
 
 	QByteArray finalHash {(char*)hash};
 
