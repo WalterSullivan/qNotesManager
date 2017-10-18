@@ -1,17 +1,18 @@
 TARGET = qnotesmanager
 TEMPLATE = app
 CONFIG += debug
-RC_FILE = qnm.rc
-QT += network
-CONFIG += crypto ssl
-QMAKE_CXXFLAGS += -Wall
-QMAKE_CXXFLAGS += -isystem \
-	$(QTDIR)/include
-DEFINES += ENABLE_LOG_TRACE
-BUILD_PATH = ./build
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-CONFIG += c++11
+
+QT += core widgets gui network
+
+MOC_DIR = .moc
+OBJECTS_DIR = .obj
+UI_DIR = .ui
+
 QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -Wall
+QMAKE_CXXFLAGS += -isystem
+
+DEFINES += ENABLE_LOG_TRACE
 
 win32 {
 	OPENSSLPATH = $(OPENSSL_ROOT_DIR)
@@ -26,35 +27,19 @@ win32 {
     LIBS  += -lssl -lcrypto
 }
 
-CONFIG(debug, debug|release) { 
+CONFIG(debug, debug|release) {
 	# Debug
 	QMAKE_CXXFLAGS += -O0
 	DEFINES += DEBUG
 	DEFINES -= RELEASE
 	CONFIG += console
-	DESTDIR = $${BUILD_PATH}/debug
-	unix:TARGET = $$join(TARGET,,,_debug)
-	else:TARGET = $$join(TARGET,,,d)
-	unix:OBJECTS_DIR = $${BUILD_PATH}/debug/.obj/unix
-	win32:OBJECTS_DIR = $${BUILD_PATH}/debug/.obj/win32
-	mac:OBJECTS_DIR = $${BUILD_PATH}/debug/.obj/mac
-	UI_DIR = $${BUILD_PATH}/debug/.ui
-	MOC_DIR = $${BUILD_PATH}/debug/.moc
-	RCC_DIR = $${BUILD_PATH}/debug/.rcc
 }
-else { 
+else {
 	# Release
 	QMAKE_CXXFLAGS += -O2
 	DEFINES -= DEBUG
 	DEFINES += RELEASE
 	CONFIG -= console
-	DESTDIR = $${BUILD_PATH}/release
-	unix:OBJECTS_DIR = $${BUILD_PATH}/release/.obj/unix
-	win32:OBJECTS_DIR = $${BUILD_PATH}/release/.obj/win32
-	mac:OBJECTS_DIR = $${BUILD_PATH}/release/.obj/mac
-	UI_DIR = $${BUILD_PATH}/release/.ui
-	MOC_DIR = $${BUILD_PATH}/release/.moc
-	RCC_DIR = $${BUILD_PATH}/release/.rcc
 }
 
 HEADERS += src/tag.h \
@@ -195,4 +180,4 @@ SOURCES += src/tagownerscollection.cpp \
 	src/searchpanelwidget.cpp \
 	src/sizeeditwidget.cpp
 
-RESOURCES += icons.qrc
+RESOURCES += icons.qrc qnm.rc

@@ -26,7 +26,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QStandardItemModel>
 #include <QDateTime>
 #include <QSemaphore>
-#include <QWeakPointer>
+#include <QPointer>
 
 #include "documentvisualsettings.h"
 
@@ -99,8 +99,8 @@ namespace qNotesManager {
 
 		mutable QDateTime fileTimeStamp;
 		mutable bool doNotReloadFlag;
-                
-                QWeakPointer<QThread> saveThread;
+
+        QPointer<QThread> saveThread;
 
 	public:
 		explicit Document();

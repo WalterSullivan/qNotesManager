@@ -208,15 +208,15 @@ void Document::Save(QString name, quint16 version) {
 		WARNING("No filename specified");
 		return;
 	}
-	
-        if (saveThread) {
-                WARNING("currently saving");
-                return;
-        }
-	
+
+    if (saveThread) {
+        WARNING("currently saving");
+        return;
+    }
+
 	Serializer* w = new Serializer();
 	saveThread = new QThread();
-        QThread *t = saveThread.data();
+    QThread *t = saveThread.data();
 	w->moveToThread(t);
 	this->moveToThread(t);
 
@@ -230,7 +230,7 @@ void Document::Save(QString name, quint16 version) {
 
 	QObject::connect(t, SIGNAL(started()), w, SLOT(sl_start()));
         QObject::connect(w, SIGNAL(sg_finished()), this, SLOT(sl_returnSelfToMainThread()), Qt::DirectConnection);
-        
+
         QObject::connect(w, SIGNAL(sg_finished()), w, SLOT(deleteLater()));
         QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(quit()));
         QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(deleteLater()));

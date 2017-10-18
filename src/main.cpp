@@ -19,6 +19,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTextCodec>
 #include <QFileInfo>
 #include <QtGlobal>
+#include <QTextCodec>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +53,7 @@ int main(int argc, char** argv) {
 			"file					File to open\n");
 	errorOutput = true;
 
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
 	QStringList arguments = QCoreApplication::arguments();
 
