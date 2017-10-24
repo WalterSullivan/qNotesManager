@@ -16,7 +16,7 @@ DEFINES += ENABLE_LOG_TRACE
 
 win32 {
 	OPENSSLPATH = $(OPENSSL_ROOT_DIR)
-
+	RC_FILE = qnm.rc
 	!exists($${OPENSSLPATH}): error ("OpenSSL not configured")
 	DEPENDPATH += $${OPENSSLPATH}/include
 	INCLUDEPATH += $${OPENSSLPATH}/include
@@ -180,4 +180,4 @@ SOURCES += src/tagownerscollection.cpp \
 	src/searchpanelwidget.cpp \
 	src/sizeeditwidget.cpp
 
-RESOURCES += icons.qrc qnm.rc
+RESOURCES += icons.qrc
