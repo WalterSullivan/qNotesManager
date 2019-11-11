@@ -69,7 +69,7 @@ HttpImageDownloader::HttpImageDownloader(QObject *parent) :
 }
 
 HttpImageDownloader::~HttpImageDownloader() {
-	CancelAllDownloads();
+	// CancelAllDownloads();
 }
 
 void HttpImageDownloader::SetProxy(QNetworkProxy& p) {
