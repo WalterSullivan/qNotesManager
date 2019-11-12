@@ -209,14 +209,8 @@ void Document::Save(QString name, quint16 version) {
 		return;
 	}
 
-    if (saveThread) {
-        WARNING("currently saving");
-        return;
-    }
-
 	Serializer* w = new Serializer();
-	saveThread = new QThread();
-    QThread *t = saveThread.data();
+    QThread *t = new QThread(this);
 	w->moveToThread(t);
 	this->moveToThread(t);
 
@@ -225,15 +219,17 @@ void Document::Save(QString name, quint16 version) {
 	QObject::connect(w, SIGNAL(sg_SavingFinished()), this, SIGNAL(sg_SavingFinished()));
 	QObject::connect(w, SIGNAL(sg_SavingProgress(int)), this, SIGNAL(sg_SavingProgress(int)));
 	QObject::connect(w, SIGNAL(sg_SavingStarted()), this, SIGNAL(sg_SavingStarted()));
-	QObject::connect(w, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)));
+	QObject::connect(w, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this,
+                     SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)));
 	QObject::connect(w, SIGNAL(sg_Message(QString)), this, SIGNAL(sg_Message(QString)));
 
 	QObject::connect(t, SIGNAL(started()), w, SLOT(sl_start()));
-        QObject::connect(w, SIGNAL(sg_finished()), this, SLOT(sl_returnSelfToMainThread()), Qt::DirectConnection);
+    QObject::connect(w, SIGNAL(sg_finished()), this, SLOT(sl_returnSelfToMainThread()),
+                     Qt::DirectConnection);
 
-        QObject::connect(w, SIGNAL(sg_finished()), w, SLOT(deleteLater()));
-        QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(quit()));
-        QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(deleteLater()));
+    QObject::connect(w, SIGNAL(sg_finished()), w, SLOT(deleteLater()));
+    QObject::connect(w, SIGNAL(sg_finished()), t, SLOT(quit()));
+    QObject::connect(t, SIGNAL(finished()), t, SLOT(deleteLater()));
 
 	quint16 newVersion = version > 0 ? version : this->fileVersion;
 	QString newName = name.isEmpty() ? this->fileName : name;

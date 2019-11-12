@@ -100,8 +100,6 @@ namespace qNotesManager {
 		mutable QDateTime fileTimeStamp;
 		mutable bool doNotReloadFlag;
 
-        QPointer<QThread> saveThread;
-
 	public:
 		explicit Document();
 		~Document();
