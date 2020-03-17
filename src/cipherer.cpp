@@ -34,6 +34,7 @@ Cipherer::Cipherer() :
 
 {
 	avaliableCipherTypes.insert(1, "aes128");
+	avaliableCipherTypes.insert(2, "aes256");
 }
 
 QByteArray Cipherer::Encrypt(const QByteArray& data, const QByteArray& keyData, int cipherID) {
@@ -56,6 +57,22 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 	if (!avaliableCipherTypes.contains(cipherID)) {
 		return QByteArray();
 	}
+
+
+	qDebug() << "crypto mode " << avaliableCipherTypes[cipherID];
+
+	switch (cipherID) {
+        case 1:
+            return Cipherer::process_1(data, keyData, direction);
+        case 2:
+            return Cipherer::process_2(data, keyData, direction);
+        default:
+            return QByteArray();
+    }
+}
+
+QByteArray Cipherer::process_1(const QByteArray& data, const QByteArray& keyData,Direction direction)
+{
 
 	QByteArray initVectorData ("aes128-cbc-pkcs7", 16);
 
@@ -97,7 +114,7 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 			return QByteArray();
 		}
 		actualEncodedDataLength = len;
-    
+
 		if(1 != EVP_EncryptFinal_ex(ctx, encodedData + len, &len)) {
 			delete[] encodedData;
 			return QByteArray();
@@ -145,6 +162,99 @@ QByteArray Cipherer::process(const QByteArray& data, const QByteArray& keyData,
 		delete[] decodedData;
 	}
 
+	return resultArray;
+}
+
+
+QByteArray Cipherer::process_2(const QByteArray& data, const QByteArray& keyData,Direction direction)
+{
+
+	QByteArray initVectorData ("aes256-cbc-pkcs7", 16);
+
+	QByteArray formalizedKey = keyData.leftJustified(32, '\0', true);
+	unsigned char aesKey[32];
+	memset(aesKey, 0, 32);
+	memcpy(aesKey, formalizedKey.data(), 32);
+
+	const unsigned char* inputData = (const unsigned char*)data.data();
+	size_t inputLength = data.length();
+
+
+	QByteArray resultArray;
+
+	EVP_CIPHER_CTX *ctx;
+
+	if (direction == Direction::Encode) {
+		const size_t approximateEncodedDataLength = ((inputLength + AES_BLOCK_SIZE) / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
+		unsigned char* encodedData = new unsigned char[approximateEncodedDataLength];
+		memset(encodedData, 0, approximateEncodedDataLength);
+
+		int len;
+		int actualEncodedDataLength;
+
+		/* Create and initialise the context */
+		if(!(ctx = EVP_CIPHER_CTX_new())) {
+			delete[] encodedData;
+			return QByteArray();
+		}
+
+		if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, aesKey, (uchar*)initVectorData.data())) {
+			delete[] encodedData;
+			return QByteArray();
+		}
+
+		if(1 != EVP_EncryptUpdate(ctx, encodedData, &len, inputData, inputLength)) {
+			delete[] encodedData;
+			return QByteArray();
+		}
+		actualEncodedDataLength = len;
+
+		if(1 != EVP_EncryptFinal_ex(ctx, encodedData + len, &len)) {
+			delete[] encodedData;
+			return QByteArray();
+		}
+		actualEncodedDataLength += len;
+
+		EVP_CIPHER_CTX_free(ctx);
+
+		resultArray = QByteArray((const char*)encodedData, actualEncodedDataLength);
+		delete[] encodedData;
+
+	} else {
+
+		unsigned char* decodedData = new unsigned char[inputLength];
+		memset(decodedData, 0, inputLength);
+
+		int len;
+		int actualDecodedDataLength;
+
+		if(!(ctx = EVP_CIPHER_CTX_new())) {
+			delete[] decodedData;
+			 return QByteArray();
+		}
+
+		if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, aesKey, (uchar*)initVectorData.data())) {
+			delete[] decodedData;
+			return QByteArray();
+		}
+
+		if(1 != EVP_DecryptUpdate(ctx, decodedData, &len, inputData, inputLength)) {
+			delete[] decodedData;
+			return QByteArray();
+		}
+		actualDecodedDataLength = len;
+
+		if(1 != EVP_DecryptFinal_ex(ctx, decodedData + len, &len)) {
+			delete[] decodedData;
+			return QByteArray();
+		}
+		actualDecodedDataLength += len;
+
+		EVP_CIPHER_CTX_free(ctx);
+
+		resultArray = QByteArray((const char*)decodedData, actualDecodedDataLength);
+		delete[] decodedData;
+	}
 
 	return resultArray;
 }
@@ -173,7 +283,7 @@ QByteArray Cipherer::GetHash(const QByteArray& str, quint8 hashID) {
 	}
 	SHA256_Final(hash, &sha256);
 
-	QByteArray finalHash {(char*)hash};
+	QByteArray finalHash {(char*)hash, SHA256_DIGEST_LENGTH};
 
 	return finalHash;
 }
@@ -197,7 +307,7 @@ QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
 	HMAC_Final(ctx, hash, &len);
     HMAC_CTX_free(ctx);
 
-	QByteArray finalHash {(char*)hash};
+	QByteArray finalHash {(char*)hash, SHA256_DIGEST_LENGTH};
 
 	return finalHash;
 }

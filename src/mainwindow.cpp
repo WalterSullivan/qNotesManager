@@ -624,23 +624,24 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	globalSearchAction->setEnabled(enable);
 	sl_Clipboard_DataChanged();
 
-
-
 	updateWindowTitle();
 }
 
 void MainWindow::sl_OpenRecentFileAction_Triggered() {
 	// Find sender action
 	QObject* sender = QObject::sender();
-	if (sender == 0) {return;}
+	if (sender == 0) {
+        return;
+    }
 
 	QAction* senderAction = 0;
 	senderAction = dynamic_cast<QAction*>(sender);
-	if (senderAction == 0) {return;}
-
-	QString fileName = senderAction->text();
-
-	// Chech if file exists
+	if (senderAction == 0) {
+        return;
+    }
+	QString fileName = senderAction->text().remove(QChar('&'));
+    qDebug() << "open: " << fileName;
+	// check if file exists
 	QFileInfo fileInfo(fileName);
 	if (!fileInfo.exists()) {
 		CustomMessageBox msg(this, "Selected file not found. Delete it from history?", "File not found",

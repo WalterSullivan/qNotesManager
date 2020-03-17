@@ -31,6 +31,9 @@ namespace qNotesManager {
 
 		QHash<int, QString> avaliableCipherTypes;
 
+        QByteArray process_1(const QByteArray& data, const QByteArray& keyData,Direction direction);
+        QByteArray process_2(const QByteArray& data, const QByteArray& keyData,Direction direction);
+
 	public:
 		Cipherer();
 

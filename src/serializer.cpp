@@ -31,6 +31,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QFileInfo>
 #include <QApplication>
 #include <QStack>
+#include <QDebug>
+
 
 using namespace qNotesManager;
 
@@ -161,6 +163,7 @@ void Serializer::loadDocument() {
 	}
 
 	doc->fileVersion = r_fileVersion;
+    qDebug() << "file version: " << hex << r_fileVersion;
 
 	switch (r_fileVersion) {
 		case 0x0001:
