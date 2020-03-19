@@ -281,11 +281,13 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 				QByteArray testPasswordHash = c.GetSecureHash(password.toLatin1(), r_secureHashID);
 				if (passwordHash == testPasswordHash) {
 					r_cipherKey = password.toLatin1();
+                    password.fill('z');
 					break;
 				} else {
 					wrongPassword = true;
 				}
 			}
+            password.fill('z');
 		}
 	}
 
@@ -1182,7 +1184,7 @@ void Serializer::saveTag_v1(const Tag* tag, BOIBuffer& buffer) {
 	result = buffer.write(w_nameArray.constData(), w_nameSize);
 }
 
-// Save file ver. 2
+// Load file ver. 2
 void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 	qint64 readResult = 0;
 
@@ -1238,6 +1240,7 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 				QByteArray testPasswordHash = c.GetSecureHash(password.toLatin1(), r_secureHashID);
 				if (passwordHash == testPasswordHash) {
 					r_cipherKey = password.toLatin1();
+                    password.fill('z');
 					break;
 				} else {
 					wrongPassword = true;

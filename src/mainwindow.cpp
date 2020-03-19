@@ -500,6 +500,9 @@ void MainWindow::sl_DocumentPropertiesAction_Triggered() {
 	}
 
 	docProperties->SetDocument(doc);
+
+	QObject::connect(docProperties, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*,bool)), this, SLOT(sl_Document_PasswordRequired(QSemaphore*,QString*,bool)));
+
 	docProperties->exec();
 }
 
@@ -864,8 +867,9 @@ void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p, bool la
 	bool ok = false;
 
 	QString password;
-	QString message = lastTryFailed ? "Incorrect. Try again" :
-					  "This document is protected. Enter password";
+	QString message = lastTryFailed ?
+                      "Incorrect. Try again" :
+					  "Enter password for the document";
 
 	while (password.isEmpty()) {
 		password = QInputDialog::getText(this, "Enter password",

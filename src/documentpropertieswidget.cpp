@@ -42,14 +42,18 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 	QObject::connect(useEncryptionCheckbox, SIGNAL(stateChanged(int)),
 					 this, SLOT(sl_UseEncryptionCB_StateChanged(int)));
 	passwordLabel = new QLabel("Password:", this);
-	passwordLineEdit = new QLineEdit(this);
-	passwordLineEdit->setEchoMode(QLineEdit::Password);
-	passwordLineEdit->setToolTip("Enter a password for your document."
-								 "Note that if you forget the password you will be unable to "
-								 "open your encrypted document.");
+
+	passwordButton = new QPushButton("New", this);
+	passwordButton->setToolTip("Enter a password for your document.\n"
+                               "Note that if you forget the password\n"
+                               "you will be unable to open your\n"
+                               "encrypted document.");
+	QObject::connect(passwordButton, SIGNAL(clicked()), this, SLOT(sl_password()));
+
 	encryptionAlgLabel = new QLabel("Encryption algorithm:", this);
 	encryptionAlg = new QComboBox(this);
-	encryptionAlg->setToolTip("Select encryption algorithm. If you don't know what it is, just "
+	encryptionAlg->setToolTip("Select encryption algorithm.\n"
+                              "If you don't know what it is, just\n"
 							  "leave default value.");
 
 	Cipherer c;
@@ -70,7 +74,7 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 
 	QGridLayout* encryptionLayout = new QGridLayout();
 	encryptionLayout->addWidget(passwordLabel, 0, 0);
-	encryptionLayout->addWidget(passwordLineEdit, 0, 1);
+	encryptionLayout->addWidget(passwordButton, 0, 1);
 	encryptionLayout->addWidget(encryptionAlgLabel, 1, 0);
 	encryptionLayout->addWidget(encryptionAlg, 1, 1);
 	encryptionGroupBox->setLayout(encryptionLayout);
@@ -99,6 +103,13 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 	setWindowTitle("Document properties");
 }
 
+DocumentPropertiesWidget::~DocumentPropertiesWidget()
+{
+    password.fill('z');
+    password.clear();
+}
+
+
 void DocumentPropertiesWidget::SetDocument(Document* d) {
 	if (d == nullptr) {
 		WARNING("Null pointer recieved");
@@ -114,18 +125,15 @@ void DocumentPropertiesWidget::SetDocument(Document* d) {
 	if (cipherID == 0) {
 		useEncryptionCheckbox->setChecked(false);
 		encryptionAlg->setCurrentIndex(-1);
-		passwordLineEdit->setText(QString());
 	} else {
 		useEncryptionCheckbox->setChecked(true);
 		int index = encryptionAlg->findData(cipherID, Qt::UserRole);
 		if (index == -1) {
-			WARNING("Situable index not found");
+			WARNING("Suitable index not found");
 			encryptionAlg->setCurrentIndex(0);
 		} else {
 			encryptionAlg->setCurrentIndex(index);
 		}
-		passwordLineEdit->setText(d->GetPassword());
-
 	}
 
 	currentDocument = d;
@@ -134,7 +142,9 @@ void DocumentPropertiesWidget::SetDocument(Document* d) {
 void DocumentPropertiesWidget::sl_UseEncryptionCB_StateChanged(int) {
 	bool enabled = useEncryptionCheckbox->isChecked();
 	encryptionGroupBox->setEnabled(enabled);
-	if (encryptionAlg->currentIndex() == -1) {encryptionAlg->setCurrentIndex(0);}
+	if (encryptionAlg->currentIndex() == -1) {
+        encryptionAlg->setCurrentIndex(0);
+    }
 }
 
 void DocumentPropertiesWidget::accept() {
@@ -146,10 +156,11 @@ void DocumentPropertiesWidget::accept() {
 							   "Select encryption algorithm", encryptionAlg);
 			return;
 		}
-		if (passwordLineEdit->text().isEmpty()) {
-			passwordLineEdit->setFocus(Qt::OtherFocusReason);
-			QToolTip::showText(passwordLineEdit->mapToGlobal(QPoint(0,0)),
-							   "Enter password", passwordLineEdit);
+		if ((currentDocument->GetCipherID() == 0) && password.isEmpty()) {
+            // activated crypto mode and no password
+			passwordButton->setFocus(Qt::OtherFocusReason);
+			QToolTip::showText(passwordButton->mapToGlobal(QPoint(0,0)),
+							   "Enter password", passwordButton);
 			return;
 		}
 	}
@@ -157,7 +168,8 @@ void DocumentPropertiesWidget::accept() {
 	QDialog::accept();
 }
 
-void DocumentPropertiesWidget::sl_Accepted() {
+void DocumentPropertiesWidget::sl_Accepted()
+{
 	quint8 cipherID = 0;
 	if (useEncryptionCheckbox->isChecked()) {
 		QVariant data = encryptionAlg->itemData(encryptionAlg->currentIndex(), Qt::UserRole);
@@ -167,12 +179,51 @@ void DocumentPropertiesWidget::sl_Accepted() {
 		cipherID = qVariantValue<quint8>(data);
 #endif
 	}
+
 	if (currentDocument->GetCipherID() != cipherID ||
-		currentDocument->GetPassword() != passwordLineEdit->text()) {
-		currentDocument->SetCipherData(cipherID, passwordLineEdit->text());
+        ((cipherID != 0) && !password.isEmpty())) {
+		currentDocument->SetCipherData(cipherID, password);
 	}
+
+    password.fill('z');
+    password.clear();
 }
 
-void DocumentPropertiesWidget::sl_Rejected() {
+void DocumentPropertiesWidget::sl_Rejected()
+{
 	currentDocument = nullptr;
+    password.fill('z');
+    password.clear();
 }
+
+void DocumentPropertiesWidget::sl_password()
+{
+    bool wrongPassword = false;
+
+    QSemaphore s;
+    password.fill('z');
+    password.clear();
+
+    emit sg_PasswordRequired(&s, &password, wrongPassword);
+    s.acquire(); // wait user action
+
+    if (password.isEmpty())
+        return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

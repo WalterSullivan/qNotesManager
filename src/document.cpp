@@ -566,29 +566,37 @@ quint8 Document::GetCipherID() const {
 	return cipherID;
 }
 
-QString Document::GetPassword() const {
-	return QString(password);
-}
+void Document::SetCipherData(const quint8 id, const QString& _password)
+{
+	if (id == 0) {
+        // disable encryption
+        password.fill('z');
+        password.clear();
 
-void Document::SetCipherData(const quint8 id, const QString& _password) {
-	if (id != 0 && _password.isEmpty()) {
-		WARNING("Password is empty");
-		return;
-	}
+        if (cipherID != id) {
+            cipherID = id;
+            onChange();
+        }
 
-	if (cipherID != id) {
-		cipherID = id;
-		onChange();
-	}
+    } else {
 
-	if (password != _password) {
-		if (cipherID == 0) {
-			password = QByteArray();
-		} else {
-			password = _password.toLocal8Bit();
-		}
-		onChange();
-	}
+        if (cipherID == 0 && _password.isEmpty()) {
+            // crypto mode is activated
+            WARNING("Password is empty");
+            return;
+        }
+
+        if (cipherID != id) {
+            cipherID = id;
+            onChange();
+        }
+
+        if (!_password.isEmpty()) {
+            // password update
+            password = _password.toLocal8Bit();
+            onChange();
+        }
+    }
 }
 
 QString Document::GetDefaultNoteIcon() const {

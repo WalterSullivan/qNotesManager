@@ -143,7 +143,7 @@ namespace qNotesManager {
 		void SetCompressionLevel(const quint8 level);
 
 		quint8 GetCipherID() const;
-		QString GetPassword() const;
+		// QString GetPassword() const;
 		void SetCipherData(const quint8 id, const QString& _password = QString());
 
 		QDateTime GetCreationDate() const;

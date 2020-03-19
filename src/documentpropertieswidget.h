@@ -25,6 +25,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QLineEdit>
 #include <QGroupBox>
 #include <QPushButton>
+#include <QSemaphore>
 
 namespace qNotesManager {
 	class Document;
@@ -41,18 +42,26 @@ namespace qNotesManager {
 		QGroupBox* encryptionGroupBox;
 		QCheckBox* useEncryptionCheckbox;
 		QLabel* passwordLabel;
-		QLineEdit* passwordLineEdit;
+		// QLineEdit* passwordLineEdit;
 		QLabel* encryptionAlgLabel;
 		QComboBox* encryptionAlg;
 
+		QPushButton* passwordButton;
 		QPushButton* okButton;
 		QPushButton* cancelButton;
+
+        QString password;
 
 		Document* currentDocument;
 
 	public:
 		explicit DocumentPropertiesWidget(QWidget *parent = 0);
+        virtual ~DocumentPropertiesWidget();
+
 		void SetDocument(Document* d);
+
+	signals:
+		void sg_PasswordRequired(QSemaphore*, QString*, bool);
 
 	public slots:
 		virtual void accept();
@@ -61,6 +70,8 @@ namespace qNotesManager {
 		void sl_UseEncryptionCB_StateChanged(int = 0);
 		void sl_Accepted();
 		void sl_Rejected();
+        void sl_password();
+
 	};
 }
 
