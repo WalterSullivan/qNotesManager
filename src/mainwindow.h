@@ -78,6 +78,7 @@ namespace qNotesManager {
 		QAction* saveDocumentAction;
 		QAction* saveDocumentAsAction;
 		QAction* closeDocumentAction;
+		QAction* insertDocumentAction;
 		QAction* documentPropertiesAction;
 		QAction* globalSearchAction;
 		QAction* exitAction;
@@ -133,6 +134,7 @@ namespace qNotesManager {
 	public:
 		explicit MainWindow();
 		void OpenDocument(QString fileName);
+        void InsertDocument(QString fileName);
 
 	protected:
 		/*virtual*/ void closeEvent (QCloseEvent* event);
@@ -157,6 +159,7 @@ namespace qNotesManager {
 		// Menu event handlers
 		void sl_NewDocumentAction_Triggered();
 		void sl_OpenDocumentAction_Triggered();
+		void sl_InsertDocumentAction_Triggered();
 		void sl_SaveDocumentAction_Triggered(bool* actionCancelled = 0);
 		void sl_SaveDocumentAsAction_Triggered();
 		void sl_CloseDocumentAction_Triggered(bool* actionCancelled = 0, bool* actionDelayed = 0, bool suppressSaving = false);
@@ -189,6 +192,7 @@ namespace qNotesManager {
 		void sl_Document_LoadingProgress(int);
 		void sl_Document_LoadingPartiallyFinished();
 		void sl_Document_LoadingFinished();
+        void sl_Document_LoadingFinishedForInserting();
 		void sl_Document_LoadingFailed(QString errorString);
 		void sl_Document_LoadingAborted();
 		void sl_Document_SavingStarted();

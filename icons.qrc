@@ -878,6 +878,7 @@
         <file alias="eraser">icons/gui/eraser.png</file>
         <file alias="folder">icons/gui/folder.png</file>
         <file alias="folder-horizontal-open">icons/gui/folder-horizontal-open.png</file>
+        <file alias="folder-insert">icons/gui/folder--plus.png</file>
         <file alias="magnifier">icons/gui/magnifier.png</file>
         <file alias="background-color">icons/gui/paint-can-color.png</file>
         <file alias="table">icons/gui/table.png</file>

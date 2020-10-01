@@ -107,7 +107,6 @@ void MainWindow::createActions() {
 	saveDocumentAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
 	saveDocumentAction->setEnabled(false);
 
-
 	saveDocumentAsAction = new QAction(QPixmap("/gui/disk-black"), "Save As...", this);
 	QObject::connect(saveDocumentAsAction, SIGNAL(triggered()),
 					 this, SLOT(sl_SaveDocumentAsAction_Triggered()));
@@ -118,6 +117,10 @@ void MainWindow::createActions() {
 					 this, SLOT(sl_CloseDocumentAction_Triggered()));
 	closeDocumentAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Q));
 	closeDocumentAction->setEnabled(false);
+
+	insertDocumentAction = new QAction(QPixmap(":/gui/folder-insert"), "Insert document", this);
+	QObject::connect(insertDocumentAction, SIGNAL(triggered()),
+					 this, SLOT(sl_InsertDocumentAction_Triggered()));
 
 	documentPropertiesAction = new QAction(QPixmap(":/gui/property"), "Document properties", this);
 	QObject::connect(documentPropertiesAction, SIGNAL(triggered()),
@@ -218,9 +221,7 @@ void MainWindow::createControls() {
 	toolbar->addAction(quickNoteAction);
 	toolbar->addAction(exitAction);
 
-
 	addToolBar(toolbar);
-
 
 	// Create statusbar
 	statusBar = new QStatusBar();
@@ -251,6 +252,7 @@ void MainWindow::createControls() {
 	documentMenu->addAction(saveDocumentAction);
 	documentMenu->addAction(saveDocumentAsAction);
 	documentMenu->addAction(closeDocumentAction);
+	documentMenu->addAction(insertDocumentAction);
 	documentMenu->addSeparator();
 	documentMenu->addAction(documentPropertiesAction);
 	documentMenu->addSeparator();
@@ -364,7 +366,7 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 
 	while(fileName.isEmpty()) {
 		fileName = QFileDialog::getOpenFileName(this, "Select a file to load", QString(),
-												"qNotesManager save file (*.nms)");
+												"qNotesManager file (*.nms)");
 		if (fileName.isNull()) {return;}
 
 		QFile file(fileName);
@@ -396,6 +398,28 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 	OpenDocument(fileName);
 }
 
+
+void MainWindow::sl_InsertDocumentAction_Triggered() {
+	QString fileName = QString();
+
+	while(fileName.isEmpty()) {
+		fileName = QFileDialog::getOpenFileName(this, "Select a file to insert", QString(),
+												"qNotesManager file (*.nms)");
+		if (fileName.isNull()) {return;}
+
+		QFile file(fileName);
+		if (fileName.isEmpty() || !file.exists()) {
+			CustomMessageBox msg(this, "Select a valid file to open", "Warning", QMessageBox::Warning);
+			msg.show();
+		} else {
+			break;
+		}
+	}
+
+	InsertDocument(fileName);
+}
+
+
 void MainWindow::OpenDocument(QString fileName) {
 	tempDocument = new Document();
 
@@ -409,10 +433,26 @@ void MainWindow::OpenDocument(QString fileName) {
 	QObject::connect(tempDocument, SIGNAL(sg_Message(QString)), this, SLOT(sl_Document_Message(QString)));
 	QObject::connect(tempDocument, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*,bool)), this, SLOT(sl_Document_PasswordRequired(QSemaphore*,QString*,bool)));
 
-
 	tempDocument->Open(fileName);
 	newRecentFile(fileName);
 }
+
+void MainWindow::InsertDocument(QString fileName) {
+	tempDocument = new Document();
+
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingAborted()), this, SLOT(sl_Document_LoadingAborted()));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingFailed(QString)), this, SLOT(sl_Document_LoadingFailed(QString)));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingFinished()), this, SLOT(sl_Document_LoadingFinishedForInserting()));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingPartiallyFinished()), this, SLOT(sl_Document_LoadingPartiallyFinished()));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingProgress(int)), this, SLOT(sl_Document_LoadingProgress(int)));
+	QObject::connect(tempDocument, SIGNAL(sg_LoadingStarted()), this, SLOT(sl_Document_LoadingStarted()));
+	QObject::connect(tempDocument, SIGNAL(sg_ConfirmationRequest(QSemaphore*,QString,bool*)), this, SLOT(sl_Document_ConfirmationRequest(QSemaphore*,QString,bool*)));
+	QObject::connect(tempDocument, SIGNAL(sg_Message(QString)), this, SLOT(sl_Document_Message(QString)));
+	QObject::connect(tempDocument, SIGNAL(sg_PasswordRequired(QSemaphore*,QString*,bool)), this, SLOT(sl_Document_PasswordRequired(QSemaphore*,QString*,bool)));
+
+	tempDocument->Open(fileName);
+}
+
 
 void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 	Document* doc = Application::I()->CurrentDocument();
@@ -863,6 +903,36 @@ void MainWindow::sl_Document_LoadingFinished() {
 	}
 }
 
+void MainWindow::sl_Document_LoadingFinishedForInserting() {
+
+	statusBarActionLabel->setText("");
+	statusBarProgress->reset();
+	statusBarProgress->setVisible(false);
+
+    // source
+    Folder *src_root = tempDocument->GetRoot();
+    src_root->SetName(tempDocument->GetFilename());
+    src_root->SetType(Folder::UserFolder);
+    src_root->SetLocked(false);
+
+    // target
+    Document *current_doc = Application::I()->CurrentDocument();
+    Folder *tgt_temp = current_doc->GetTempFolder();
+
+    tgt_temp->Items.Add(src_root);
+
+    tempDocument = 0;
+
+	mainSplitter->setEnabled(true);
+	toolbar->setEnabled(true);
+	menuBar->setEnabled(true);
+
+	if (!Application::I()->CurrentDocument()->DoNotReload()) {
+		documentUpdateCheckTimer.start();
+	}
+}
+
+
 void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p, bool lastTryFailed) {
 	bool ok = false;
 
@@ -921,6 +991,8 @@ void MainWindow::sl_Document_LoadingAborted() {
 	mainSplitter->setEnabled(true);
 	toolbar->setEnabled(true);
 	menuBar->setEnabled(true);
+
+    tempDocument->deleteLater();
 }
 
 void MainWindow::sl_Document_SavingStarted() {
