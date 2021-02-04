@@ -876,7 +876,12 @@ void MainWindow::sl_Document_PasswordRequired(QSemaphore* s, QString* p, bool la
 		}
 	}
 
-	*p = password;
+	if (password.isEmpty()) {
+        *p = QString();
+    } else {
+        *p = password + QString("iakelmedwedmansurivanov"); // the salt
+        password.fill('z');
+    }
 	s->release();
 }
 

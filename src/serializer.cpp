@@ -787,6 +787,7 @@ void Serializer::saveDocument_v1() {
 		}
 		Cipherer c;
 		dataArray = c.Encrypt(dataArray, encryptionKey, doc->cipherID);
+        encryptionKey.fill('z');
 		if (dataArray.isNull()) {
 			emit sg_SavingFailed("Encryption error");
 			return;
@@ -1242,6 +1243,7 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 					wrongPassword = true;
 				}
 			}
+			password.fill('z');
 		}
 	}
 
@@ -1271,6 +1273,8 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 	doc->cipherID = r_cipherID;
 	doc->password = r_cipherKey;
 	doc->fileName = filename;
+
+    r_cipherKey.fill('z');
 
 	BOIBuffer dataBuffer(&dataArray);
 	dataBuffer.open(QIODevice::ReadOnly);
@@ -1765,6 +1769,7 @@ void Serializer::saveDocument_v2() {
 		}
 		Cipherer c;
 		dataArray = c.Encrypt(dataArray, encryptionKey, doc->cipherID);
+        encryptionKey.fill('z');
 		if (dataArray.isNull()) {
 			emit sg_SavingFailed("Encryption error");
 			return;

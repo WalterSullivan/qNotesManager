@@ -106,7 +106,10 @@ Document::Document() : QObject(0) {
 	doNotReloadFlag = false;
 }
 
-Document::~Document() {
+Document::~Document()
+{
+    password.fill('z');
+
 	delete rootFolder;
 	delete trashFolder;
 	delete tempFolder;
