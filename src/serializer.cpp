@@ -368,7 +368,7 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 			QByteArray pixmapArray(imageDataSize, 0x0);
 			readResult = dataBuffer.read(pixmapArray.data(), imageDataSize);
 
-			CachedImageFile* image = new CachedImageFile(pixmapArray, nameArray, iconInfo.suffix());
+			CachedImageFile* image = new CachedImageFile(pixmapArray, QString::fromUtf8(nameArray), iconInfo.suffix());
 			iconNames.insert(QString::number(image->GetCRC32()), image->GetMD5());
 
 			doc->AddCustomIconToStorage(image);
@@ -894,7 +894,7 @@ Note* Serializer::loadNote_v1(BOIBuffer& buffer) {
 			QByteArray r_imageArray(r_imageArraySize, 0x0);
 			bytesRead = buffer.read(r_imageArray.data(), r_imageArraySize);
 
-			CachedImageFile* image = new CachedImageFile(r_imageArray, r_imageName, imageFormat);
+			CachedImageFile* image = new CachedImageFile(r_imageArray, QString::fromUtf8(r_imageName), imageFormat);
 			images.push_back(image);
 
 			imagesSize +=	sizeof(r_imageNameSize) +
@@ -941,18 +941,18 @@ Note* Serializer::loadNote_v1(BOIBuffer& buffer) {
 
 
 	Note* note = new Note("");
-	note->name = r_captionArray;
+	note->name = QString::fromUtf8(r_captionArray);
 	note->creationDate = QDateTime::fromTime_t(r_creationDate);
 	note->modificationDate = QDateTime::fromTime_t(r_modificationDate);
 	note->textDate = r_textDate == 0 ? QDateTime() : QDateTime::fromTime_t(r_textDate);
-	note->author = r_authorArray;
-	note->source = r_sourceArray;
-	note->comment = r_commentArray;
+	note->author = QString::fromUtf8(r_authorArray);
+	note->source = QString::fromUtf8(r_sourceArray);
+	note->comment = QString::fromUtf8(r_commentArray);
 	note->iconID = r_iconID;
 	note->nameBackColor.setRgba(r_backColor);
 	note->nameForeColor.setRgba(r_foreColor);
 	note->locked = (bool)r_locked;
-	note->cachedHtml = r_textArray;
+	note->cachedHtml = QString::fromUtf8(r_textArray);
 	note->textDocumentInitialized = false;
 	foreach(CachedImageFile* image, images) {
 		note->document->AddResourceImage(image);
@@ -1101,7 +1101,7 @@ Folder* Serializer::loadFolder_v1(BOIBuffer& buffer) {
 	}
 
 	Folder* folder = new Folder("");
-	folder->name = r_caption;
+	folder->name = QString::fromUtf8(r_caption);
 	folder->nameForeColor.setRgba(r_foreColor);
 	folder->nameBackColor.setRgba(r_backColor);
 	folder->locked = (bool)r_locked;
@@ -1164,7 +1164,7 @@ Tag* Serializer::loadTag_v1(BOIBuffer& buffer) {
 		buffer.seek(buffer.pos() + bytesToSkip); // If chunck has more data in case of newer file version.
 	}
 
-	return new Tag(r_nameArray);
+	return new Tag(QString::fromUtf8(r_nameArray));
 }
 
 void Serializer::saveTag_v1(const Tag* tag, BOIBuffer& buffer) {
@@ -1323,7 +1323,7 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 			QByteArray pixmapArray(imageDataSize, 0x0);
 			readResult = dataBuffer.read(pixmapArray.data(), imageDataSize);
 
-			CachedImageFile* image = new CachedImageFile(pixmapArray, nameArray, iconInfo.suffix());
+			CachedImageFile* image = new CachedImageFile(pixmapArray, QString::fromUtf8(nameArray), iconInfo.suffix());
 
 			doc->AddCustomIconToStorage(image);
 			sendProgressSignal(&dataBuffer);
@@ -1872,7 +1872,7 @@ Note* Serializer::loadNote_v2(BOIBuffer& buffer) {
 			QByteArray r_imageArray(r_imageArraySize, 0x0);
 			bytesRead = buffer.read(r_imageArray.data(), r_imageArraySize);
 
-			CachedImageFile* image = new CachedImageFile(r_imageArray, r_imageName, imageFormat);
+			CachedImageFile* image = new CachedImageFile(r_imageArray, QString::fromUtf8(r_imageName), imageFormat);
 			images.push_back(image);
 
 			imagesSize +=	sizeof(r_imageNameSize) +
@@ -1904,7 +1904,7 @@ Note* Serializer::loadNote_v2(BOIBuffer& buffer) {
 			QByteArray r_fileArray(r_fileArraySize, 0x0);
 			bytesRead = buffer.read(r_fileArray.data(), r_fileArraySize);
 
-			CachedFile* file = new CachedFile(r_fileArray, r_fileName);
+			CachedFile* file = new CachedFile(r_fileArray, QString::fromUtf8(r_fileName));
 			attachedFiles.push_back(file);
 
 			loadedDataSize +=	sizeof(r_fileNameSize) +
@@ -1922,18 +1922,18 @@ Note* Serializer::loadNote_v2(BOIBuffer& buffer) {
 	}
 
 	Note* note = new Note("");
-	note->name = r_captionArray;
+	note->name = QString::fromUtf8(r_captionArray);
 	note->creationDate = QDateTime::fromTime_t(r_creationDate);
 	note->modificationDate = QDateTime::fromTime_t(r_modificationDate);
 	note->textDate = r_textDate == 0 ? QDateTime() : QDateTime::fromTime_t(r_textDate);
-	note->author = r_authorArray;
-	note->source = r_sourceArray;
-	note->comment = r_commentArray;
+	note->author = QString::fromUtf8(r_authorArray);
+	note->source = QString::fromUtf8(r_sourceArray);
+	note->comment = QString::fromUtf8(r_commentArray);
 	note->iconID = r_iconID;
 	note->nameBackColor.setRgba(r_backColor);
 	note->nameForeColor.setRgba(r_foreColor);
 	note->locked = (bool)r_locked;
-	note->cachedHtml = r_textArray;
+	note->cachedHtml = QString::fromUtf8(r_textArray);
 	note->textDocumentInitialized = false;
 	foreach(CachedImageFile* image, images) {
 		note->document->AddResourceImage(image);
