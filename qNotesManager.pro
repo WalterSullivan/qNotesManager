@@ -8,7 +8,12 @@ QMAKE_CXXFLAGS += -isystem \
 DEFINES += ENABLE_LOG_TRACE
 BUILD_PATH = ./build
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-CONFIG += c++11
+# With C++11 support
+greaterThan(QT_MAJOR_VERSION, 4){
+	CONFIG += c++11
+} else {
+	QMAKE_CXXFLAGS += -std=c++11
+}
 
 win32 {
 	OPENSSLPATH = $(OPENSSL_ROOT_DIR)
@@ -19,6 +24,7 @@ win32 {
 	LIBS += -L$${OPENSSLPATH}/bin
 	LIBS += -leay32MD
 } else {
+	CONFIG += link_pkgconfig
 	PKGCONFIG += openssl
 }
 
