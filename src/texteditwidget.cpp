@@ -46,9 +46,7 @@ TextEditWidget::TextEditWidget(QWidget *parent) : QWidget(parent) {
 void TextEditWidget::CreateControls() {
 	// Create TextEdit
 	textField = new TextEdit();
-	QFont c = textField->currentFont();
-	c.setPointSize(9);
-	textField->setCurrentFont(c);
+
 	textField->installEventFilter(this);
 
 	QObject::connect(textField, SIGNAL(textChanged()),
