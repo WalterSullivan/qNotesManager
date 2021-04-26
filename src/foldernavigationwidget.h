@@ -28,7 +28,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QAction>
 #include <QSortFilterProxyModel>
 #include <QLineEdit>
-#include <QItemDelegate>
 
 namespace qNotesManager {
 	class HierarchyModel;
@@ -81,7 +80,7 @@ namespace qNotesManager {
 		explicit FolderNavigationWidget(QWidget *parent = 0);
 		void SetCurrentItem(Note*);
 		void SetModel(HierarchyModel* model);
-		void SetModelItemDelegate(QItemDelegate*);
+		void SetModelItemDelegate(QAbstractItemDelegate*);
 		void UpdatePinnedFolderData();
 
 		QList<QAction*> GetSelectedItemsActions() const;

@@ -33,7 +33,7 @@ NavigationPanelWidget::NavigationPanelWidget(QWidget *parent) : QWidget(parent) 
 	QObject::connect(tabWidget, SIGNAL(currentChanged(int)),
 					 this, SLOT(sl_TabWidget_CurrentChanged(int)));
 
-	QItemDelegate* delegate = new ModelItemDelegate(this);
+	QAbstractItemDelegate* delegate = new ModelItemDelegate(this);
 
 	hierarchyWidget = new FolderNavigationWidget();
 	hierarchyWidget->SetModelItemDelegate(delegate);

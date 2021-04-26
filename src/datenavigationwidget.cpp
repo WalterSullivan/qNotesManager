@@ -116,7 +116,7 @@ void DateNavigationWidget::SetTextDateModel(DatesModel* model) {
 	sl_updateTreeModel();
 }
 
-void DateNavigationWidget::SetModelItemDelegate(QItemDelegate* delegate) {
+void DateNavigationWidget::SetModelItemDelegate(QAbstractItemDelegate* delegate) {
 	treeView->setItemDelegate(delegate);
 }
 

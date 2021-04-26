@@ -1116,6 +1116,6 @@ void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 	}
 }
 
-void FolderNavigationWidget::SetModelItemDelegate(QItemDelegate* delegate) {
+void FolderNavigationWidget::SetModelItemDelegate(QAbstractItemDelegate* delegate) {
 	treeView->setItemDelegate(delegate);
 }

@@ -22,7 +22,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTreeView>
 #include <QGroupBox>
 #include <QRadioButton>
-#include <QItemDelegate>
 
 namespace qNotesManager {
 	class Note;
@@ -37,7 +36,7 @@ namespace qNotesManager {
 		void SetModificationModel(DatesModel*);
 		void SetTextDateModel(DatesModel*);
 
-		void SetModelItemDelegate(QItemDelegate*);
+		void SetModelItemDelegate(QAbstractItemDelegate*);
 
 	private:
 		QGroupBox*		groupBox;

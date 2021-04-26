@@ -59,7 +59,7 @@ void TagsNavigationWidget::SetModel(TagsModel* _model) {
 	}
 }
 
-void TagsNavigationWidget::SetModelItemDelegate(QItemDelegate* delegate) {
+void TagsNavigationWidget::SetModelItemDelegate(QAbstractItemDelegate* delegate) {
 	treeView->setItemDelegate(delegate);
 }
 
