@@ -846,6 +846,14 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 	QList<QPair<int, int> > fragments;
 	QList<QPair<int, int> > hyperLinkFragments;
 
+	// If document is empty change default font
+	if (this->document()->isEmpty()) {
+		QFont font = this->document()->defaultFont();
+		if (format.hasProperty(QTextFormat::FontPointSize)) {font.setPointSize(format.fontPointSize());}
+		if (format.hasProperty(QTextFormat::FontFamily)) {font.setFamily(format.fontFamily());}
+		this->document()->setDefaultFont(font);
+	}
+
 	// If nothing is selected, set format for empty cursor
 	if (selectionStart == selectionEnd) {
 		cursor.mergeCharFormat(format);
