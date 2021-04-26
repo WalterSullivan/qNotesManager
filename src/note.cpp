@@ -333,6 +333,7 @@ void Note::SetComment(QString c) {
 void Note::sl_DocumentChanged() {
 	textUpdateTimer.start();
 
+	emit sg_TextChanged();
 	onChange();
 }
 
