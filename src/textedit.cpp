@@ -846,6 +846,14 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 	QList<QPair<int, int> > fragments;
 	QList<QPair<int, int> > hyperLinkFragments;
 
+	// If nothing is selected, set format for empty cursor
+	if (selectionStart == selectionEnd) {
+		cursor.mergeCharFormat(format);
+		setTextCursor(cursor);
+		return;
+	}
+
+	// Set format for selected text
 	while (true) {
 		if (!block.isValid()) {break;}
 		if (block.blockNumber() == -1) {
@@ -855,6 +863,7 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 
 		QTextBlock::iterator it;
 		qDebug() << "Text block #" << block.blockNumber() << ". Text:\n" << block.text();
+
 		for(it = block.begin(); !(it.atEnd()); ++it) {
 			QTextFragment currentFragment = it.fragment();
 			if (!currentFragment.isValid()) {continue;}
