@@ -74,7 +74,6 @@ void BaseModelItem::AddChildTo(BaseModelItem* item, int position) {
 	childrenList.insert(position, item);
 	item->parentItem = this;
 	item->setParent(this); // QObject parentship
-	insertIndexCache.Clear();
 }
 
 // Removes child item
@@ -91,7 +90,6 @@ void BaseModelItem::RemoveChild(BaseModelItem* item) {
 	childrenList.removeAll(item);
 	item->parentItem = 0;
 	item->setParent(0); // QObject parentship
-	insertIndexCache.Clear();
 }
 
 // Returns index of child item.
@@ -125,7 +123,6 @@ BaseModelItem* BaseModelItem::ChildAt(int index) const {
 
 void BaseModelItem::ClearChildrenList() {
 	childrenList.clear();
-	insertIndexCache.Clear();
 }
 
 // Returns true if object is a child or a grandchild of item 'parent', otherwise returns false.
@@ -166,10 +163,6 @@ int BaseModelItem::FindInsertIndex(const BaseModelItem* item) const {
 	}
 
 	int newIndex = -1;
-	// Cached index. Mechanism not finished
-	//if (insertIndexCache.IsValid() && insertIndexCache.prt == item) {
-		//return insertIndexCache.cachedIndex;
-	//}
 
 	if (sorted) {
 		newIndex = findInsertIndex_Sorted(item);
@@ -177,12 +170,8 @@ int BaseModelItem::FindInsertIndex(const BaseModelItem* item) const {
 		newIndex = findInsertIndex_Simple(item);
 	}
 
-	//insertIndexCache.Set(item, newIndex);
-
 	return newIndex;
 }
-
-//int BaseModelItem::FindInsertIndex(const BaseModelItem* item, const int suggestedIndex) const {}
 
 // virtual
 // Compares internal item data for sorting purpose. Returns true by default.

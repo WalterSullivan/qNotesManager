@@ -60,19 +60,6 @@ namespace qNotesManager {
 		int findInsertIndex_Sorted(const BaseModelItem*) const;
 		int findInsertIndex_Simple(const BaseModelItem*) const;
 
-		class IndexCache {
-		public:
-			IndexCache() : prt(0), cachedIndex(-1) {}
-			const BaseModelItem* prt;
-			int cachedIndex;
-
-			void Clear() {prt = 0; cachedIndex = -1;}
-			bool IsValid() {return cachedIndex >= 0;}
-			void Set(BaseModelItem* p, int i) {prt = p; cachedIndex = i;}
-		};
-
-		IndexCache insertIndexCache;
-
 	public:
 		explicit BaseModelItem(ItemType type = Null);
 		virtual ~BaseModelItem();
@@ -94,8 +81,6 @@ namespace qNotesManager {
 		bool IsOffspringOf(const BaseModelItem*) const;
 
 		int FindInsertIndex(const BaseModelItem*) const;
-		//int FindInsertIndex(const BaseModelItem*, const int) const;
-
 
 		virtual bool LessThan(const BaseModelItem*) const;
 		bool IsSorted() const;
