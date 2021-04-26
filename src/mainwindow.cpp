@@ -740,6 +740,10 @@ void MainWindow::sl_CurrentNoteChanged(Note* note) {
 			formatMenu->addAction(action);
 		}
 	}
+
+	if (Application::I()->Settings.GetHighlightActiveNote()) {
+		navigationPanel->sl_SelectNoteInTree(note);
+	}
 }
 
 void MainWindow::sl_ShowHideMainWindowAction_Triggered() {

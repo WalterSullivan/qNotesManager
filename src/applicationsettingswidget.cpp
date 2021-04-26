@@ -29,6 +29,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	showZeroChildrenCheckbox = new QCheckBox("Show zero in folder's title when it is empty", this);
 	showTagsTreeViewCheckbox = new QCheckBox("Show 'Tags' tree", this);
 	showDatesTreeViewCheckbox = new QCheckBox("Show 'Dates' tree", this);
+	highlightActiveNoteCheckbox = new QCheckBox("Highlight active note in tree", this);
 	showSystemTrayCheckbox = new QCheckBox("Show icon in system tray", this);
 	QObject::connect(showSystemTrayCheckbox, SIGNAL(stateChanged(int)),
 					 this, SLOT(sl_ShowSystemTrayCheckbox_StateChanged(int)));
@@ -59,6 +60,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	mainLayout->addWidget(showZeroChildrenCheckbox);
 	mainLayout->addWidget(showTagsTreeViewCheckbox);
 	mainLayout->addWidget(showDatesTreeViewCheckbox);
+	mainLayout->addWidget(highlightActiveNoteCheckbox);
 	mainLayout->addWidget(showSystemTrayCheckbox);
 	mainLayout->addWidget(closeToTrayCheckbox);
 	mainLayout->addWidget(minimizeToTrayCheckbox);
@@ -80,6 +82,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	showZeroChildrenCheckbox->setChecked(Application::I()->Settings.GetShowZeroChildren());
 	showTagsTreeViewCheckbox->setChecked(Application::I()->Settings.GetShowTagsTreeView());
 	showDatesTreeViewCheckbox->setChecked(Application::I()->Settings.GetShowDatesTreeView());
+	highlightActiveNoteCheckbox->setChecked(Application::I()->Settings.GetHighlightActiveNote());
 	showSystemTrayCheckbox->setChecked(Application::I()->Settings.GetShowSystemTray());
 	closeToTrayCheckbox->setChecked(Application::I()->Settings.GetCloseToTray());
 	minimizeToTrayCheckbox->setChecked(Application::I()->Settings.GetMinimizeToTray());
@@ -95,6 +98,7 @@ void ApplicationSettingsWidget::accept() {
 	Application::I()->Settings.SetShowZeroChildren(showZeroChildrenCheckbox->isChecked());
 	Application::I()->Settings.SetShowTagsTreeView(showTagsTreeViewCheckbox->isChecked());
 	Application::I()->Settings.SetShowDatesTreeView(showDatesTreeViewCheckbox->isChecked());
+	Application::I()->Settings.SetHighlightActiveNote(highlightActiveNoteCheckbox->isChecked());
 	Application::I()->Settings.SetShowSystemTray(showSystemTrayCheckbox->isChecked());
 	Application::I()->Settings.SetCloseToTray(closeToTrayCheckbox->isChecked());
 	Application::I()->Settings.SetMinimizeToTray(minimizeToTrayCheckbox->isChecked());

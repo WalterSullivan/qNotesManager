@@ -188,4 +188,10 @@ void ApplicationSettings::SetConfirmItemDeletion(bool v) {
 	settings->setValue("app/confirm/itemdeletion", v);
 }
 
+bool ApplicationSettings::GetHighlightActiveNote() const {
+	return settings->value("mainwindow/highlightactivenote", true).toBool();
+}
 
+void ApplicationSettings::SetHighlightActiveNote(bool v) {
+	settings->setValue("mainwindow/highlightactivenote", v);
+}

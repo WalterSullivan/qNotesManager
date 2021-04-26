@@ -30,6 +30,7 @@ namespace qNotesManager {
 		QCheckBox* showZeroChildrenCheckbox;
 		QCheckBox* showTagsTreeViewCheckbox;
 		QCheckBox* showDatesTreeViewCheckbox;
+		QCheckBox* highlightActiveNoteCheckbox;
 		QCheckBox* showSystemTrayCheckbox;
 		QCheckBox* closeToTrayCheckbox;
 		QCheckBox* minimizeToTrayCheckbox;

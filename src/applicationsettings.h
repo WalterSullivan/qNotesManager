@@ -93,6 +93,9 @@ namespace qNotesManager {
 		bool GetConfirmItemDeletion() const;
 		void SetConfirmItemDeletion(bool v);
 
+		bool GetHighlightActiveNote() const;
+		void SetHighlightActiveNote(bool v);
+
 	private:
 		QSettings* settings;
 	};
