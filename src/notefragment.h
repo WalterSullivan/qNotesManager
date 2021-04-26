@@ -44,7 +44,7 @@ namespace qNotesManager {
 		NoteFragment(const NoteFragment&);
 		~NoteFragment() {};
 
-		const Note* const NotePrt;
+		const Note* const NotePtr;
 		const FragmentType Type;
 		const int Start;
 		const int Length;

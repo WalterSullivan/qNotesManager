@@ -235,7 +235,7 @@ void NoteEditWidget::ShowFragment(const NoteFragment& fragment) {
 		return;
 	}
 
-	if (fragment.NotePrt != currentNote) {
+	if (fragment.NotePtr != currentNote) {
 		WARNING("Wrong fragment");
 		return;
 	}

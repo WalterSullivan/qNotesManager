@@ -35,16 +35,16 @@ SearchResultsModel::SearchResultsModel(QObject *parent) : BaseModel(parent) {
 void SearchResultsModel::AddResult(const NoteFragment& fragment) {
 	NoteModelItem* noteItem = 0;
 
-	if (notesHash.contains(fragment.NotePrt)) {
-		noteItem = notesHash.value(fragment.NotePrt);
+	if (notesHash.contains(fragment.NotePtr)) {
+		noteItem = notesHash.value(fragment.NotePtr);
 	} else {
-		Note* note = const_cast<Note*>(fragment.NotePrt);
+		Note* note = const_cast<Note*>(fragment.NotePtr);
 		if (!note) {
 			WARNING("Null pointer recieved");
 			return;
 		}
 		noteItem = new NoteModelItem(note);
-		notesHash.insert(fragment.NotePrt, noteItem);
+		notesHash.insert(fragment.NotePtr, noteItem);
 
 		QObject::connect(noteItem, SIGNAL(sg_DataChanged(BaseModelItem*)),
 						 this, SLOT(sl_Item_DataChanged(BaseModelItem*)));
@@ -60,7 +60,7 @@ void SearchResultsModel::AddResult(const NoteFragment& fragment) {
 	SearchModelItem* searchResultItem = new SearchModelItem(fragment);
 	QObject::connect(searchResultItem, SIGNAL(sg_DataChanged(BaseModelItem*)),
 					 this, SLOT(sl_Item_DataChanged(BaseModelItem*)));
-	resultsHash.insert(fragment.NotePrt, searchResultItem);
+	resultsHash.insert(fragment.NotePtr, searchResultItem);
 
 	QModelIndex noteItemIndex = createIndex(GetRootItem()->IndexOfChild(noteItem), 0, noteItem);
 	beginInsertRows(noteItemIndex, noteItem->ChildrenCount(), noteItem->ChildrenCount());

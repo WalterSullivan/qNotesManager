@@ -124,15 +124,15 @@ void NotesTabWidget::CloseNote(const Note* n) {
 }
 
 void NotesTabWidget::ShowFragment(const NoteFragment& fragment) {
-	if (!fragment.NotePrt) {
+	if (!fragment.NotePtr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
 
-	OpenNote(const_cast<Note*>(fragment.NotePrt));
+	OpenNote(const_cast<Note*>(fragment.NotePtr));
 
 	NoteEditWidget* noteWidget =
-			dynamic_cast<NoteEditWidget*>(hash.value(fragment.NotePrt));
+			dynamic_cast<NoteEditWidget*>(hash.value(fragment.NotePtr));
 
 	noteWidget->ShowFragment(fragment);
 }

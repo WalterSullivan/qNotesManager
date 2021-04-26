@@ -27,7 +27,7 @@ using namespace qNotesManager;
 int NoteFragment::metaTypeID = 0;
 
 NoteFragment::NoteFragment() :
-		NotePrt(0),
+		NotePtr(0),
 		Type(CaptionFragment),
 		Start(-1),
 		Length(0),
@@ -41,7 +41,7 @@ NoteFragment::NoteFragment() :
 
 NoteFragment::NoteFragment(const Note* n, FragmentType t, int s, int l,
 						   QString sample, int ss, int sl) :
-		NotePrt(n),
+		NotePtr(n),
 		Type(t),
 		Start(s),
 		Length(l),
@@ -64,7 +64,7 @@ NoteFragment::NoteFragment(const Note* n, FragmentType t, int s, int l,
 }
 
 NoteFragment::NoteFragment(const NoteFragment& f) :
-		NotePrt(f.NotePrt),
+		NotePtr(f.NotePtr),
 		Type(f.Type),
 		Start(f.Start),
 		Length(f.Length),

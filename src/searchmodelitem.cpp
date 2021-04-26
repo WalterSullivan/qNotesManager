@@ -28,10 +28,10 @@ SearchModelItem::SearchModelItem(const NoteFragment& f) :
 		BaseModelItem(BaseModelItem::SearchResult),
 		fragment(f) {
 	expired = false;
-	if (!fragment.NotePrt) {
+	if (!fragment.NotePtr) {
 		WARNING("Null pointer recieved");
 	} else {
-		QObject::connect(fragment.NotePrt, SIGNAL(sg_TextChanged()),
+		QObject::connect(fragment.NotePtr, SIGNAL(sg_TextChanged()),
 						 this, SLOT(sl_Note_TextChanged()));
 	}
 }
