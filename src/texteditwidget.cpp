@@ -576,11 +576,13 @@ void TextEditWidget::sl_MergeCellsAction_Triggered() {
 
 void TextEditWidget::sl_fontComboBoxCurrentFontChanged (const QFont& font) {
 	textField->SetFontFamily(font.family());
+	textField->setFocus();
 }
 
 void TextEditWidget::sl_fontSizeComboBoxCurrentIndexChanged (int) {
 	int size = fontSizeComboBox->itemData(fontSizeComboBox->currentIndex()).toInt();
 	textField->SetFontSize(size);
+	textField->setFocus();
 }
 
 void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
