@@ -53,7 +53,7 @@ TextDocument::TextDocument(QObject *parent) : QTextDocument(parent) {
 
 	QFont f;
 	f.setFamily("Arial");
-	f.setPointSize(9);
+	f.setPointSize(12);
 	setDefaultFont(f);
 }
 
