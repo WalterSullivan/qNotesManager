@@ -26,6 +26,7 @@ using namespace qNotesManager;
 
 ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(parent) {
 	showNumberOfItemsCheckbox = new QCheckBox("Show number of child items in folder's title", this);
+	showZeroChildrenCheckbox = new QCheckBox("Show zero in folder's title when it is empty", this);
 	showTagsTreeViewCheckbox = new QCheckBox("Show 'Tags' tree", this);
 	showDatesTreeViewCheckbox = new QCheckBox("Show 'Dates' tree", this);
 	showSystemTrayCheckbox = new QCheckBox("Show icon in system tray", this);
@@ -55,6 +56,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addWidget(showNumberOfItemsCheckbox);
+	mainLayout->addWidget(showZeroChildrenCheckbox);
 	mainLayout->addWidget(showTagsTreeViewCheckbox);
 	mainLayout->addWidget(showDatesTreeViewCheckbox);
 	mainLayout->addWidget(showSystemTrayCheckbox);
@@ -75,6 +77,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 
 	// Load settings
 	showNumberOfItemsCheckbox->setChecked(Application::I()->Settings.GetShowNumberOfItems());
+	showZeroChildrenCheckbox->setChecked(Application::I()->Settings.GetShowZeroChildren());
 	showTagsTreeViewCheckbox->setChecked(Application::I()->Settings.GetShowTagsTreeView());
 	showDatesTreeViewCheckbox->setChecked(Application::I()->Settings.GetShowDatesTreeView());
 	showSystemTrayCheckbox->setChecked(Application::I()->Settings.GetShowSystemTray());
@@ -89,6 +92,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 
 void ApplicationSettingsWidget::accept() {
 	Application::I()->Settings.SetShowNumberOfItems(showNumberOfItemsCheckbox->isChecked());
+	Application::I()->Settings.SetShowZeroChildren(showZeroChildrenCheckbox->isChecked());
 	Application::I()->Settings.SetShowTagsTreeView(showTagsTreeViewCheckbox->isChecked());
 	Application::I()->Settings.SetShowDatesTreeView(showDatesTreeViewCheckbox->isChecked());
 	Application::I()->Settings.SetShowSystemTray(showSystemTrayCheckbox->isChecked());

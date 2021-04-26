@@ -45,6 +45,9 @@ namespace qNotesManager {
 		bool GetShowNumberOfItems() const;
 		void SetShowNumberOfItems(bool v);
 
+		bool GetShowZeroChildren() const;
+		void SetShowZeroChildren(bool v);
+
 		bool GetShowTagsTreeView() const;
 		void SetShowTagsTreeView(bool v);
 

@@ -27,6 +27,7 @@ namespace qNotesManager {
 	Q_OBJECT
 	private:
 		QCheckBox* showNumberOfItemsCheckbox;
+		QCheckBox* showZeroChildrenCheckbox;
 		QCheckBox* showTagsTreeViewCheckbox;
 		QCheckBox* showDatesTreeViewCheckbox;
 		QCheckBox* showSystemTrayCheckbox;

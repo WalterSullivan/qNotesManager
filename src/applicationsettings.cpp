@@ -60,6 +60,14 @@ void ApplicationSettings::SetShowNumberOfItems(bool v) {
 	settings->setValue("mainwindow/showitemscount", v);
 }
 
+bool ApplicationSettings::GetShowZeroChildren() const {
+	return settings->value("mainwindow/showzerochildren", true).toBool();
+}
+
+void ApplicationSettings::SetShowZeroChildren(bool v) {
+	settings->setValue("mainwindow/showzerochildren", v);
+}
+
 bool ApplicationSettings::GetShowTagsTreeView() const {
 	return settings->value("mainwindow/showtagstree", true).toBool();
 }

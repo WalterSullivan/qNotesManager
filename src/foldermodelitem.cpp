@@ -58,7 +58,12 @@ QVariant FolderModelItem::data(int role) const {
 		QString childrenCount = QString(" (%1)").arg(QString::number(folder->Items.Count()));
 		QString returnValue = folder->GetName();
 		if (Application::I()->Settings.GetShowNumberOfItems()) {
-			returnValue.append(childrenCount);
+			if (
+					(folder->Items.Count() > 0) ||
+					((folder->Items.Count() == 0) && (Application::I()->Settings.GetShowZeroChildren()))
+				) {
+				returnValue.append(childrenCount);
+			}
 		}
 		return returnValue;
 	} else if (role == Qt::ToolTipRole) {
