@@ -44,6 +44,7 @@ void SearchResultsModel::AddResult(const NoteFragment& fragment) {
 			return;
 		}
 		noteItem = new NoteModelItem(note);
+		noteItem->IsEditable = false;
 		notesHash.insert(fragment.NotePtr, noteItem);
 
 		QObject::connect(noteItem, SIGNAL(sg_DataChanged(BaseModelItem*)),

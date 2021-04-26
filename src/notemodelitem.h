@@ -43,6 +43,8 @@ namespace qNotesManager {
 		/*virtual*/
 		bool LessThan(const BaseModelItem*) const;
 
+		bool IsEditable;
+
 	private slots:
 		void sl_Note_PropertiesChanged();
 	};

@@ -35,6 +35,7 @@ NoteModelItem::NoteModelItem(Note* note) : BaseModelItem(BaseModelItem::note), _
 		QObject::connect(note, SIGNAL(sg_VisualPropertiesChanged()),
 					 this, SLOT(sl_Note_PropertiesChanged()));
 	}
+	IsEditable = true;
 }
 
 QVariant NoteModelItem::data(int role) const {
@@ -90,7 +91,7 @@ bool NoteModelItem::setData(const QVariant& value, int role) {
 Qt::ItemFlags NoteModelItem::flags () const {
 	Qt::ItemFlags flags = BaseModelItem::flags();
 
-	if (!_storedData->IsLocked()) {
+	if ((!_storedData->IsLocked()) && (IsEditable)) {
 		return flags | Qt::ItemIsEditable;
 	}
 
