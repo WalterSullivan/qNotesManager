@@ -745,7 +745,7 @@ void MainWindow::sl_CurrentNoteChanged(Note* note) {
 	}
 
 	if (Application::I()->Settings.GetHighlightActiveNote()) {
-		navigationPanel->sl_SelectNoteInTree(note);
+		if (Application::I()->CurrentDocument() != nullptr) {navigationPanel->sl_SelectNoteInTree(note);}
 	}
 }
 
