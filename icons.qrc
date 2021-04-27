@@ -927,5 +927,6 @@
         <file alias="chain">icons/gui/chain.png</file>
         <file alias="image-resize">icons/gui/image-resize.png</file>
         <file alias="table-edit">icons/gui/table--pencil.png</file>
+        <file alias="book-brown">icons/gui/book-brown.png</file>
     </qresource>
 </RCC>

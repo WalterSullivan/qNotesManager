@@ -77,7 +77,7 @@ MainWindow::MainWindow() : QMainWindow(nullptr) {
 					 this, SLOT(sl_Application_CurrentDocumentChanged(Document*)));
 
 
-
+	setWindowIcon(QIcon(":/main"));
 	setWindowTitle(VER_PRODUCTNAME_STR);
 	updateRecentFilesMenu();
 

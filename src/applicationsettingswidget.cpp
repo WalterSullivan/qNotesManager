@@ -75,6 +75,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	createBackupsCheckbox->setVisible(false);
 
 	setLayout(mainLayout);
+	setWindowIcon(QIcon(":/gui/wrench-screwdriver"));
 	setWindowTitle("Settings");
 
 	// Load settings
