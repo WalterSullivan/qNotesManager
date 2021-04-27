@@ -43,6 +43,8 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(0) {
 	propertiesPanelCollapsed = false;
 
 	textEditWidget = new TextEditWidget();
+	QObject::connect(textEditWidget, SIGNAL(sg_LinkClicked(QUrl)),
+					 this, SIGNAL(sg_LinkClicked(QUrl)));
 
 	propertiesWidget = new QWidget();
 

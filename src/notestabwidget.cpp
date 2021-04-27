@@ -91,6 +91,8 @@ void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 	hash.insert(note, w);
 	QObject::connect(note, SIGNAL(sg_VisualPropertiesChanged()),
 					 this, SLOT(sl_Note_PropertiesChanged()));
+	QObject::connect(w, SIGNAL(sg_LinkClicked(QUrl)),
+					 this, SIGNAL(sg_LinkClicked(QUrl)));
 
 
 	tabWidget->addTab(w, note->GetIcon(), cropStringForTabCaption(note->GetName()));

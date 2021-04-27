@@ -145,7 +145,7 @@ namespace qNotesManager {
 		void sl_NoteDoubleClicked(Note*);
 
 		void sl_CurrentNoteChanged(Note*);
-
+		void sl_Note_LinkClicked(QUrl url);
 
 		void sl_ShowSearchResult(NoteFragment);
 		void sl_SearchResults_CloseRequest();

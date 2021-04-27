@@ -46,6 +46,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTimer>
 #include <QInputDialog>
 #include <QMimeData>
+#include <QDesktopServices>
 
 using namespace qNotesManager;
 
@@ -181,6 +182,8 @@ void MainWindow::createControls() {
 	notesTabWidget = new NotesTabWidget();
 	QObject::connect(notesTabWidget, SIGNAL(sg_CurrentNoteChanged(Note*)),
 					 this, SLOT(sl_CurrentNoteChanged(Note*)));
+	QObject::connect(notesTabWidget, SIGNAL(sg_LinkClicked(QUrl)),
+					 this, SLOT(sl_Note_LinkClicked(QUrl)));
 
 	rightPanelWidget = new QWidget();
 	rightPanelSplitter = new QSplitter(Qt::Vertical, this);
@@ -743,6 +746,16 @@ void MainWindow::sl_CurrentNoteChanged(Note* note) {
 
 	if (Application::I()->Settings.GetHighlightActiveNote()) {
 		navigationPanel->sl_SelectNoteInTree(note);
+	}
+}
+
+void MainWindow::sl_Note_LinkClicked(QUrl url) {
+	QString scheme = url.scheme();
+
+	if (scheme == "note") {
+		// Not supported yet
+	} else if ((scheme == "http") || (scheme == "https") || (scheme == "file") || (scheme == "mailto")) {
+		QDesktopServices::openUrl(url);
 	}
 }
 

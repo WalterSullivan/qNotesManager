@@ -29,6 +29,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QComboBox>
 #include <QFontComboBox>
 #include <QLabel>
+#include <QUrl>
 
 
 /*
@@ -126,7 +127,7 @@ namespace qNotesManager {
 
 
 	signals:
-		void sg_TextChanged();
+		void sg_LinkClicked(QUrl url);
 
 	private slots:
 		void sl_ClearFormattingAction_Clicked();

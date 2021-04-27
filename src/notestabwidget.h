@@ -23,6 +23,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QHash>
 #include <QLayout>
 #include <QMenu>
+#include <QUrl>
 
 #if QT_VERSION < 0x040500
 	#include <QPushButton>
@@ -68,6 +69,7 @@ namespace qNotesManager {
 
 	signals:
 		void sg_CurrentNoteChanged(Note*);
+		void sg_LinkClicked(QUrl url);
 
 	private slots:
 		void sl_Note_PropertiesChanged();

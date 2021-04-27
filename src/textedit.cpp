@@ -40,7 +40,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QTextTable>
 #include <QClipboard>
 #include <QDateTime>
-#include <QDesktopServices>
 #include "cachedimagefile.h"
 #include <QBuffer>
 
@@ -567,13 +566,6 @@ void TextEdit::mousePressEvent (QMouseEvent* event) {
 		QString href = anchorAt(event->pos());
 		if (!href.isEmpty()) {
 			QUrl url(href);
-			QString scheme = url.scheme();
-
-			if (scheme == "note") {
-				// Not supported yet
-			} else {
-				QDesktopServices::openUrl(href);
-			}
 			emit this->sg_LinkClicked(url);
 		}
 	}

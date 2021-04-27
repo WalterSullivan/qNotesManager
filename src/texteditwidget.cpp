@@ -49,8 +49,8 @@ void TextEditWidget::CreateControls() {
 
 	textField->installEventFilter(this);
 
-	QObject::connect(textField, SIGNAL(textChanged()),
-					 this, SIGNAL(sg_TextChanged()));
+	QObject::connect(textField, SIGNAL(sg_LinkClicked(QUrl)),
+					 this, SIGNAL(sg_LinkClicked(QUrl)));
 	QObject::connect(textField, SIGNAL(textChanged()),
 					 this, SLOT(sl_TextEdit_CursorPositionChanged()));
 	QObject::connect(textField, SIGNAL(selectionChanged()),

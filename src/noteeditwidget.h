@@ -25,6 +25,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QDateTimeEdit>
 #include <QScrollArea>
 #include <QCheckBox>
+#include <QUrl>
 
 
 namespace qNotesManager {
@@ -82,6 +83,9 @@ namespace qNotesManager {
 	protected:
 		// virtual
 		bool eventFilter (QObject* watched, QEvent* event);
+
+	signals:
+		void sg_LinkClicked(QUrl url);
 
 	private slots:
 		void sl_OpenClosePropertiesButton_Clicked();
