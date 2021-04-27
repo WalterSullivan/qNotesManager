@@ -840,7 +840,7 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 
 	// If document is empty change default font
 	if (this->document()->isEmpty()) {
-		QFont font = this->document()->defaultFont();
+		QFont font = cursor.charFormat().font();
 		if (format.hasProperty(QTextFormat::FontPointSize)) {font.setPointSize(format.fontPointSize());}
 		if (format.hasProperty(QTextFormat::FontFamily)) {font.setFamily(format.fontFamily());}
 		this->document()->setDefaultFont(font);
