@@ -21,12 +21,12 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QBuffer>
 #include <QSysInfo>
 
-#define CHECK_FOR_READ if (device == 0 || !device->isOpen() || !device->isReadable()) {WARNING("Device not ready for reading"); return 0;}
+#define CHECK_FOR_READ if (device == nullptr || !device->isOpen() || !device->isReadable()) {WARNING("Device not ready for reading"); return 0;}
 
 using namespace qNotesManager;
 
 BOIBuffer::BOIBuffer(QIODevice* dev) {
-	if (dev == 0) {
+	if (dev == nullptr) {
 		WARNING("No device specified");
 	}
 	device = dev;
@@ -34,7 +34,7 @@ BOIBuffer::BOIBuffer(QIODevice* dev) {
 }
 
 BOIBuffer::BOIBuffer(QByteArray* array) {
-	if (array == 0) {
+	if (array == nullptr) {
 		WARNING("No device specified");
 	} else {
 		device = new QBuffer(array, this);

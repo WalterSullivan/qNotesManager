@@ -128,12 +128,12 @@ TextEdit::TextEdit(QWidget *parent) :
 void TextEdit::SetDocument(TextDocument* newDocument) {
 	// QTextEdit class has no 'DocumentChanged' signal therefore this function is used to
 	// manage signal-slot connections with current document
-	TextDocument* d = 0;
+	TextDocument* d = nullptr;
 	d = qobject_cast<TextDocument*>(document());
-	if (d != 0) {
+	if (d != nullptr) {
 		QObject::disconnect(d, 0, this, 0);
 	}
-	d = 0;
+	d = nullptr;
 
 	QObject::connect(newDocument, SIGNAL(sg_NeedRelayout()),
 					 this, SLOT(sl_Document_NeedRelayout()));
@@ -291,7 +291,7 @@ bool TextEdit::canInsertFromMimeData(const QMimeData* source) const {
 
 QMimeData* TextEdit::createMimeDataFromSelection() const {
 	const TextDocument* d = qobject_cast<TextDocument*>(document());
-	if (d == 0) {
+	if (d == nullptr) {
 		return QTextEdit::createMimeDataFromSelection();
 	}
 
@@ -314,7 +314,7 @@ QMimeData* TextEdit::createMimeDataFromSelection() const {
 		int length = url.length();
 
 		const CachedImageFile* image = d->GetResourceImage(url);
-		if (image != 0) {
+		if (image != nullptr) {
 			const QString fileName = image->SaveToTempFolder();
 			if (!fileName.isEmpty()) {
 				const QUrl newUrl = QUrl::fromLocalFile(fileName);
@@ -949,7 +949,7 @@ void TextEdit::sl_CopyCurrentFormat(bool copy) {
 
 void TextEdit::sl_SaveImageAction_Triggered() {
 	QAction* action = qobject_cast<QAction*>(QObject::sender());
-	if (action == 0) {return;}
+	if (action == nullptr) {return;}
 
 	QPoint pos = action->data().toPoint();
 	QTextFragment fragment = findFragmentAtPos(pos);
@@ -959,7 +959,7 @@ void TextEdit::sl_SaveImageAction_Triggered() {
 
 		const TextDocument* textDocument = dynamic_cast<TextDocument*>(document());
 		CachedImageFile* image = textDocument->GetResourceImage(imageName);
-		if (image == 0) {return;}
+		if (image == nullptr) {return;}
 
 		QString filename = QFileDialog::getSaveFileName(this, "Select a name", image->GetFileName(),
 			"");

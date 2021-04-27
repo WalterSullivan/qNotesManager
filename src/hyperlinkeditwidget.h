@@ -35,7 +35,7 @@ namespace qNotesManager {
 		QPushButton*	cancelButton;
 
 	public:
-		explicit HyperlinkEditWidget(QWidget *parent = 0);
+		explicit HyperlinkEditWidget(QWidget *parent = nullptr);
 
 		void Set(const QString& name, const QString& url);
 		QString GetName() const;

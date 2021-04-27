@@ -30,7 +30,7 @@ namespace qNotesManager {
 	class DateNavigationWidget : public QWidget {
 	Q_OBJECT
 	public:
-		explicit DateNavigationWidget(QWidget *parent = 0);
+		explicit DateNavigationWidget(QWidget *parent = nullptr);
 
 		void SetCreationModel(DatesModel*);
 		void SetModificationModel(DatesModel*);

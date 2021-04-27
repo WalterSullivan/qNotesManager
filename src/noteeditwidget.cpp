@@ -35,8 +35,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-NoteEditWidget::NoteEditWidget(Note* n) : QWidget(0) {
-	if (!n) {
+NoteEditWidget::NoteEditWidget(Note* n) : QWidget(nullptr) {
+	if (n == nullptr) {
 		WARNING("Null pointer recieved");
 	}
 
@@ -224,7 +224,7 @@ Note* NoteEditWidget::CurrentNote() const {
 }
 
 void NoteEditWidget::ScrollTo(int position) {
-	if (!currentNote) {
+	if (currentNote == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -232,7 +232,7 @@ void NoteEditWidget::ScrollTo(int position) {
 }
 
 void NoteEditWidget::ShowFragment(const NoteFragment& fragment) {
-	if (!currentNote) {
+	if (currentNote == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -273,7 +273,7 @@ void NoteEditWidget::ShowFragment(const NoteFragment& fragment) {
 }
 
 int NoteEditWidget::CurrentPosition() const {
-	if (!currentNote) {
+	if (currentNote == nullptr) {
 		WARNING("Null pointer recieved");
 		return -1;
 	}
@@ -281,7 +281,7 @@ int NoteEditWidget::CurrentPosition() const {
 }
 
 void NoteEditWidget::updateControlsData() {
-	if (!currentNote) {
+	if (currentNote == nullptr) {
 		WARNING("Null pointer recieved");
 		setEnabled(false);
 		return;
@@ -305,7 +305,7 @@ void NoteEditWidget::updateControlsData() {
 }
 
 void NoteEditWidget::updateControlsStatus() {
-	if (!currentNote) {
+	if (currentNote == nullptr) {
 		setEnabled(false);
 		currentNoteLocked = true;
 		return;
@@ -327,7 +327,7 @@ void NoteEditWidget::updateControlsStatus() {
 }
 
 void NoteEditWidget::fillControlsWithData() {
-	if (!currentNote) {
+	if (currentNote == nullptr) {
 		return;
 	}
 
@@ -364,7 +364,7 @@ void NoteEditWidget::sl_TextCreationDateTime_Changed(const QDateTime& newDateTim
 }
 
 void NoteEditWidget::sl_TagsEdit_CollectionChanged(QStringList newTags) {
-	if (!currentNote) {
+	if (currentNote == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}

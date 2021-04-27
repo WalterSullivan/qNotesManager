@@ -291,7 +291,7 @@ void TablePropertiesWidget::loadData() {
 
 void TablePropertiesWidget::fillTableWidget() {
 	for (int row = 0; row < tableColumnsCount + 1; row++) {
-		QTableWidgetItem *newItem = 0;
+		QTableWidgetItem *newItem = nullptr;
 
 		newItem = new QTableWidgetItem((row == 0 ? "Table" : QString("Column %1").arg(row)));
 		tableWidget->setItem(row, 0, newItem);

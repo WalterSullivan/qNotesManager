@@ -31,7 +31,7 @@ CustomMessageBox::CustomMessageBox(QWidget* parent, const QString& text,
 					   QMessageBox::StandardButtons buttons,
 					   QMessageBox::StandardButton defaultButton) :
 	QDialog(parent, Qt::MSWindowsFixedSizeDialogHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint) {
-	clickedButton = 0;
+	clickedButton = nullptr;
 
 	if (!caption.isEmpty()) {
 		captionLabel = new QLabel(caption);
@@ -39,11 +39,11 @@ CustomMessageBox::CustomMessageBox(QWidget* parent, const QString& text,
 		font.setBold(true);
 		captionLabel->setFont(font);
 	} else {
-		captionLabel = 0;
+		captionLabel = nullptr;
 	}
 
 	if (Icon == QMessageBox::NoIcon) {
-		imageLabel = 0;
+		imageLabel = nullptr;
 	} else {
 		imageLabel = new QLabel();
 		imageLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -107,7 +107,7 @@ QMessageBox::StandardButton CustomMessageBox::show() {
 		return QMessageBox::Cancel;
 	}
 
-	if (clickedButton == 0) {
+	if (clickedButton == nullptr) {
 		return QMessageBox::Cancel;
 	}
 
@@ -115,11 +115,11 @@ QMessageBox::StandardButton CustomMessageBox::show() {
 }
 
 void CustomMessageBox::AddCustomWidget(QWidget* w) {
-	if (!w) {return;}
+	if (w == nullptr) {return;}
 
 	int buttonsIndex = layout->indexOf(buttonsBox);
 	layout->insertWidget(buttonsIndex, w);
-	if (w->parent() == 0) {w->setParent(this);}
+	if (w->parent() == nullptr) {w->setParent(this);}
 }
 
 QPixmap CustomMessageBox::standardIcon(QMessageBox::Icon icon) {

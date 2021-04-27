@@ -25,8 +25,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 BookmarksMenu::BookmarksMenu(const QString& title, QWidget *parent) : QMenu(title, parent) {
-	currentDocument = 0;
-	currentNote = 0;
+	currentDocument = nullptr;
+	currentNote = nullptr;
 
 	addBookmarkAction = new QAction(QIcon(":gui/star-plus"), "Add to bookmarks", this);
 	QObject::connect(addBookmarkAction, SIGNAL(triggered()),
@@ -55,21 +55,21 @@ void BookmarksMenu::SetDocument(Document* document) {
 
 	currentDocument = document;
 
-	if (!currentDocument) {
+	if (currentDocument == nullptr) {
 
 	} else {
 		QObject::connect(currentDocument, SIGNAL(sg_BookmarksListChanged()),
 						 this, SLOT(sl_Document_BookmarksListChanged()));
 	}
 
-	menuAction()->setEnabled(currentDocument != 0);
+	menuAction()->setEnabled(currentDocument != nullptr);
 	updateMenu();
 }
 
 void BookmarksMenu::sl_CurrentNoteChanged(Note* note){
 	currentNote = note;
 
-	if (currentNote == 0 || currentDocument == 0) {
+	if (currentNote == nullptr || currentDocument == nullptr) {
 		addBookmarkAction->setEnabled(false);
 		removeBookmarkAction->setEnabled(false);
 	} else {
@@ -85,15 +85,15 @@ void BookmarksMenu::sl_CurrentNoteChanged(Note* note){
 }
 
 void BookmarksMenu::sl_AddBookmarkAction_Triggered() {
-	if (currentNote == 0) {return;}
-	if (currentDocument == 0) {return;}
+	if (currentNote == nullptr) {return;}
+	if (currentDocument == nullptr) {return;}
 
 	currentDocument->AddBookmark(currentNote);
 }
 
 void BookmarksMenu::sl_RemoveBookmarkAction_Triggered() {
-	if (currentNote == 0) {return;}
-	if (currentDocument == 0) {return;}
+	if (currentNote == nullptr) {return;}
+	if (currentDocument == nullptr) {return;}
 
 	currentDocument->RemoveBookmark(currentNote);
 }
@@ -102,7 +102,7 @@ void BookmarksMenu::sl_ActionTriggered(QAction* action) {
 	if (action == addBookmarkAction || action == removeBookmarkAction) {return;}
 
 	Note* note = links[action];
-	if (note == 0) {return;}
+	if (note == nullptr) {return;}
 
 	emit sg_OpenBookmark(note);
 }
@@ -120,18 +120,18 @@ void BookmarksMenu::updateMenu() {
 	}
 	links.clear();
 
-	if (currentDocument == 0) {return;}
+	if (currentDocument == nullptr) {return;}
 
 	for (int i = 0; i < currentDocument->GetBookmarksCount(); i++) {
 		Note* note = currentDocument->GetBookmark(i);
 
-		QAction* action = new QAction(note->GetIcon(), note->GetName(), 0);
+		QAction* action = new QAction(note->GetIcon(), note->GetName(), nullptr);
 
 		addAction(action);
 		links.insert(action, note);
 	}
 
-	if (currentNote == 0) {
+	if (currentNote == nullptr) {
 		addBookmarkAction->setEnabled(false);
 		removeBookmarkAction->setEnabled(false);
 	} else {

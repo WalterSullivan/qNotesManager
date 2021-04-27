@@ -69,7 +69,7 @@ void TextDocument::sl_Downloader_DownloadFinished (QUrl url, CachedImageFile* im
 		errorDownloads.removeOne(url);
 	}
 
-	if (!image || !image->IsValidImage()) {
+	if (image == nullptr || !image->IsValidImage()) {
 		if (!errorDownloads.contains(url)) {
 			errorDownloads.append(url);
 			if (!restartDownloadsTimer.isActive()) {
@@ -247,7 +247,7 @@ void TextDocument::sl_RestartDownloadsTimer_Timeout() {
 }
 
 CachedImageFile* TextDocument::GetResourceImage(QString name) const {
-	return originalImages.contains(name) ? originalImages.value(name) : 0;
+	return originalImages.contains(name) ? originalImages.value(name) : nullptr;
 }
 
 void TextDocument::AddResourceImage(CachedImageFile* image) {

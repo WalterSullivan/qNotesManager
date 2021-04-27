@@ -32,7 +32,7 @@ namespace qNotesManager {
 		QPushButton* okButton;
 
 	public:
-		explicit AboutProgramWidget(QWidget *parent = 0);
+		explicit AboutProgramWidget(QWidget *parent = nullptr);
 
 	};
 }

@@ -33,7 +33,7 @@ namespace qNotesManager {
 			TextUnderlineColor
 		};
 
-		explicit ColorPickerButton(AffectedObject type, QWidget *parent = 0);
+		explicit ColorPickerButton(AffectedObject type, QWidget *parent = nullptr);
 		~ColorPickerButton();
 
 		QColor GetCurrentColor() const;

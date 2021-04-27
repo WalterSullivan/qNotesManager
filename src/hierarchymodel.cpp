@@ -33,21 +33,21 @@ using namespace qNotesManager;
 
 HierarchyModel::HierarchyModel(Document* doc) : BaseModel(doc) {
 	Folder* rootFolder = doc->GetRoot();
-	if (rootFolder == 0) {
+	if (rootFolder == nullptr) {
 		WARNING("Null reference");
 		return;
 	}
 	RegisterItem(rootFolder);
 
 	Folder* tempFolder = doc->GetTempFolder();
-	if (tempFolder == 0) {
+	if (tempFolder == nullptr) {
 		WARNING("Null reference");
 		return;
 	}
 	RegisterItem(tempFolder);
 
 	Folder* trashFolder = doc->GetTrashFolder();
-	if (trashFolder == 0) {
+	if (trashFolder == nullptr) {
 		WARNING("Null reference");
 		return;
 	}
@@ -64,7 +64,7 @@ HierarchyModel::HierarchyModel(Document* doc) : BaseModel(doc) {
 }
 
 void HierarchyModel::RegisterItem(Folder* folder) { // Register folder and all items inside of it
-	if (!folder) {
+	if (folder == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -85,7 +85,7 @@ void HierarchyModel::RegisterItem(Folder* folder) { // Register folder and all i
 	FolderModelItem* fi = new FolderModelItem(folder);
 	QObject::connect(fi, SIGNAL(sg_DataChanged(BaseModelItem*)), this, SLOT(sl_Item_DataChanged(BaseModelItem*)));
 	BaseModelItem* parent = _bridge.value(folder->GetParent());
-	if (parent != 0) {
+	if (parent != nullptr) {
 		parent->AddChildTo(fi, folder->GetParent()->Items.IndexOf(folder));
 	}
 	_bridge.insert(folder, fi);
@@ -103,7 +103,7 @@ void HierarchyModel::RegisterItem(Folder* folder) { // Register folder and all i
 }
 
 void HierarchyModel::RegisterItem(Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -122,7 +122,7 @@ void HierarchyModel::RegisterItem(Note* note) {
 }
 
 void HierarchyModel::UnregisterItem(Folder* folder) {
-	if (!folder) {
+	if (folder == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -147,7 +147,7 @@ void HierarchyModel::UnregisterItem(Folder* folder) {
 	BaseModelItem* childItem = _bridge.value(folder);
 
 	Folder* parent = folder->GetParent();
-	if (parent != 0) {
+	if (parent != nullptr) {
 		if (!_bridge.contains(parent)) {
 			WARNING("Item parent is not registered");
 		} else {
@@ -159,13 +159,13 @@ void HierarchyModel::UnregisterItem(Folder* folder) {
 	_bridge.remove(folder);
 
 	if (GetDisplayRootItem() == childItem) {SetDisplayRootItem(GetRootItem());}
-	if (GetRootItem() == childItem) {SetRootItem(0);}
+	if (GetRootItem() == childItem) {SetRootItem(nullptr);}
 
 	delete childItem;
 }
 
 void HierarchyModel::UnregisterItem(Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -175,7 +175,7 @@ void HierarchyModel::UnregisterItem(Note* note) {
 	}
 
 	Folder* parent = note->GetParent();
-	if (!parent) {
+	if (parent == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -195,13 +195,13 @@ void HierarchyModel::UnregisterItem(Note* note) {
 }
 
 void HierarchyModel::SetPinnedFolder(Folder* f) {
-	if (f == 0) {
+	if (f == nullptr) {
 		BaseModelItem* currentDisplayRootItem = GetDisplayRootItem();
 
 		SetDisplayRootItem(GetRootItem());
 
 		BaseModelItem* parentItem = currentDisplayRootItem->parent();
-		if (parentItem != 0) {
+		if (parentItem != nullptr) {
 			QModelIndexList list;
 			QModelIndex newItemIndex = createIndex(parentItem->IndexOfChild(currentDisplayRootItem), 0, currentDisplayRootItem);
 			list << newItemIndex;
@@ -221,17 +221,17 @@ Folder* HierarchyModel::GetPinnedFolder() const {
 
 	// No folder pinned
 	if (displayRootItem == GetRootItem()) {
-		return 0;
+		return nullptr;
 	}
 
-	if (displayRootItem == 0) {
+	if (displayRootItem == nullptr) {
 		WARNING("Display root is NULL");
-		return 0;
+		return nullptr;
 	}
 
 	if (displayRootItem->DataType() != BaseModelItem::folder) {
 		WARNING("Display root is not a folder");
-		return 0;
+		return nullptr;
 	}
 
 	const FolderModelItem* folderModelItem = dynamic_cast<const FolderModelItem*>(displayRootItem);
@@ -402,7 +402,7 @@ void HierarchyModel::sl_Item_DataChanged(BaseModelItem* modelItem) {
 	if (!itemInVisibleBranch) {return;}
 
 	QModelIndex itemIndex;
-	if (modelItem->parent() == 0) {
+	if (modelItem->parent() == nullptr) {
 		itemIndex = QModelIndex();
 	} else {
 		itemIndex = createIndex(modelItem->parent()->IndexOfChild(modelItem), 0, modelItem);
@@ -448,7 +448,7 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 	if (!data->hasFormat("application/ami.pointer")) {return false;}
 	if (column > 0) {return false;}
 
-	BaseModelItem* newParentModelItem = 0;
+	BaseModelItem* newParentModelItem = nullptr;
 	if (parent.isValid()) {
 		newParentModelItem = static_cast<BaseModelItem*>(parent.internalPointer());
 	} else { // dropped to root item
@@ -472,12 +472,12 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 
 	QByteArray encodedData = data->data("application/ami.pointer");
 	QDataStream stream(&encodedData, QIODevice::ReadOnly);
-	void* p = 0;
+	void* p = nullptr;
 
 	QList<BaseModelItem*> movedItems;
 
 	while (!stream.atEnd()) {
-		p = 0;
+		p = nullptr;
 		stream.readRawData((char*)&p, sizeof(p));
 
 
@@ -488,14 +488,14 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 		qDebug() << "\n";
 
 		Folder* newParentFolder = (dynamic_cast<FolderModelItem*>(newParentModelItem))->GetStoredData();
-		AbstractFolderItem* droppedFolderItem = 0;
+		AbstractFolderItem* droppedFolderItem = nullptr;
 		if (droppedModelItem->DataType() == BaseModelItem::folder) {
 			droppedFolderItem = (dynamic_cast<FolderModelItem*>(droppedModelItem))->GetStoredData();
 		} else if (droppedModelItem->DataType() == BaseModelItem::note) {
 			droppedFolderItem = (dynamic_cast<NoteModelItem*>(droppedModelItem))->GetStoredData();
 		}
 
-		if (!droppedFolderItem) {
+		if (droppedFolderItem == nullptr) {
 			WARNING("Casting error");
 			continue;
 		}
@@ -535,7 +535,7 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 	QModelIndexList indexesToSelect;
 	foreach (BaseModelItem* movedItem, movedItems) {
 		QModelIndex movedItemIndex;
-		if (movedItem->parent() == 0) {
+		if (movedItem->parent() == nullptr) {
 			movedItemIndex = QModelIndex();
 		} else {
 			movedItemIndex = createIndex(movedItem->parent()->IndexOfChild(movedItem), 0, movedItem);
@@ -574,12 +574,12 @@ QStringList HierarchyModel::mimeTypes () const {
 }
 
 void HierarchyModel::sl_RequestEmitApplySelection(AbstractFolderItem* item) {
-	if (!item) {return;}
+	if (item == nullptr) {return;}
 
 	BaseModelItem* modelItem = _bridge.value(item);
 	BaseModelItem* parentItem = modelItem->parent();
 
-	if (!parentItem) {return;}
+	if (parentItem == nullptr) {return;}
 
 	QModelIndexList list;
 	QModelIndex newItemIndex = createIndex(parentItem->IndexOfChild(modelItem), 0, modelItem);

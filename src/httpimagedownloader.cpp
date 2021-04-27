@@ -118,7 +118,7 @@ bool HttpImageDownloader::HasActiveDownload(const QUrl url) const {
 
 void HttpImageDownloader::sl_reply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(QObject::sender());
-	if (!reply) {
+	if (reply == nullptr) {
 		WARNING("Casting error");
 		return;
 	}
@@ -133,7 +133,7 @@ void HttpImageDownloader::sl_reply_downloadProgress(qint64 bytesReceived, qint64
 }
 
 QUrl HttpImageDownloader::extractOriginalUrl(QNetworkReply* reply) {
-	if (!reply) {
+	if (reply == nullptr) {
 		WARNING("Null pointer recieved");
 		return QUrl();
 	}
@@ -146,7 +146,7 @@ QUrl HttpImageDownloader::extractOriginalUrl(QNetworkReply* reply) {
 }
 
 void HttpImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
-	if (!reply) {
+	if (reply == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -274,7 +274,7 @@ void HttpImageDownloader::sl_netManager_finished (QNetworkReply * reply) {
 }
 
 void HttpImageDownloader::disconnectAndDeleteReply(QNetworkReply* reply) {
-	if (!reply) {
+	if (reply == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}

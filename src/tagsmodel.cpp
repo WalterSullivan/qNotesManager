@@ -33,7 +33,7 @@ TagsModel::TagsModel(Document *doc) : BaseModel(doc) {
 	root->SetSorted(true);
 	SetRootItem(root);
 
-	if (!doc) {
+	if (doc == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -52,7 +52,7 @@ TagsModel::TagsModel(Document *doc) : BaseModel(doc) {
 void TagsModel::sl_Tag_OwnerAdded(Note* note) {
 	Tag* tag = qobject_cast<Tag*>(QObject::sender());
 
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -80,7 +80,7 @@ void TagsModel::sl_Tag_OwnerAdded(Note* note) {
 void TagsModel::sl_Tag_OwnerRemoved(Note* note) {
 	Tag* tag = qobject_cast<Tag*>(QObject::sender());
 
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -92,7 +92,7 @@ void TagsModel::sl_Tag_OwnerRemoved(Note* note) {
 	BaseModelItem* tagItem = tagsBridge.value(tag);
 
 	// Searching for note item, that is a child of tagItem
-	BaseModelItem* noteItem = 0;
+	BaseModelItem* noteItem = nullptr;
 	QList<BaseModelItem*> noteItems = notesBridge.values(note);
 	foreach (BaseModelItem* i, noteItems) {
 		if (i->parent() == tagItem) {
@@ -101,7 +101,7 @@ void TagsModel::sl_Tag_OwnerRemoved(Note* note) {
 		}
 	}
 
-	if (!noteItem) {
+	if (noteItem == nullptr) {
 		WARNING("Corresponding item not found");
 		return;
 	}
@@ -122,7 +122,7 @@ void TagsModel::sl_Tag_OwnerRemoved(Note* note) {
 void TagsModel::sl_Tag_OwnersRemoved() {
 	Tag* tag = qobject_cast<Tag*>(QObject::sender());
 
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -154,7 +154,7 @@ void TagsModel::sl_Tag_OwnersRemoved() {
 }
 
 void TagsModel::sl_Document_TagRegistered(Tag* tag) {
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -194,7 +194,7 @@ void TagsModel::sl_Document_TagRegistered(Tag* tag) {
 }
 
 void TagsModel::sl_Document_TagUnregistered(Tag* tag) {
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -222,7 +222,7 @@ void TagsModel::sl_Document_TagUnregistered(Tag* tag) {
 
 void TagsModel::sl_Item_DataChanged(BaseModelItem* item) {
 	const BaseModelItem* parentItem = item->parent();
-	if (!parentItem) {
+	if (parentItem == nullptr) {
 		WARNING("Could not find item parent");
 		return;
 	}

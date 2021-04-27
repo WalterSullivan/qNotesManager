@@ -150,7 +150,7 @@ void SearchResultsWidget::sl_ListView_DoubleClicked(const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::SearchResult) {
 		SearchModelItem* si = dynamic_cast<SearchModelItem*>(item);
-		if (!si) {
+		if (si == nullptr) {
 			WARNING("Casting error");
 			return;
 		}
@@ -190,7 +190,7 @@ void SearchResultsWidget::sl_ShowInTreeAction_Triggered() {
 
 	if (modelItem->DataType() == BaseModelItem::note) {
 		Note* n = (dynamic_cast<NoteModelItem*>(modelItem))->GetStoredData();
-		if (!n) {
+		if (n == nullptr) {
 			return;
 		}
 

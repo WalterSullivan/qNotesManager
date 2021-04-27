@@ -105,7 +105,7 @@ namespace qNotesManager {
 
 
 	public:
-		explicit TextEditWidget (QWidget *parent = 0);
+		explicit TextEditWidget (QWidget *parent = nullptr);
 
 		QString toPlainText () const;
 		QString toHtml () const;

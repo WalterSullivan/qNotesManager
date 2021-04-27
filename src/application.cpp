@@ -29,10 +29,10 @@ Application* Application::I() {
 }
 
 Application::Application() :
-		QObject(0),
+		QObject(nullptr),
 		DefaultNoteIcon(":/icons/standard/Document/document.png"),
 		DefaultFolderIcon(":/icons/standard/Folder/folder.png") {
-	_currentDocument = 0;
+	_currentDocument = nullptr;
 	standardIconsModel = new QStandardItemModel(this);
 
 	LoadIconsFromDir(":/icons/standard/Document");

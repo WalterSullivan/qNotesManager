@@ -50,7 +50,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-MainWindow::MainWindow() : QMainWindow(0) {
+MainWindow::MainWindow() : QMainWindow(nullptr) {
 	closeDocumentAfterSave = false;
 	exitAppAfterSave = false;
 	openDocumentAfterSave = false;
@@ -171,7 +171,7 @@ void MainWindow::createActions() {
 void MainWindow::createControls() {
 	createActions();
 
-	docProperties = 0;
+	docProperties = nullptr;
 
 	navigationPanel = new NavigationPanelWidget();
 	QObject::connect(navigationPanel, SIGNAL(sg_NoteDoubleClicked(Note*)),
@@ -201,8 +201,8 @@ void MainWindow::createControls() {
 	setCentralWidget(mainSplitter);
 
 	engine = new DocumentSearchEngine(this);
-	searchWidget = 0;
-	searchResultsWidget = 0;
+	searchWidget = nullptr;
+	searchResultsWidget = nullptr;
 
 	// Create toolbar
 	toolbar = new QToolBar(this);
@@ -331,7 +331,7 @@ void MainWindow::changeEvent (QEvent* event) {
 }
 
 void MainWindow::sl_NoteDoubleClicked(Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -344,7 +344,7 @@ void MainWindow::sl_ShowSearchResult(NoteFragment fragment) {
 
 void MainWindow::sl_NewDocumentAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc != 0) {
+	if (doc != nullptr) {
 		bool cancelled = false;
 		bool delayed = false;
 
@@ -378,7 +378,7 @@ void MainWindow::sl_OpenDocumentAction_Triggered() {
 
 
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc != 0) {
+	if (doc != nullptr) {
 		bool cancelled = false;
 		bool delayed = false;
 
@@ -416,7 +416,7 @@ void MainWindow::OpenDocument(QString fileName) {
 
 void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 	Document* doc = Application::I()->CurrentDocument();
-	if (!doc) {
+	if (doc == nullptr) {
 		WARNING("No current document set");
 		return;
 	}
@@ -437,7 +437,7 @@ void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 
 void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
+	if (doc == nullptr) {
 		WARNING("No current document set");
 		return;
 	}
@@ -452,7 +452,7 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 
 void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled, bool* actionDelayed, bool suppressSaving) {
 	Document* oldDoc = Application::I()->CurrentDocument();
-	if (oldDoc == 0) {
+	if (oldDoc == nullptr) {
 		WARNING("No current document set");
 		return;
 	}
@@ -483,19 +483,19 @@ void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled, bool* a
 	}
 
 	documentUpdateCheckTimer.stop();
-	Application::I()->SetCurrentDocument(0);
+	Application::I()->SetCurrentDocument(nullptr);
 	notesTabWidget->Clear();
 	delete oldDoc;
 }
 
 void MainWindow::sl_DocumentPropertiesAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (!doc) {
+	if (doc == nullptr) {
 		WARNING("Current document not set");
 		return;
 	}
 
-	if (!docProperties) {
+	if (docProperties == nullptr) {
 		docProperties = new DocumentPropertiesWidget(this);
 	}
 
@@ -504,10 +504,10 @@ void MainWindow::sl_DocumentPropertiesAction_Triggered() {
 }
 
 void MainWindow::sl_GlobalSearchAction_Triggered() {
-	if (!searchWidget) {
+	if (searchWidget == nullptr) {
 		searchWidget = new SearchWidget(engine, this);
 	}
-	if (!searchResultsWidget) {
+	if (searchResultsWidget == nullptr) {
 		searchResultsWidget = new SearchResultsWidget(engine);
 		QObject::connect(searchResultsWidget, SIGNAL(sg_ShowSearchResults(NoteFragment)),
 						 this, SLOT(sl_ShowSearchResult(NoteFragment)));
@@ -535,7 +535,7 @@ void MainWindow::sl_SearchResults_ShowRequest() {
 void MainWindow::sl_ExitAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
 
-	if (doc != 0) {
+	if (doc != nullptr) {
 		bool cancelled = false;
 		bool delayed = false;
 
@@ -616,7 +616,7 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 	sl_EditMenuContentChanged();
 
 	// Actions
-	bool enable = (doc != 0);
+	bool enable = (doc != nullptr);
 	saveDocumentAction->setEnabled(enable);
 	saveDocumentAsAction->setEnabled(enable);
 	closeDocumentAction->setEnabled(enable);
@@ -632,11 +632,11 @@ void MainWindow::sl_Application_CurrentDocumentChanged(Document* oldDoc) {
 void MainWindow::sl_OpenRecentFileAction_Triggered() {
 	// Find sender action
 	QObject* sender = QObject::sender();
-	if (sender == 0) {return;}
+	if (sender == nullptr) {return;}
 
-	QAction* senderAction = 0;
+	QAction* senderAction = nullptr;
 	senderAction = dynamic_cast<QAction*>(sender);
-	if (senderAction == 0) {return;}
+	if (senderAction == nullptr) {return;}
 
 	QString fileName = senderAction->text();
 
@@ -657,7 +657,7 @@ void MainWindow::sl_OpenRecentFileAction_Triggered() {
 	}
 
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc != 0) {
+	if (doc != nullptr) {
 		bool cancelled = false;
 		bool delayed = false;
 
@@ -676,7 +676,7 @@ void MainWindow::sl_OpenRecentFileAction_Triggered() {
 
 void MainWindow::updateWindowTitle() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
+	if (doc == nullptr) {
 		setWindowTitle(VER_PRODUCTNAME_STR);
 		setWindowModified(false);
 	} else {
@@ -776,7 +776,7 @@ void MainWindow::sl_Tray_Activated (QSystemTrayIcon::ActivationReason reason) {
 }
 
 void MainWindow::sl_Clipboard_DataChanged() {
-	if (Application::I()->CurrentDocument() == 0) {
+	if (Application::I()->CurrentDocument() == nullptr) {
 		quickNoteAction->setEnabled(false);
 		return;
 	}
@@ -786,7 +786,7 @@ void MainWindow::sl_Clipboard_DataChanged() {
 
 void MainWindow::sl_QuickNoteAction_Triggered() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
+	if (doc == nullptr) {
 		WARNING("Current document not set");
 		return;
 	}
@@ -812,7 +812,7 @@ void MainWindow::sl_BookmarksMenu_NoteOpenRequest(Note* note) {
 }
 
 void MainWindow::sl_EditMenuContentChanged() {
-	if (!Application::I()->CurrentDocument()) {
+	if (Application::I()->CurrentDocument() == nullptr) {
 		editMenu->menuAction()->setEnabled(false);
 		return;
 	}
@@ -862,7 +862,7 @@ void MainWindow::sl_Document_LoadingFinished() {
 	statusBarProgress->reset();
 	statusBarProgress->setVisible(false);
 	Application::I()->SetCurrentDocument(tempDocument);
-	tempDocument = 0;
+	tempDocument = nullptr;
 
 	mainSplitter->setEnabled(true);
 	toolbar->setEnabled(true);
@@ -917,7 +917,7 @@ void MainWindow::sl_Document_LoadingFailed(QString errorString) {
 
 void MainWindow::sl_Document_LoadingAborted() {
 	tempDocument->deleteLater();
-	tempDocument = 0;
+	tempDocument = nullptr;
 	statusBarActionLabel->setText("");
 	statusBarProgress->reset();
 	statusBarProgress->setVisible(false);
@@ -1038,6 +1038,6 @@ void MainWindow::sl_DocumentUpdateTimer_Timeout() {
 
 	const QString filename = doc->GetFilename();
 
-	sl_CloseDocumentAction_Triggered(0, 0, true);
+	sl_CloseDocumentAction_Triggered(nullptr, nullptr, true);
 	OpenDocument(filename);
 }

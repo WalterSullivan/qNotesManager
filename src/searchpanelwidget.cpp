@@ -164,7 +164,7 @@ bool SearchPanelWidget::eventFilter (QObject* watched, QEvent* event) {
 	}
 
 	QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
-	if (!e) {
+	if (e == nullptr) {
 		WARNING("Casting error");
 		return false;
 	}

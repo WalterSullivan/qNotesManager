@@ -44,7 +44,7 @@ namespace qNotesManager {
 		QPushButton* cancelButton;
 
 	public:
-		explicit ApplicationSettingsWidget(QWidget *parent = 0);
+		explicit ApplicationSettingsWidget(QWidget *parent = nullptr);
 
 	public slots:
 		virtual void accept();

@@ -36,7 +36,7 @@ namespace qNotesManager {
 	class TextEdit : public QTextEdit {
 	Q_OBJECT
 	public:
-		explicit TextEdit(QWidget *parent = 0);
+		explicit TextEdit(QWidget *parent = nullptr);
 
 		void SetDocument(TextDocument*);
 

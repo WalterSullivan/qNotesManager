@@ -20,6 +20,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 DocumentVisualSettings::DocumentVisualSettings() {
-	ActiveNote = 0;
+	ActiveNote = nullptr;
 	ActiveNavigationTab = 0;
 }

@@ -133,7 +133,7 @@ QDateTime Note::GetModificationDate() const {
 }
 
 QPixmap Note::GetIcon() const {
-	if (Application::I()->CurrentDocument() == 0) {
+	if (Application::I()->CurrentDocument() == nullptr) {
 		return QPixmap();
 	}
 	QPixmap icon = Application::I()->CurrentDocument()->GetItemIcon(iconID);
@@ -355,7 +355,7 @@ int Note::GetAttachedFilesCount() const {
 }
 
 void Note::AttachFile(CachedFile* file) {
-	if (file == 0) {return;}
+	if (file == nullptr) {return;}
 	if (file->Size() == 0) {return;}
 	if (attachedFiles.contains(file)) {return;}
 
@@ -365,7 +365,7 @@ void Note::AttachFile(CachedFile* file) {
 }
 
 void Note::RemoveAttachedFile(CachedFile* file) {
-	if (file == 0) {return;}
+	if (file == nullptr) {return;}
 	if (!attachedFiles.contains(file)) {return;}
 
 	attachedFiles.removeAll(file);
@@ -382,7 +382,7 @@ void Note::RemoveAttachedFile(const int index) {
 }
 
 CachedFile* Note::GetAttachedFile(int index) const {
-	if (index < 0 || index >= attachedFiles.count()) {return 0;}
+	if (index < 0 || index >= attachedFiles.count()) {return nullptr;}
 
 	return attachedFiles[index];
 }

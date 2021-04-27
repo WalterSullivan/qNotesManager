@@ -37,7 +37,7 @@ namespace qNotesManager {
 		void updateMenu();
 
 	public:
-		explicit BookmarksMenu(const QString& title, QWidget *parent = 0);
+		explicit BookmarksMenu(const QString& title, QWidget *parent = nullptr);
 		void SetDocument(Document*);
 
 	signals:

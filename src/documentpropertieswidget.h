@@ -51,7 +51,7 @@ namespace qNotesManager {
 		Document* currentDocument;
 
 	public:
-		explicit DocumentPropertiesWidget(QWidget *parent = 0);
+		explicit DocumentPropertiesWidget(QWidget *parent = nullptr);
 		void SetDocument(Document* d);
 
 	public slots:

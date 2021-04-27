@@ -27,7 +27,7 @@ using namespace qNotesManager;
 int NoteFragment::metaTypeID = 0;
 
 NoteFragment::NoteFragment() :
-		NotePtr(0),
+		NotePtr(nullptr),
 		Type(CaptionFragment),
 		Start(-1),
 		Length(0),
@@ -58,7 +58,7 @@ NoteFragment::NoteFragment(const Note* n, FragmentType t, int s, int l,
 	if (l < 0) {
 		WARNING("Wrong 'length' value");
 	}
-	if (!n) {
+	if (n == nullptr) {
 		WARNING("Null pointer recieved");
 	}
 }

@@ -31,7 +31,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 TagsNavigationWidget::TagsNavigationWidget(QWidget *parent) : QWidget(parent) {
-	model = 0;
+	model = nullptr;
 
 	treeView = new QTreeView();
 	treeView->setHeaderHidden(true);
@@ -52,7 +52,7 @@ void TagsNavigationWidget::SetModel(TagsModel* _model) {
 	model = _model;
 	treeView->setModel(model);
 
-	if (treeView->model() != 0) {
+	if (treeView->model() != nullptr) {
 		for (int i = 0; i < treeView->model()->columnCount(); i++) {
 			treeView->resizeColumnToContents(i);
 		}
@@ -69,7 +69,7 @@ void TagsNavigationWidget::sl_View_clicked (const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
 		Note* n = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-		if (!n) {
+		if (n == nullptr) {
 			WARNING("Casting error");
 			return;
 		}
@@ -83,7 +83,7 @@ void TagsNavigationWidget::sl_View_doubleClicked (const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
 		Note* n = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-		if (!n) {
+		if (n == nullptr) {
 			WARNING("Casting error");
 			return;
 		}

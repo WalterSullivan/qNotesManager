@@ -26,13 +26,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 NoteTagsCollection::NoteTagsCollection(Note* owner) : owner(owner) {
-	if (!owner) {
+	if (owner == nullptr) {
 		WARNING("Null pointer recieved");
 	}
 }
 
 void NoteTagsCollection::Add(Tag* tag) {
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -48,7 +48,7 @@ void NoteTagsCollection::Add(Tag* tag) {
 }
 
 void NoteTagsCollection::Remove(Tag* tag) {
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -64,7 +64,7 @@ void NoteTagsCollection::Remove(Tag* tag) {
 }
 
 bool NoteTagsCollection::Contains(Tag* tag) const {
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return false;
 	}
@@ -85,7 +85,7 @@ int NoteTagsCollection::Count() const {
 Tag* NoteTagsCollection::ItemAt(int index) const {
 	if (index < 0 || index >= tags.count()) {
 		WARNING("Index is out of bounds");
-		return 0;
+		return nullptr;
 	}
 
 	return tags.at(index);

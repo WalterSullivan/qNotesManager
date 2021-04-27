@@ -31,9 +31,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 DateNavigationWidget::DateNavigationWidget(QWidget *parent) : QWidget(parent) {
-	creationDateModel = 0;
-	modificationDateModel = 0;
-	textDateModel = 0;
+	creationDateModel = nullptr;
+	modificationDateModel = nullptr;
+	textDateModel = nullptr;
 
 	treeView = new QTreeView();
 	treeView->setHeaderHidden(true);
@@ -77,7 +77,7 @@ void DateNavigationWidget::sl_View_clicked (const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
 		NoteModelItem* noteItem = dynamic_cast<NoteModelItem*>(item);
-		if (noteItem == 0) {
+		if (noteItem == nullptr) {
 			WARNING("Casting error");
 			return;
 		}
@@ -92,7 +92,7 @@ void DateNavigationWidget::sl_View_doubleClicked (const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
 		NoteModelItem* noteItem = dynamic_cast<NoteModelItem*>(item);
-		if (noteItem == 0) {
+		if (noteItem == nullptr) {
 			WARNING("Casting error");
 			return;
 		}
@@ -129,7 +129,7 @@ void DateNavigationWidget::sl_updateTreeModel(bool) {
 		treeView->setModel(textDateModel);
 	}
 
-	if (treeView->model() != 0) {
+	if (treeView->model() != nullptr) {
 		for (int i = 0; i < treeView->model()->columnCount(); i++) {
 			treeView->resizeColumnToContents(i);
 		}

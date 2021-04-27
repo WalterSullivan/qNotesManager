@@ -77,7 +77,7 @@ namespace qNotesManager {
 		void restoreExpandedIndexes();
 
 	public:
-		explicit FolderNavigationWidget(QWidget *parent = 0);
+		explicit FolderNavigationWidget(QWidget *parent = nullptr);
 		void SetCurrentItem(Note*);
 		void SetModel(HierarchyModel* model);
 		void SetModelItemDelegate(QAbstractItemDelegate*);

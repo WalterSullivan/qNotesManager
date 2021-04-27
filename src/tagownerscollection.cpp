@@ -25,7 +25,7 @@ TagOwnersCollection::TagOwnersCollection() {
 }
 
 void TagOwnersCollection::Add(Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -40,7 +40,7 @@ void TagOwnersCollection::Add(Note* note) {
 }
 
 void TagOwnersCollection::Remove(Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -55,7 +55,7 @@ void TagOwnersCollection::Remove(Note* note) {
 }
 
 bool TagOwnersCollection::Contains(Note* note) const {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return false;
 	}
@@ -78,7 +78,7 @@ int TagOwnersCollection::Count() const {
 Note* TagOwnersCollection::ItemAt(int index) const {
 	if (index < 0 || index >= owners.count()) {
 		WARNING("Index is out of bounds");
-		return 0;
+		return nullptr;
 	}
 
 	return owners.at(index);

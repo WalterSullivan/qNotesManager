@@ -51,7 +51,7 @@ namespace qNotesManager {
 		double imageOriginalRatio;
 
 	public:
-		explicit SizeEditWidget(QWidget *parent = 0);
+		explicit SizeEditWidget(QWidget *parent = nullptr);
 		void SetData(const QSize&, const QSize&);
 
 		QSize NewSize;

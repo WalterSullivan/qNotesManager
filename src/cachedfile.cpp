@@ -103,10 +103,10 @@ CachedFile* CachedFile::FromFile(const QString& fileName) {
 	QFile file(fileName);
 
 	if (!file.exists()) {
-		return 0;
+		return nullptr;
 	}
 
-	if (!file.open(QIODevice::ReadOnly)) {return 0;}
+	if (!file.open(QIODevice::ReadOnly)) {return nullptr;}
 
 	QByteArray array = file.readAll();
 	file.close();

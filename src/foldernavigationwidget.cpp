@@ -66,7 +66,7 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 	treeView->setHeaderHidden(true);
 	treeView->setEnabled(false);
 
-	model = 0;
+	model = nullptr;
 
 	currentRootLabel = new QLabel();
 	currentRootLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
@@ -197,7 +197,7 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 }
 
 void FolderNavigationWidget::SetCurrentItem(Note* note) {
-	if (!note) {return;}
+	if (note == nullptr) {return;}
 
 	model->sl_RequestEmitApplySelection(note);
 }
@@ -217,7 +217,7 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 	QList<QAction*> list;
 
 	const QItemSelectionModel* selectionModel = treeView->selectionModel();
-	if (!selectionModel) {return list;}
+	if (selectionModel == nullptr) {return list;}
 
 	list.append(addTopLevelNote);
 	list.append(addTopLevelFolder);
@@ -228,7 +228,7 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 
 	// 0 items
 	if (indexesList.isEmpty()) {
-		if (model->GetPinnedFolder() != 0) {
+		if (model->GetPinnedFolder() != nullptr) {
 			// Edd context menu items for pinned folder
 			if (model->GetPinnedFolder() == Application::I()->CurrentDocument()->GetTrashFolder()) {
 				list.append(clearTrashAction);
@@ -344,7 +344,7 @@ QList<QAction*> FolderNavigationWidget::GetSelectedItemsActions() const {
 }
 
 void FolderNavigationWidget::sl_PinFolderButton_Toggled(bool toggle) {
-	if (!model || !Application::I()->CurrentDocument()) {
+	if (model == nullptr || Application::I()->CurrentDocument() == nullptr) {
 		currentRootLabel->setText("");
 		currentRootLabel->setToolTip("");
 
@@ -354,7 +354,7 @@ void FolderNavigationWidget::sl_PinFolderButton_Toggled(bool toggle) {
 		return;
 	}
 
-	Folder* folderToPin = 0;
+	Folder* folderToPin = nullptr;
 	if (toggle) {
 		QModelIndex index = treeView->currentIndex();
 		if (!index.isValid()) {
@@ -406,10 +406,10 @@ void FolderNavigationWidget::sl_AddNoteAction_Triggered() {
 		return;
 	}
 
-	Folder* parentFolder = 0;
+	Folder* parentFolder = nullptr;
 
 	if (indexesList.size() == 0) {
-		parentFolder = (model->GetPinnedFolder() == 0 ? doc->GetRoot() : model->GetPinnedFolder());
+		parentFolder = (model->GetPinnedFolder() == nullptr ? doc->GetRoot() : model->GetPinnedFolder());
 	} else {
 		BaseModelItem* modelitem =
 				static_cast<BaseModelItem*>(indexesList.value(0).internalPointer());
@@ -441,10 +441,10 @@ void FolderNavigationWidget::sl_AddFolderAction_Triggered() {
 		return;
 	}
 
-	Folder* parentFolder = 0;
+	Folder* parentFolder = nullptr;
 
 	if (indexesList.size() == 0) {
-		parentFolder = (model->GetPinnedFolder() == 0 ? doc->GetRoot() : model->GetPinnedFolder());
+		parentFolder = (model->GetPinnedFolder() == nullptr ? doc->GetRoot() : model->GetPinnedFolder());
 	} else {
 		BaseModelItem* modelitem =
 				static_cast<BaseModelItem*>(indexesList.value(0).internalPointer());
@@ -481,12 +481,12 @@ void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
 		return;
 	}
 
-	AbstractFolderItem* itemToEdit = 0;
+	AbstractFolderItem* itemToEdit = nullptr;
 
 	if (indexesList.size() == 0) {
-		itemToEdit = (model->GetPinnedFolder() == 0 ? Application::I()->CurrentDocument()->GetRoot() : model->GetPinnedFolder());
+		itemToEdit = (model->GetPinnedFolder() == nullptr ? Application::I()->CurrentDocument()->GetRoot() : model->GetPinnedFolder());
 	} else {
-		BaseModelItem* modelItemToEdit = 0;
+		BaseModelItem* modelItemToEdit = nullptr;
 
 		QModelIndex itemIndex = indexesList.at(0);
 		if (!itemIndex.isValid()) {
@@ -499,7 +499,7 @@ void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!f) {
+			if (f == nullptr) {
 				WARNING("Casting error");
 				return;
 			}
@@ -512,7 +512,7 @@ void FolderNavigationWidget::sl_PropertiesAction_Triggered() {
 			itemToEdit = f;
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!n) {
+			if (n == nullptr) {
 				WARNING("Casting error");
 				return;
 			}
@@ -543,7 +543,7 @@ void FolderNavigationWidget::sl_DefaultForeColor_Triggered() {
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!f) {
+			if (f == nullptr) {
 				WARNING("Casting error");
 				continue;
 			}
@@ -558,7 +558,7 @@ void FolderNavigationWidget::sl_DefaultForeColor_Triggered() {
 			f->SetNameForeColor(f->GetDefaultForeColor());
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!n) {
+			if (n == nullptr) {
 				WARNING("Casting error");
 				continue;
 			}
@@ -588,7 +588,7 @@ void FolderNavigationWidget::sl_DefaultBackColor_Triggered() {
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!f) {
+			if (f == nullptr) {
 				WARNING("Casting error");
 				continue;
 			}
@@ -603,7 +603,7 @@ void FolderNavigationWidget::sl_DefaultBackColor_Triggered() {
 			f->SetNameBackColor(f->GetDefaultBackColor());
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!n) {
+			if (n == nullptr) {
 				WARNING("Casting error");
 				continue;
 			}
@@ -656,7 +656,7 @@ void FolderNavigationWidget::sl_CustomForeColor_Triggered() {
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!f) {
+			if (f == nullptr) {
 				WARNING("Casting error");
 				continue;
 			}
@@ -671,7 +671,7 @@ void FolderNavigationWidget::sl_CustomForeColor_Triggered() {
 			f->SetNameForeColor(newColor);
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!n) {
+			if (n == nullptr) {
 				WARNING("Casting error");
 				continue;
 			}
@@ -723,7 +723,7 @@ void FolderNavigationWidget::sl_CustomBackColor_Triggered() {
 
 		if (modelItemToEdit->DataType() == BaseModelItem::folder) {
 			Folder* f = (dynamic_cast<FolderModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!f) {
+			if (f == nullptr) {
 				WARNING("Casting error");
 				continue;
 			}
@@ -738,7 +738,7 @@ void FolderNavigationWidget::sl_CustomBackColor_Triggered() {
 			f->SetNameBackColor(newColor);
 		} else if (modelItemToEdit->DataType() == BaseModelItem::note) {
 			Note* n = (dynamic_cast<NoteModelItem*>(modelItemToEdit))->GetStoredData();
-			if (!n) {
+			if (n == nullptr) {
 				WARNING("Casting error");
 				continue;
 			}
@@ -787,7 +787,7 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 	if (event->type() != QEvent::KeyPress) {return false;}
 
 	ModelItemDelegate* delegate = dynamic_cast<ModelItemDelegate*>(treeView->itemDelegate());
-	if (delegate != 0 && delegate->isEditing()) {
+	if (delegate != nullptr && delegate->isEditing()) {
 		return false;
 	}
 
@@ -816,7 +816,7 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 			BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 			if (item->DataType() == BaseModelItem::note) {
 				Note* note = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-				if (!note) {
+				if (note == nullptr) {
 					WARNING("Casting error");
 					continue;
 				}
@@ -868,7 +868,7 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 
 		BaseModelItem* modelItemToDelete = static_cast<BaseModelItem*>(index.internalPointer());
 
-		AbstractFolderItem* itemToDelete = 0;
+		AbstractFolderItem* itemToDelete = nullptr;
 		if (modelItemToDelete->DataType() == BaseModelItem::folder) {
 			FolderModelItem* fmi = dynamic_cast<FolderModelItem*>(modelItemToDelete);
 			itemToDelete = fmi->GetStoredData();
@@ -882,13 +882,13 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 			NoteModelItem* fmi = dynamic_cast<NoteModelItem*>(modelItemToDelete);
 			itemToDelete = fmi->GetStoredData();
 		}
-		if (itemToDelete == 0) {
+		if (itemToDelete == nullptr) {
 			WARNING("Could not find an item for deletion");
 			continue;
 		}
 
 		Folder* parentFolder = itemToDelete->GetParent();
-		if (parentFolder == 0) {
+		if (parentFolder == nullptr) {
 			WARNING("Cannot delete item without parent");
 			continue;
 		}
@@ -992,7 +992,7 @@ void FolderNavigationWidget::sl_View_clicked (const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
 		Note* n = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-		if (!n) {
+		if (n == nullptr) {
 			WARNING("Casting error");
 			return;
 		}
@@ -1006,7 +1006,7 @@ void FolderNavigationWidget::sl_View_doubleClicked (const QModelIndex& index) {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
 	if (item->DataType() == BaseModelItem::note) {
 		Note* n = dynamic_cast<NoteModelItem*>(item)->GetStoredData();
-		if (!n) {
+		if (n == nullptr) {
 			WARNING("Casting error");
 			return;
 		}
@@ -1020,7 +1020,7 @@ void FolderNavigationWidget::sl_View_SelectionChanged(const QItemSelection&, con
 
 void FolderNavigationWidget::sl_View_Expanded(const QModelIndex& index) {
 	if (!index.isValid()) {return;}
-	if (index.internalPointer() == 0) {return;}
+	if (index.internalPointer() == nullptr) {return;}
 
 	BaseModelItem* modelItemToEdit =
 			static_cast<BaseModelItem*>(index.internalPointer());
@@ -1033,7 +1033,7 @@ void FolderNavigationWidget::sl_View_Expanded(const QModelIndex& index) {
 
 void FolderNavigationWidget::sl_View_Collapsed(const QModelIndex& index) {
 	if (!index.isValid()) {return;}
-	if (index.internalPointer() == 0) {return;}
+	if (index.internalPointer() == nullptr) {return;}
 
 	BaseModelItem* modelItemToEdit =
 			static_cast<BaseModelItem*>(index.internalPointer());
@@ -1058,7 +1058,7 @@ void FolderNavigationWidget::restoreExpandedIndexes() {
 		}
 
 		if (!index.isValid()) {continue;}
-		if (index.internalPointer() == 0) {continue;}
+		if (index.internalPointer() == nullptr) {continue;}
 		BaseModelItem* modelItemToEdit =
 				static_cast<BaseModelItem*>(index.internalPointer());
 
@@ -1091,7 +1091,7 @@ void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 	}
 
 	treeView->setModel(model);
-	if (treeView->model() != 0) {
+	if (treeView->model() != nullptr) {
 		for (int i = 0; i < treeView->model()->columnCount(); i++) {
 			treeView->resizeColumnToContents(i);
 		}
@@ -1100,12 +1100,12 @@ void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 		restoreExpandedIndexes();
 	}
 
-	treeView->setEnabled(model != 0);
-	pinFolderButton->setEnabled(model != 0);
+	treeView->setEnabled(model != nullptr);
+	pinFolderButton->setEnabled(model != nullptr);
 
 	if (model) {
 		pinFolderButton->blockSignals(true);
-		pinFolderButton->setChecked(model->GetPinnedFolder() != 0);
+		pinFolderButton->setChecked(model->GetPinnedFolder() != nullptr);
 		pinFolderButton->blockSignals(false);
 		UpdatePinnedFolderData();
 	} else {

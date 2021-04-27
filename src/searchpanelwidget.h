@@ -59,7 +59,7 @@ namespace qNotesManager {
 		bool eventFilter (QObject* watched, QEvent* event);
 
 	public:
-		explicit SearchPanelWidget(QTextEdit* edit, QWidget *parent = 0);
+		explicit SearchPanelWidget(QTextEdit* edit, QWidget *parent = nullptr);
 		QString SearchText() const;
 		QString ReplaceText() const;
 

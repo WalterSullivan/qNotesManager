@@ -26,7 +26,7 @@ namespace qNotesManager {
 	private:
 		mutable bool _isEditing;
 	public:
-		explicit ModelItemDelegate(QObject *parent = 0);
+		explicit ModelItemDelegate(QObject *parent = nullptr);
 
 		virtual void paint (QPainter* painter, const QStyleOptionViewItem& option,
 							const QModelIndex& index) const;

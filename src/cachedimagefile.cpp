@@ -25,7 +25,7 @@ using namespace qNotesManager;
 CachedImageFile::CachedImageFile(const QByteArray& array, const QString& name, const QString& format) :
 		CachedFile(array, name),
 		cachedPixmapSize(QSize()),
-		cachedPixmap(0),
+		cachedPixmap(nullptr),
 		cachePixmapInitialized(false),
 		Format(format) {
 
@@ -77,10 +77,10 @@ CachedImageFile* CachedImageFile::FromFile(const QString& fileName) {
 	QFile file(fileName);
 
 	if (!file.exists()) {
-		return 0;
+		return nullptr;
 	}
 
-	if (!file.open(QIODevice::ReadOnly)) {return 0;}
+	if (!file.open(QIODevice::ReadOnly)) {return nullptr;}
 
 	QByteArray array = file.readAll();
 	file.close();

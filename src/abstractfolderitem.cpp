@@ -21,8 +21,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-AbstractFolderItem::AbstractFolderItem(ItemType type) : QObject(0), itemType(type) {
-	parent = 0;
+AbstractFolderItem::AbstractFolderItem(ItemType type) : QObject(nullptr), itemType(type) {
+	parent = nullptr;
 }
 
 AbstractFolderItem::~AbstractFolderItem() {
@@ -50,7 +50,7 @@ Folder* AbstractFolderItem::GetParent() const {
 }
 
 bool AbstractFolderItem::IsOffspringOf(const Folder* folder) const {
-	if (folder == 0) {
+	if (folder == nullptr) {
 		WARNING("Null reference");
 		return false;
 	}
@@ -58,7 +58,7 @@ bool AbstractFolderItem::IsOffspringOf(const Folder* folder) const {
 	if (folder == this) {return false;}
 
 	Folder* f = parent;
-	while (f != 0) {
+	while (f != nullptr) {
 		if (f == folder) {return true;}
 		f = f->GetParent();
 	}

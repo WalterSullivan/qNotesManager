@@ -53,7 +53,7 @@ void DatesModel::sl_Item_DataChanged(BaseModelItem* item) {
 
 void DatesModel::sl_Note_DateChanged() {
 	Note* note = qobject_cast<Note*>(QObject::sender());
-	if (note == 0) {
+	if (note == nullptr) {
 		WARNING("Casting error");
 		return;
 	}
@@ -77,7 +77,7 @@ void DatesModel::sl_Note_DateChanged() {
 		return;
 	}
 
-	BaseModelItem* noteItem = 0;
+	BaseModelItem* noteItem = nullptr;
 
 	// Check if date didn't changed
 	if (notesBridge.contains(note) && noteDate.isValid()) {
@@ -117,7 +117,7 @@ void DatesModel::sl_Note_DateChanged() {
 }
 
 void DatesModel::sl_NoteRegistered(Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -128,7 +128,7 @@ void DatesModel::sl_NoteRegistered(Note* note) {
 
 
 	QDateTime (Note::*fp)() const;
-	fp = 0;
+	fp = nullptr;
 
 	switch (lookupField) {
 	case CreationDate:
@@ -156,7 +156,7 @@ void DatesModel::sl_NoteRegistered(Note* note) {
 }
 
 void DatesModel::sl_NoteUnregistered(Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -172,11 +172,11 @@ void DatesModel::sl_NoteUnregistered(Note* note) {
 }
 
 void DatesModel::addNoteToTree(NoteModelItem* noteItem) {
-	if (!noteItem) {
+	if (noteItem == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
-	if (noteItem->GetStoredData() == 0) {
+	if (noteItem->GetStoredData() == nullptr) {
 		WARNING("Item has no internal data");
 		return;
 	}
@@ -197,7 +197,7 @@ void DatesModel::addNoteToTree(NoteModelItem* noteItem) {
 		return;
 	}
 
-	BaseModelItem* newParentItem = 0;
+	BaseModelItem* newParentItem = nullptr;
 
 	qint32 dayID =		GenerateDateID(noteDate.year(), noteDate.month(), noteDate.day());
 	qint32 monthID =	GenerateDateID(noteDate.year(), noteDate.month());
@@ -348,7 +348,7 @@ qint32 DatesModel::GenerateDateID(const int year, const int month, const int day
 }
 
 qint32 DatesModel::GenerateDateID(const BaseModelItem* item) const {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return 0;
 	}
@@ -358,8 +358,8 @@ qint32 DatesModel::GenerateDateID(const BaseModelItem* item) const {
 	}
 
 	const DateModelItem* ditem = dynamic_cast<const DateModelItem*>(item);
-	const DateModelItem* year = 0;
-	const DateModelItem* month = 0;
+	const DateModelItem* year = nullptr;
+	const DateModelItem* month = nullptr;
 
 	switch (ditem->component) {
 	case DateModelItem::Year:
@@ -367,12 +367,12 @@ qint32 DatesModel::GenerateDateID(const BaseModelItem* item) const {
 		break;
 
 	case DateModelItem::Month:
-		if (ditem->parent() == 0) {
+		if (ditem->parent() == nullptr) {
 			WARNING("Item has no parent");
 			return 0;
 		}
 		year = dynamic_cast<const DateModelItem*>(item->parent());
-		if (year == 0) {
+		if (year == nullptr) {
 			WARNING("Casting error");
 			return 0;
 		}
@@ -380,22 +380,22 @@ qint32 DatesModel::GenerateDateID(const BaseModelItem* item) const {
 		break;
 
 	case DateModelItem::Day:
-		if (ditem->parent() == 0) {
+		if (ditem->parent() == nullptr) {
 			WARNING("Item has no parent");
 			return 0;
 		}
 		month = dynamic_cast<const DateModelItem*>(item->parent());
-		if (month == 0) {
+		if (month == nullptr) {
 			WARNING("Casting error");
 			return 0;
 		}
 
-		if (month->parent() == 0) {
+		if (month->parent() == nullptr) {
 			WARNING("Item has no parent");
 			return 0;
 		}
 		year = dynamic_cast<const DateModelItem*>(month->parent());
-		if (year == 0) {
+		if (year == nullptr) {
 			WARNING("Casting error");
 			return 0;
 		}

@@ -24,7 +24,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 FolderItemCollection::FolderItemCollection(Folder* owner) : QObject(owner), _owner(owner) {
-	if (!owner) {
+	if (owner == nullptr) {
 		WARNING("Null pointer recieved");
 	}
 }
@@ -34,7 +34,7 @@ void FolderItemCollection::Add(AbstractFolderItem* item) {
 }
 
 void FolderItemCollection::AddTo(AbstractFolderItem* item, int index) {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -46,7 +46,7 @@ void FolderItemCollection::AddTo(AbstractFolderItem* item, int index) {
 		WARNING("Item is already in the list");
 		return;
 	}
-	if (item->GetParent() != 0) {
+	if (item->GetParent() != nullptr) {
 		WARNING("Item already has a parent");
 		return;
 	}
@@ -64,7 +64,7 @@ void FolderItemCollection::AddTo(AbstractFolderItem* item, int index) {
 }
 
 void FolderItemCollection::Remove(AbstractFolderItem* item) {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -80,13 +80,13 @@ void FolderItemCollection::Remove(AbstractFolderItem* item) {
 	emit sg_ItemAboutToBeRemoved(item);
 
 	_items.removeOne(item);
-	item->SetParent(0);
+	item->SetParent(nullptr);
 
 	emit sg_ItemRemoved(item);
 }
 
 bool FolderItemCollection::Contains(AbstractFolderItem* item) const {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return false;
 	}
@@ -96,7 +96,7 @@ bool FolderItemCollection::Contains(AbstractFolderItem* item) const {
 
 void FolderItemCollection::Clear() {
 	for (int i = 0; i < _items.count(); ++i) {
-		_items.at(i)->SetParent(0);
+		_items.at(i)->SetParent(nullptr);
 	}
 
 	emit sg_AboutToClear();
@@ -127,7 +127,7 @@ void FolderItemCollection::Move(AbstractFolderItem* item, int to) {
 }
 
 void FolderItemCollection::Move(AbstractFolderItem* item, Folder* newParent) {
-	if (!newParent) {
+	if (newParent == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -140,7 +140,7 @@ void FolderItemCollection::Move(AbstractFolderItem* item, Folder* newParent) {
 }
 
 void FolderItemCollection::Move(AbstractFolderItem* item, int to, Folder* newParent) {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -152,7 +152,7 @@ void FolderItemCollection::Move(AbstractFolderItem* item, int to, Folder* newPar
 		WARNING("'to' index is out of bounds");
 		return;
 	}
-	if (!newParent) {
+	if (newParent == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -189,14 +189,14 @@ int FolderItemCollection::Count() const {
 AbstractFolderItem* FolderItemCollection::ItemAt(int index) const {
 	if (index < 0 || index >= _items.count()) {
 		WARNING("Index is out of bounds");
-		return 0;
+		return nullptr;
 	}
 
 	return _items.at(index);
 }
 
 int FolderItemCollection::IndexOf(AbstractFolderItem* const item) const {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return -1;
 	}

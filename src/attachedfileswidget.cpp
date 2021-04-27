@@ -71,7 +71,7 @@ void AttachedFilesWidget::SetFocusPolicyCustom(Qt::FocusPolicy policy) {
 }
 
 void AttachedFilesWidget::sl_AddButton_Clicked() {
-	if (currentNote == 0) {return;}
+	if (currentNote == nullptr) {return;}
 
 	QString fileName = QString();
 
@@ -90,7 +90,7 @@ void AttachedFilesWidget::sl_AddButton_Clicked() {
 	}
 
 	CachedFile* newFile = CachedFile::FromFile(fileName);
-	if (newFile == 0 || newFile->Size() == 0) {
+	if (newFile == nullptr || newFile->Size() == 0) {
 		CustomMessageBox msg(this, "Failed to open file", "Warning", QMessageBox::Warning);
 		msg.show();
 		delete newFile;
@@ -120,17 +120,17 @@ void AttachedFilesWidget::sl_AddButton_Clicked() {
 }
 
 void AttachedFilesWidget::sl_SaveButton_Clicked() {
-	if (currentNote == 0) {return;}
+	if (currentNote == nullptr) {return;}
 
 	const QListWidgetItem* currentItem = listWidget->currentItem();
-	if (currentItem == 0) {return;}
+	if (currentItem == nullptr) {return;}
 
 	const QVariant indexData = currentItem->data(Qt::UserRole);
 	if (indexData.isNull() || !indexData.isValid()) {return;}
 	const int fileIndex = indexData.toInt();
 
 	const CachedFile* attachedFile = currentNote->GetAttachedFile(fileIndex);
-	if (attachedFile == 0) {return;}
+	if (attachedFile == nullptr) {return;}
 
 	QString fileName = QString();
 
@@ -147,7 +147,7 @@ void AttachedFilesWidget::sl_SaveButton_Clicked() {
 }
 
 void AttachedFilesWidget::sl_DeleteButton_Clicked() {
-	if (currentNote == 0) {return;}
+	if (currentNote == nullptr) {return;}
 
 	QList<QListWidgetItem*> selectedItems = listWidget->selectedItems();
 	if (selectedItems.size() == 0) {return;}
@@ -166,7 +166,7 @@ void AttachedFilesWidget::sl_DeleteButton_Clicked() {
 		if (indexData.isNull() || !indexData.isValid()) {return;}
 		const int fileIndex = indexData.toInt();
 		CachedFile* file = currentNote->GetAttachedFile(fileIndex);
-		if (file == 0) {continue;}
+		if (file == nullptr) {continue;}
 
 		filesToDelete.push_back(file);
 	}
@@ -188,10 +188,10 @@ void AttachedFilesWidget::updateData() {
 		icon = ip.icon(info);
 		*/
 
-	if (currentNote != 0) {
+	if (currentNote != nullptr) {
 		for (int i = 0; i < currentNote->GetAttachedFilesCount(); i++) {
 			const CachedFile* file = currentNote->GetAttachedFile(i);
-			if (file == 0) {continue;}
+			if (file == nullptr) {continue;}
 
 			QListWidgetItem* newItem = new QListWidgetItem(icon, file->GetFileName());
 			newItem->setData(Qt::UserRole, i);
@@ -208,7 +208,7 @@ void AttachedFilesWidget::updateCaption() {
 	quint32 attachedFilesTotalSize = 0;
 	QString attachedFilesTotalSizeStr = "0 Kb";
 
-	if (currentNote != 0) {
+	if (currentNote != nullptr) {
 		attachedFilesCount = currentNote->GetAttachedFilesCount();
 		for (int i = 0; i < attachedFilesCount; i++) {
 			const CachedFile* file = currentNote->GetAttachedFile(i);

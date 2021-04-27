@@ -29,7 +29,7 @@ namespace qNotesManager {
 	Q_OBJECT
 	private:
 		const QString _name;
-		Tag(const Tag&) : QObject(0) {} // Prevent construction by copying
+		Tag(const Tag&) : QObject(nullptr) {} // Prevent construction by copying
 		Tag& operator=(const Tag&){return *this;} // Prevent assignment
 
 	public:

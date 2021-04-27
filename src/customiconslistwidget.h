@@ -45,7 +45,7 @@ namespace qNotesManager {
 		int FindButtonIndexByName(const QString& name) const;
 
 	public:
-		explicit CustomIconsListWidget(QWidget *parent = 0);
+		explicit CustomIconsListWidget(QWidget *parent = nullptr);
 		QString SelectedIconKey;
 
 		void SelectIcon(const QString& key);

@@ -45,7 +45,7 @@ namespace qNotesManager {
 		QAction* showInTreeAction;
 
 	public:
-		explicit SearchResultsWidget(DocumentSearchEngine* eng, QWidget *parent = 0);
+		explicit SearchResultsWidget(DocumentSearchEngine* eng, QWidget *parent = nullptr);
 
 		DocumentSearchEngine*	engine;
 

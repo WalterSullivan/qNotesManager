@@ -38,7 +38,7 @@ namespace qNotesManager {
 		DateNavigationWidget*		datesWidget;
 
 	public:
-		explicit NavigationPanelWidget(QWidget *parent = 0);
+		explicit NavigationPanelWidget(QWidget *parent = nullptr);
 		int CurrentTabIndex() const;
 		void SetCurrentTab(int index);
 		void SetTargetDocument(Document*);

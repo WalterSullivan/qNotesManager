@@ -30,7 +30,7 @@ namespace qNotesManager {
 	class TagsNavigationWidget : public QWidget {
 	Q_OBJECT
 	public:
-		explicit TagsNavigationWidget(QWidget *parent = 0);
+		explicit TagsNavigationWidget(QWidget *parent = nullptr);
 		void SetModel(TagsModel*);
 		void SetModelItemDelegate(QAbstractItemDelegate*);
 

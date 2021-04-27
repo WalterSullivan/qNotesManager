@@ -25,7 +25,7 @@ namespace qNotesManager {
 	class SearchResultItemDelegate : public QStyledItemDelegate {
 	Q_OBJECT
 	public:
-		explicit SearchResultItemDelegate(QObject *parent = 0);
+		explicit SearchResultItemDelegate(QObject *parent = nullptr);
 
 		/*virtual*/ void paint (QPainter* painter, const QStyleOptionViewItem& option,
 							const QModelIndex& index) const;

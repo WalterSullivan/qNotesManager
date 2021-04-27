@@ -42,7 +42,7 @@ namespace qNotesManager {
 		DocumentSearchEngine*	engine;
 
 	public:
-		explicit SearchWidget(DocumentSearchEngine*, QWidget *parent = 0);
+		explicit SearchWidget(DocumentSearchEngine*, QWidget *parent = nullptr);
 	protected:
 		virtual void showEvent (QShowEvent* event);
 		virtual void keyPressEvent (QKeyEvent* event);

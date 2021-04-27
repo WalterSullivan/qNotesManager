@@ -35,7 +35,7 @@ ModelItemDelegate::ModelItemDelegate(QObject *parent) : QItemDelegate(parent) {
 void ModelItemDelegate::paint (QPainter* painter, const QStyleOptionViewItem& option,
 						const QModelIndex& index) const {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}

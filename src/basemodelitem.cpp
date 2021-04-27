@@ -27,7 +27,7 @@ using namespace qNotesManager;
 BaseModelItem::BaseModelItem(ItemType type)
 	: itemType(type)
 {
-	parentItem = 0;
+	parentItem = nullptr;
 	sorted = false;
 	sortOrder = Qt::AscendingOrder;
 }
@@ -35,7 +35,7 @@ BaseModelItem::BaseModelItem(ItemType type)
 BaseModelItem::~BaseModelItem() {
 }
 
-// Return item parent or 0 if there is none.
+// Return item parent or nullptr if there is none.
 BaseModelItem* BaseModelItem::parent() const {
 	return parentItem;
 }
@@ -54,11 +54,11 @@ void BaseModelItem::AddChild(BaseModelItem* item) {
 // Adds item 'item' into children list in specified position.
 // NOTE: 'position' parameter is ignored when sorting is enabled
 void BaseModelItem::AddChildTo(BaseModelItem* item, int position) {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
-	if (item->parentItem != 0) {
+	if (item->parentItem != nullptr) {
 		WARNING("Item already has a parent");
 		return;
 	}
@@ -78,7 +78,7 @@ void BaseModelItem::AddChildTo(BaseModelItem* item, int position) {
 
 // Removes child item
 void BaseModelItem::RemoveChild(BaseModelItem* item) {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -88,13 +88,13 @@ void BaseModelItem::RemoveChild(BaseModelItem* item) {
 	}
 
 	childrenList.removeAll(item);
-	item->parentItem = 0;
-	item->setParent(0); // QObject parentship
+	item->parentItem = nullptr;
+	item->setParent(nullptr); // QObject parentship
 }
 
 // Returns index of child item.
 int BaseModelItem::IndexOfChild(BaseModelItem* item) const {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return -1;
 	}
@@ -115,7 +115,7 @@ int BaseModelItem::ChildrenCount() const {
 BaseModelItem* BaseModelItem::ChildAt(int index) const {
 	if (index < 0 || index >= childrenList.count()) {
 		WARNING("Item at wrong index requested");
-		return 0;
+		return nullptr;
 	}
 
 	return childrenList.at(index);
@@ -127,7 +127,7 @@ void BaseModelItem::ClearChildrenList() {
 
 // Returns true if object is a child or a grandchild of item 'parent', otherwise returns false.
 bool BaseModelItem::IsOffspringOf(const BaseModelItem* parent) const {
-	if (!parent) {
+	if (parent == nullptr) {
 		WARNING("Null pointer recieved");
 		return false;
 	}
@@ -135,7 +135,7 @@ bool BaseModelItem::IsOffspringOf(const BaseModelItem* parent) const {
 	if (parent == this) {return false;}
 
 	const BaseModelItem* f = this->parent();
-	while (f != 0) {
+	while (f != nullptr) {
 		if (f == parent) {return true;}
 		f = f->parent();
 	}
@@ -157,7 +157,7 @@ bool BaseModelItem::setData(const QVariant&, int) {
 
 // Returns index where a new item will be inserted with AddChild()
 int BaseModelItem::FindInsertIndex(const BaseModelItem* item) const {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return -1;
 	}
@@ -183,7 +183,7 @@ bool BaseModelItem::LessThan(const BaseModelItem*) const {
 int BaseModelItem::findInsertIndex_Sorted(const BaseModelItem* item) const {
 	// TODO: add anchors handling
 	// TODO: handle Qt::DescendingOrder
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return -1;
 	}

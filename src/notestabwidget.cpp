@@ -68,7 +68,7 @@ NotesTabWidget::NotesTabWidget(QWidget *parent) : QWidget(parent) {
 void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 	(void)newTab;
 
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -102,7 +102,7 @@ void NotesTabWidget::OpenNote(Note* note, int position, bool newTab) {
 }
 
 void NotesTabWidget::CloseNote(const Note* n) {
-	if (!n) {
+	if (n == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -126,7 +126,7 @@ void NotesTabWidget::CloseNote(const Note* n) {
 }
 
 void NotesTabWidget::ShowFragment(const NoteFragment& fragment) {
-	if (!fragment.NotePtr) {
+	if (fragment.NotePtr == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -147,7 +147,7 @@ void NotesTabWidget::Clear() {
 
 void NotesTabWidget::sl_Note_PropertiesChanged() {
 	const Note* note = qobject_cast<Note*>(QObject::sender());
-	if (note == 0) {
+	if (note == nullptr) {
 		WARNING("Could not find sender note");
 		return;
 	}
@@ -175,24 +175,24 @@ QList<const Note*> NotesTabWidget::DisplayedNotes() const {
 }
 
 Note* NotesTabWidget::CurrentNote() const {
-	NoteEditWidget* noteWidget = 0;
+	NoteEditWidget* noteWidget = nullptr;
 
 	if (tabWidget->count() > 0) {
 		noteWidget = dynamic_cast<NoteEditWidget*>(tabWidget->currentWidget());
 	} else {
-		return 0;
+		return nullptr;
 	}
 
-	if (noteWidget == 0) {
+	if (noteWidget == nullptr) {
 		WARNING("Casting error");
-		return 0;
+		return nullptr;
 	}
 
 	return noteWidget->CurrentNote();
 }
 
 void NotesTabWidget::SetCurrentNote(const Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -215,7 +215,7 @@ QList< QPair<Note*, int> > NotesTabWidget::GetState() const {
 
 void NotesTabWidget::sl_TabWidget_CurrentChanged(int index) {
 	if (index == -1) {
-		emit sg_CurrentNoteChanged(0);
+		emit sg_CurrentNoteChanged(nullptr);
 		return;
 	}
 
@@ -241,7 +241,7 @@ void NotesTabWidget::closeTab(int index) {
 	}
 
 	QWidget* widget = tabWidget->widget(index);
-	if (widget == 0) {
+	if (widget == nullptr) {
 		WARNING("Can't find widget by index");
 		return;
 	}

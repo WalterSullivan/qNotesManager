@@ -72,7 +72,7 @@ namespace qNotesManager {
 		void updateHeight();
 
 	public:
-		explicit NoteEditWidget(Note* n = 0);
+		explicit NoteEditWidget(Note* n = nullptr);
 		Note* CurrentNote() const;
 		void ScrollTo(int position);
 		void ShowFragment(const NoteFragment& fragment);

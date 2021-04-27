@@ -29,7 +29,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 NoteModelItem::NoteModelItem(Note* note) : BaseModelItem(BaseModelItem::note), _storedData(note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 	} else {
 		QObject::connect(note, SIGNAL(sg_VisualPropertiesChanged()),
@@ -39,7 +39,7 @@ NoteModelItem::NoteModelItem(Note* note) : BaseModelItem(BaseModelItem::note), _
 }
 
 QVariant NoteModelItem::data(int role) const {
-	if (!_storedData) {
+	if (_storedData == nullptr) {
 		return QVariant();
 	}
 

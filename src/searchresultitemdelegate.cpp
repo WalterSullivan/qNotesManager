@@ -33,7 +33,7 @@ SearchResultItemDelegate::SearchResultItemDelegate(QObject *parent) : QStyledIte
 void SearchResultItemDelegate::paint (QPainter* painter, const QStyleOptionViewItem& option,
 									  const QModelIndex& index) const {
 	BaseModelItem* item = static_cast<BaseModelItem*>(index.internalPointer());
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}

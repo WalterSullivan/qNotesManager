@@ -33,13 +33,13 @@ SearchResultsModel::SearchResultsModel(QObject *parent) : BaseModel(parent) {
 }
 
 void SearchResultsModel::AddResult(const NoteFragment& fragment) {
-	NoteModelItem* noteItem = 0;
+	NoteModelItem* noteItem = nullptr;
 
 	if (notesHash.contains(fragment.NotePtr)) {
 		noteItem = notesHash.value(fragment.NotePtr);
 	} else {
 		Note* note = const_cast<Note*>(fragment.NotePtr);
-		if (!note) {
+		if (note == nullptr) {
 			WARNING("Null pointer recieved");
 			return;
 		}
@@ -70,7 +70,7 @@ void SearchResultsModel::AddResult(const NoteFragment& fragment) {
 }
 
 void SearchResultsModel::RemoveResultsForNote(const Note* n) {
-	if (!n) {
+	if (n == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -102,7 +102,7 @@ void SearchResultsModel::ClearResults() {
 }
 
 bool SearchResultsModel::ContainsResultForNote(const Note* note) {
-	if (!note) {
+	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return false;
 	}

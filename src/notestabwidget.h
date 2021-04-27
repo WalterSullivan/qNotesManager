@@ -54,7 +54,7 @@ namespace qNotesManager {
 		QAction* closeTabAction;
 
 	public:
-		explicit NotesTabWidget(QWidget *parent = 0);
+		explicit NotesTabWidget(QWidget *parent = nullptr);
 
 		void OpenNote(Note* note, int position = 0, bool newTab = false);
 		void CloseNote(const Note* n);

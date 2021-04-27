@@ -443,7 +443,7 @@ void TextEditWidget::sl_ListButton_Toggled(bool toggle) {
 }
 
 void TextEditWidget::sl_ListButton_Triggered(QAction* action) {
-	if (!action) {
+	if (action == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -451,7 +451,7 @@ void TextEditWidget::sl_ListButton_Triggered(QAction* action) {
 
 	QTextCursor cursor = this->textField->textCursor();
 	QTextList *textList = cursor.currentList();
-	if (!textList) {
+	if (textList == nullptr) {
 		WARNING("Wrong button state");
 		return;
 	}
@@ -463,7 +463,7 @@ void TextEditWidget::sl_ListButton_Triggered(QAction* action) {
 void TextEditWidget::sl_IncreaseListIndent_Triggered() {
 	QTextCursor cursor = this->textField->textCursor();
 	QTextList *textList = cursor.currentList();
-	if (!textList) {return;}
+	if (textList == nullptr) {return;}
 
 	QTextListFormat format = textList->format();
 	format.setIndent(format.indent() + 1);
@@ -473,7 +473,7 @@ void TextEditWidget::sl_IncreaseListIndent_Triggered() {
 void TextEditWidget::sl_DecreaseListIndent_Triggered() {
 	QTextCursor cursor = this->textField->textCursor();
 	QTextList *textList = cursor.currentList();
-	if (!textList) {return;}
+	if (textList == nullptr) {return;}
 
 	QTextListFormat format = textList->format();
 	if (format.indent() == 0) {return;}
@@ -507,7 +507,7 @@ void TextEditWidget::sl_CreateTableAction_Triggered() {
 
 void TextEditWidget::sl_InsertRowAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {
+	if (table == nullptr) {
 		WARNING("Wrong button state");
 		return;
 	}
@@ -520,7 +520,7 @@ void TextEditWidget::sl_InsertRowAction_Triggered() {
 
 void TextEditWidget::sl_InsertColumnAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {
+	if (table == nullptr) {
 		WARNING("Wrong button state");
 		return;
 	}
@@ -533,7 +533,7 @@ void TextEditWidget::sl_InsertColumnAction_Triggered() {
 
 void TextEditWidget::sl_RemoveRowAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {
+	if (table == nullptr) {
 		WARNING("Wrong button state");
 		return;
 	}
@@ -553,7 +553,7 @@ void TextEditWidget::sl_TablePropertiesAction_Triggered() {
 
 void TextEditWidget::sl_RemoveColumnAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {
+	if (table == nullptr) {
 		WARNING("Wrong button state");
 		return;
 	}
@@ -564,7 +564,7 @@ void TextEditWidget::sl_RemoveColumnAction_Triggered() {
 
 void TextEditWidget::sl_MergeCellsAction_Triggered() {
 	QTextTable* table = textField->textCursor().currentTable();
-	if (!table) {
+	if (table == nullptr) {
 		WARNING("Wrong button state");
 		return;
 	}
@@ -617,7 +617,7 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 	fontSizeComboBox->blockSignals(false);
 
 	const QTextTable* table = textField->textCursor().currentTable();
-	const bool tablePresent = (table != 0);
+	const bool tablePresent = (table != nullptr);
 
 	insertRowAction->setEnabled(tablePresent);
 	insertColumnAction->setEnabled(tablePresent);
@@ -647,7 +647,7 @@ bool TextEditWidget::eventFilter (QObject* watched, QEvent* event) {
 	}
 
 	QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
-	if (!e) {
+	if (e == nullptr) {
 		WARNING("Casting error");
 		return false;
 	}

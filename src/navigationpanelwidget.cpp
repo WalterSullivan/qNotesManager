@@ -102,11 +102,11 @@ void NavigationPanelWidget::SetTargetDocument(Document* document) {
 		datesWidget->SetTextDateModel(document->GetTextDatesModel());
 		tagsWidget->SetModel(document->GetTagsModel());
 	} else {
-		hierarchyWidget->SetModel(0);
-		datesWidget->SetCreationModel(0);
-		datesWidget->SetModificationModel(0);
-		datesWidget->SetTextDateModel(0);
-		tagsWidget->SetModel(0);
+		hierarchyWidget->SetModel(nullptr);
+		datesWidget->SetCreationModel(nullptr);
+		datesWidget->SetModificationModel(nullptr);
+		datesWidget->SetTextDateModel(nullptr);
+		tagsWidget->SetModel(nullptr);
 	}
 }
 

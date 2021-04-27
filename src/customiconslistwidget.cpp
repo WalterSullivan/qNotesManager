@@ -44,7 +44,7 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 
 	QVBoxLayout* buttonsLayout = new QVBoxLayout();
 
-	QPushButton* b = 0;
+	QPushButton* b = nullptr;
 	foreach (QString groupName, Application::I()->GetStandardIconGroups()) {
 		b = new QPushButton(groupName, this);
 		b->setCheckable(true);

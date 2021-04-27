@@ -41,7 +41,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-Document::Document() : QObject(0) {
+Document::Document() : QObject(nullptr) {
 	inInitMode = false;
 
 	rootFolder = new Folder("_root_", Folder::SystemFolder);
@@ -68,7 +68,7 @@ Document::Document() : QObject(0) {
 					 this, SLOT(sl_Folder_ItemRemoved(AbstractFolderItem*const)));
 	QObject::connect(trashFolder, SIGNAL(sg_DataChanged()), this, SLOT(sl_ItemDataChanged()));
 
-	pinnedFolder = 0;
+	pinnedFolder = nullptr;
 
 	tagsListModel = new QStandardItemModel(this);
 
@@ -348,7 +348,7 @@ void Document::RegisterTag(Tag* tag) {
 
 void Document::UnregisterTag(Tag* tag) {
 	allTags.removeAll(tag);
-	tag->setParent(0);
+	tag->setParent(nullptr);
 	tagsByName.remove(tag->GetName());
 	QList<QStandardItem*> itemsList = tagsListModel->findItems(tag->GetName(), Qt::MatchExactly, 0);
 	QStandardItem* item = tagsListModel->takeItem(itemsList.at(0)->row());
@@ -359,7 +359,7 @@ void Document::UnregisterTag(Tag* tag) {
 }
 
 void Document::sl_Note_TagAdded(Tag* tag) {
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -370,7 +370,7 @@ void Document::sl_Note_TagAdded(Tag* tag) {
 }
 
 void Document::sl_Note_TagRemoved(Tag* tag) {
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -387,10 +387,10 @@ void Document::sl_Note_TagRemoved(Tag* tag) {
 void Document::sl_ItemDataChanged() {
 	QObject* sender = QObject::sender();
 	AbstractFolderItem* item = dynamic_cast<AbstractFolderItem*>(sender);
-	if (item != 0) {
+	if (item != nullptr) {
 		if (item->GetItemType() == AbstractFolderItem::Type_Note) {
 			Note* n = dynamic_cast<Note*>(item);
-			if (n != 0 && bookmarks.contains(n)) {
+			if (n != nullptr && bookmarks.contains(n)) {
 				emit sg_BookmarksListChanged();
 			}
 		}
@@ -400,7 +400,7 @@ void Document::sl_ItemDataChanged() {
 }
 
 Tag* Document::FindTagByName(QString name) const {
-	return tagsByName.contains(name) ? tagsByName.value(name) : 0;
+	return tagsByName.contains(name) ? tagsByName.value(name) : nullptr;
 }
 
 QAbstractItemModel* Document::GetTagsListModel() const {
@@ -436,7 +436,7 @@ QList<Note*> Document::GetNotesList() const {
 }
 
 void Document::AddCustomIcon(CachedImageFile* image) {
-	if (!image) {
+	if (image == nullptr) {
 		WARNING("Null image recieved");
 		return;
 	}
@@ -460,7 +460,7 @@ void Document::AddCustomIcon(CachedImageFile* image) {
 }
 
 void Document::AddCustomIconToStorage(CachedImageFile* image) {
-	if (!image) {
+	if (image == nullptr) {
 		WARNING("Null image recieved");
 		return;
 	}
@@ -494,7 +494,7 @@ void Document::RemoveCustomIcon(QString key) {
 		WARNING("A few icons with the same key found");
 	}
 	QStandardItem* item = Application::I()->GetIconsModel()->takeItem(itemsList.at(0)->row());
-	if (item == 0) {
+	if (item == nullptr) {
 		WARNING("Error retrieving icon model item");
 		return;
 	}
@@ -613,7 +613,7 @@ int Document::GetBookmarksCount() const {
 }
 
 Note* Document::GetBookmark(int index) const {
-	if (index < 0 || index >= bookmarks.count()) {return 0;}
+	if (index < 0 || index >= bookmarks.count()) {return nullptr;}
 
 	return bookmarks[index];
 }
@@ -635,7 +635,7 @@ void Document::RemoveBookmark(Note* note) {
 }
 
 bool Document::IsBookmark(Note* note) {
-	if (note == 0) {return false;}
+	if (note == nullptr) {return false;}
 
 	return bookmarks.contains(note);
 }

@@ -22,8 +22,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 BaseModel::BaseModel(QObject *parent) : QAbstractItemModel(parent) {
-	displayRootItem = 0;
-	rootItem = 0;
+	displayRootItem = nullptr;
+	rootItem = nullptr;
 }
 
 /*virtual*/
@@ -34,9 +34,9 @@ void BaseModel::SetDisplayRootItem(BaseModelItem* item) {
 	if (item == displayRootItem) {return;}
 
 	// # Check if item belongs to current model's hierarchy
-	if (item != 0) {
+	if (item != nullptr) {
 		BaseModelItem* parent = item;
-		while(parent->parent() != 0) {
+		while(parent->parent() != nullptr) {
 			parent = parent->parent();
 		}
 		if (parent != rootItem) {
@@ -45,13 +45,13 @@ void BaseModel::SetDisplayRootItem(BaseModelItem* item) {
 		}
 	}
 
-	if (displayRootItem != 0 && (displayRootItem->ChildrenCount() > 0)) {
+	if (displayRootItem != nullptr && (displayRootItem->ChildrenCount() > 0)) {
 		beginRemoveRows(QModelIndex(), 0, displayRootItem->ChildrenCount() - 1);
-			displayRootItem = 0;
+			displayRootItem = nullptr;
 		endRemoveRows();
 	}
 
-	if (item != 0 && (item->ChildrenCount() > 0)) {
+	if (item != nullptr && (item->ChildrenCount() > 0)) {
 		beginInsertRows(QModelIndex(), 0, item->ChildrenCount() - 1);
 			displayRootItem = item;
 		endInsertRows();
@@ -70,7 +70,7 @@ void BaseModel::SetRootItem(BaseModelItem* item) {
 	if (rootItem == item) {return;}
 
 	if (rootItem) {
-		rootItem->setParent(0);
+		rootItem->setParent(nullptr);
 	}
 
 	rootItem = item;
@@ -103,12 +103,12 @@ QModelIndex BaseModel::parent(const QModelIndex& child) const {
 
 	BaseModelItem* item = static_cast<BaseModelItem*>(child.internalPointer());
 
-	if (item->parent() == 0 || item->parent() == displayRootItem) {return QModelIndex();}
+	if (item->parent() == nullptr || item->parent() == displayRootItem) {return QModelIndex();}
 
 	BaseModelItem* parentItem = item->parent();
 
 	int row = 0;
-	if (parentItem->parent() != 0) {
+	if (parentItem->parent() != nullptr) {
 		row = parentItem->parent()->IndexOfChild(parentItem);
 	}
 	return createIndex(row, 0, parentItem);
@@ -116,7 +116,7 @@ QModelIndex BaseModel::parent(const QModelIndex& child) const {
 
 /*virtual*/
 int BaseModel::rowCount(const QModelIndex& parent) const {
-	if (displayRootItem == 0) {return 0;}
+	if (displayRootItem == nullptr) {return 0;}
 
 	if (!parent.isValid()) {
 		return displayRootItem->ChildrenCount();

@@ -37,7 +37,7 @@ namespace qNotesManager {
 		BaseModelItem* GetRootItem() const;
 
 	public:
-		explicit BaseModel(QObject *parent = 0);
+		explicit BaseModel(QObject *parent = nullptr);
 		virtual ~BaseModel();
 
 		/*virtual*/ QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;

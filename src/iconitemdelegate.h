@@ -24,7 +24,7 @@ namespace qNotesManager {
 	class IconItemDelegate : public QStyledItemDelegate {
 	Q_OBJECT
 	public:
-		explicit IconItemDelegate(QObject *parent = 0);
+		explicit IconItemDelegate(QObject *parent = nullptr);
 		/*virtual*/ void paint (QPainter* painter, const QStyleOptionViewItem& option,
 							const QModelIndex& index) const;
 	};

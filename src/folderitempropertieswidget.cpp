@@ -32,7 +32,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialog(parent) {
-	customIconsWidget = 0;
+	customIconsWidget = nullptr;
 
 	creationDateLabel = new QLabel("Creation date:", this);
 	creationDateLabelD = new QLabel("", this);
@@ -109,7 +109,7 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 }
 
 void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
-	if (!item) {
+	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -148,7 +148,7 @@ void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
 }
 
 void FolderItemPropertiesWidget::accept() {
-	if (!itemToEdit) {
+	if (itemToEdit == nullptr) {
 		WARNING("Null pointer recieved");
 		reject();
 	}
@@ -169,15 +169,15 @@ void FolderItemPropertiesWidget::sl_Accepted() {
 		n->SetIconID(selectedIconKey);
 	}
 
-	itemToEdit = 0;
+	itemToEdit = nullptr;
 }
 
 void FolderItemPropertiesWidget::sl_Rejected() {
-	itemToEdit = 0;
+	itemToEdit = nullptr;
 }
 
 void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {
-	if (!itemToEdit) {
+	if (itemToEdit == nullptr) {
 		WARNING("Null pointer recieved");
 		reject();
 	}
@@ -197,8 +197,8 @@ void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {
 	if (customIconsWidget->exec() != QDialog::Accepted) {return;}
 
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
-		WARNING("Current document is 0");
+	if (doc == nullptr) {
+		WARNING("Current document is null");
 		return;
 	}
 
@@ -208,8 +208,8 @@ void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {
 
 void FolderItemPropertiesWidget::sl_ResetIconToDefaultButton_Clicked() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
-		WARNING("Current document is 0");
+	if (doc == nullptr) {
+		WARNING("Current document is null");
 		return;
 	}
 
@@ -224,8 +224,8 @@ void FolderItemPropertiesWidget::sl_ResetIconToDefaultButton_Clicked() {
 
 void FolderItemPropertiesWidget::sl_SetDefaultIconButton_Clicked() {
 	Document* doc = Application::I()->CurrentDocument();
-	if (doc == 0) {
-		WARNING("Current document is 0");
+	if (doc == nullptr) {
+		WARNING("Current document is null");
 		return;
 	}
 

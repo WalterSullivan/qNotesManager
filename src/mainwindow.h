@@ -157,9 +157,9 @@ namespace qNotesManager {
 		// Menu event handlers
 		void sl_NewDocumentAction_Triggered();
 		void sl_OpenDocumentAction_Triggered();
-		void sl_SaveDocumentAction_Triggered(bool* actionCancelled = 0);
+		void sl_SaveDocumentAction_Triggered(bool* actionCancelled = nullptr);
 		void sl_SaveDocumentAsAction_Triggered();
-		void sl_CloseDocumentAction_Triggered(bool* actionCancelled = 0, bool* actionDelayed = 0, bool suppressSaving = false);
+		void sl_CloseDocumentAction_Triggered(bool* actionCancelled = nullptr, bool* actionDelayed = nullptr, bool suppressSaving = false);
 		void sl_DocumentPropertiesAction_Triggered();
 		void sl_GlobalSearchAction_Triggered();
 		void sl_OpenRecentFileAction_Triggered();

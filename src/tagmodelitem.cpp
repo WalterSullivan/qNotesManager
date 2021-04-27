@@ -26,13 +26,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 TagModelItem::TagModelItem(const Tag* tag) : BaseModelItem(BaseModelItem::tag), _tag(tag) {
-	if (!tag) {
+	if (tag == nullptr) {
 		WARNING("Null pointer recieved");
 	}
 }
 
 QVariant TagModelItem::data(int role) const {
-	if (!_tag) {
+	if (_tag == nullptr) {
 		WARNING("Null pointer recieved");
 		return QVariant();
 	}

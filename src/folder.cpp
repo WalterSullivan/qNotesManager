@@ -104,7 +104,7 @@ void Folder::SetType(Folder::FolderType _type) {
 
 QPixmap Folder::GetIcon() const {
 	if (type == UserFolder) {
-		if (Application::I()->CurrentDocument() == 0) {
+		if (Application::I()->CurrentDocument() == nullptr) {
 			return QPixmap();
 		}
 		return Application::I()->CurrentDocument()->GetItemIcon(iconID);
@@ -222,7 +222,7 @@ QString Folder::GetPath() const {
 	QString path = name;
 
 	Folder* f = GetParent();
-	while(f != 0 && f->GetParent() != 0) {
+	while(f != nullptr && f->GetParent() != nullptr) {
 		path.prepend(f->name + "/");
 		f = f->GetParent();
 	}

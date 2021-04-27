@@ -28,7 +28,7 @@ DocumentSearchThread::DocumentSearchThread(QObject *parent) :
 		QThread(parent),
 		regexp(QRegExp()),
 		isActive(false),
-		currentNote(0),
+		currentNote(nullptr),
 		primarySearchQueueSize(0),
 		processedNotesCount(0)
 {
@@ -277,7 +277,7 @@ void DocumentSearchThread::run() {
 	regexp = QRegExp();
 	emit sg_SearchEnded();
 	SetActive(false);
-	SetCurrentNote(0);
+	SetCurrentNote(nullptr);
 }
 
 void DocumentSearchThread::SetRegexp(const QRegExp& regexp) {

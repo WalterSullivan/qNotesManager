@@ -37,7 +37,7 @@ namespace qNotesManager {
 		mutable QReadWriteLock NRlock;
 
 	public:
-		explicit LocalImageLoadWorker() : QObject(0), needRestart(true) {}
+		explicit LocalImageLoadWorker() : QObject(nullptr), needRestart(true) {}
 		void AddUrl(const QUrl&);
 		void CancelAllDownloads();
 

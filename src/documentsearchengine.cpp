@@ -30,7 +30,7 @@ using namespace qNotesManager;
 
 DocumentSearchEngine::DocumentSearchEngine(QObject* parent) :
 		QObject(parent),
-		document(0),
+		document(nullptr),
 		thread(new DocumentSearchThread(this)) {
 
 	QObject::connect(thread, SIGNAL(sg_SearchResult(NoteFragment)),
@@ -66,7 +66,7 @@ bool DocumentSearchEngine::IsQueryValid(QString query, bool useRegExp) const {
 
 void DocumentSearchEngine::StartSearch(QString query, bool matchCase, bool searchWholeWord,
 								  bool useRegexp) {
-	if (document == 0) {return;}
+	if (document == nullptr) {return;}
 
 	if (thread->isRunning()) {
 		WARNING("Thread is already running");
@@ -126,13 +126,13 @@ void DocumentSearchEngine::SetTargetDocument(Document* doc) {
 		StopSearch();
 	}
 
-	if (document != 0) {
+	if (document != nullptr) {
 		QObject::disconnect(document, 0, this, 0);
 	}
 
 	document = doc;
 
-	if (document != 0) {
+	if (document != nullptr) {
 		QObject::connect(document, SIGNAL(sg_ItemUnregistered(Note*)),
 						 this, SLOT(sl_Document_NoteDeleted(Note*)));
 		QObject::connect(document, SIGNAL(destroyed()),
@@ -142,7 +142,7 @@ void DocumentSearchEngine::SetTargetDocument(Document* doc) {
 
 void DocumentSearchEngine::sl_Document_Destroyed() {
 	// In case if we forget to null target document
-	document = 0;
+	document = nullptr;
 
 	thread->ClearNotesList();
 }

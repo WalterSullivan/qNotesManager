@@ -31,7 +31,7 @@ namespace qNotesManager {
 		void editingFinished();
 
 	public:
-		explicit TagsLineEdit(QWidget *parent = 0);
+		explicit TagsLineEdit(QWidget *parent = nullptr);
 		void SetTagsModel(QAbstractItemModel*);
 
 	protected:

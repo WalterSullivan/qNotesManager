@@ -34,8 +34,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-Serializer::Serializer() : QObject(0) {
-	doc = 0;
+Serializer::Serializer() : QObject(nullptr) {
+	doc = nullptr;
 	operation = Unknown;
 	filename = QString();
 }
@@ -54,7 +54,7 @@ void Serializer::Save(Document* d, const QString& fileNameToSave, quint16 versio
 }
 
 void Serializer::sl_start() {
-	if (!doc || operation == Unknown || filename.isEmpty()) {
+	if (doc == nullptr || operation == Unknown || filename.isEmpty()) {
 		WARNING("Wrong argument");
 		emit sg_finished();
 		return;
@@ -213,7 +213,7 @@ void Serializer::saveDocument() {
 }
 
 void Serializer::sendProgressSignal(BOIBuffer* buffer) {
-	if (!buffer) {
+	if (buffer == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
 	}
@@ -457,7 +457,7 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 				return;
 			}
 			Folder* parentFolder = dynamic_cast<Folder*>(folderItems.value(folderID));
-			if (!parentFolder) {
+			if (parentFolder == nullptr) {
 				WARNING("Casting error");
 				parentFolder = doc->rootFolder;
 			}
@@ -510,7 +510,7 @@ void Serializer::loadDocument_v1(BOIBuffer& buffer) {
 					continue;
 				}
 				Note* note = dynamic_cast<Note*>(folderItems.value(ownerID));
-				if (!note) {
+				if (note == nullptr) {
 					WARNING("Casting error");
 					continue;
 				}
@@ -996,7 +996,7 @@ void Serializer::saveNote_v1(const Note* note, BOIBuffer& buffer) {
 
 	foreach (QString imageName, imagesNamesList) {
 		CachedImageFile* image = note->document->GetResourceImage(imageName);
-		if (!image) {
+		if (image == nullptr) {
 			WARNING("Image not found");
 			continue;
 		}
@@ -1403,7 +1403,7 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 				return;
 			}
 			Folder* parentFolder = dynamic_cast<Folder*>(folderItems.value(folderID));
-			if (!parentFolder) {
+			if (parentFolder == nullptr) {
 				WARNING("Casting error");
 				parentFolder = doc->rootFolder;
 			}
@@ -1456,7 +1456,7 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 					continue;
 				}
 				Note* note = dynamic_cast<Note*>(folderItems.value(ownerID));
-				if (!note) {
+				if (note == nullptr) {
 					WARNING("Casting error");
 					continue;
 				}
@@ -1482,7 +1482,7 @@ void Serializer::loadDocument_v2(BOIBuffer& buffer) {
 				continue;
 			}
 			Note* bookmark = dynamic_cast<Note*>(folderItems.value(bookmarkID));
-			if (bookmark == 0) {
+			if (bookmark == nullptr) {
 				WARNING("Could not find note by ID");
 				continue;
 			}
@@ -1980,7 +1980,7 @@ void Serializer::saveNote_v2(const Note* note, BOIBuffer& buffer) {
 
 	foreach (QString imageName, imagesNamesList) {
 		CachedImageFile* image = note->document->GetResourceImage(imageName);
-		if (!image) {
+		if (image == nullptr) {
 			WARNING("Image not found");
 			continue;
 		}

@@ -48,7 +48,7 @@ namespace qNotesManager {
 		QHash<QString, CachedImageFile*> originalImages;
 
 	public:
-		explicit TextDocument(QObject *parent = 0);
+		explicit TextDocument(QObject *parent = nullptr);
 		~TextDocument();
 
 		QStringList GetImagesList() const;

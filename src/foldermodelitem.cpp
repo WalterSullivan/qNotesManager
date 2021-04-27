@@ -31,7 +31,7 @@ using namespace qNotesManager;
 FolderModelItem::FolderModelItem(Folder* _folder) :
 		BaseModelItem(BaseModelItem::folder),
 		folder(_folder) {
-	if (!folder) {
+	if (folder == nullptr) {
 		CRITICAL("Null pointer recieved");
 	} else {
 		QObject::connect(folder, SIGNAL(sg_VisualPropertiesChanged()),
@@ -41,7 +41,7 @@ FolderModelItem::FolderModelItem(Folder* _folder) :
 }
 
 QVariant FolderModelItem::data(int role) const {
-	if (!folder) {
+	if (folder == nullptr) {
 		return QVariant();
 	}
 	if (role == Qt::DecorationRole) {

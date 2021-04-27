@@ -34,7 +34,7 @@ namespace qNotesManager {
 		QMultiHash<const Note*, SearchModelItem*> resultsHash;
 
 	public:
-		explicit SearchResultsModel(QObject *parent = 0);
+		explicit SearchResultsModel(QObject *parent = nullptr);
 
 		void AddResult(const NoteFragment&);
 		void RemoveResultsForNote(const Note*);

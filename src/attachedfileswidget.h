@@ -28,7 +28,7 @@ namespace qNotesManager {
 		void updateListWidgetHeight();
 
 	public:
-		explicit AttachedFilesWidget(Note* note, QWidget *parent = 0);
+		explicit AttachedFilesWidget(Note* note, QWidget *parent = nullptr);
 		void SetFocusPolicyCustom(Qt::FocusPolicy);
 
 	protected:
