@@ -37,6 +37,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QSemaphore>
 #include <QProgressBar>
 #include <QTimer>
+#include <QUrl>
 
 namespace qNotesManager {
 	class NavigationPanelWidget;
