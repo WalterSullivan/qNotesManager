@@ -29,11 +29,13 @@ BookmarksMenu::BookmarksMenu(const QString& title, QWidget *parent) : QMenu(titl
 	currentNote = nullptr;
 
 	addBookmarkAction = new QAction(QIcon(":gui/star-plus"), "Add to bookmarks", this);
+	addBookmarkAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_B));
 	QObject::connect(addBookmarkAction, SIGNAL(triggered()),
 					 this, SLOT(sl_AddBookmarkAction_Triggered()));
 	addBookmarkAction->setEnabled(false);
 
 	removeBookmarkAction = new QAction(QIcon(":/gui/star-minus"), "Remove from bookmarks", this);
+	removeBookmarkAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_B));
 	QObject::connect(removeBookmarkAction, SIGNAL(triggered()),
 					 this, SLOT(sl_RemoveBookmarkAction_Triggered()));
 	removeBookmarkAction->setEnabled(false);

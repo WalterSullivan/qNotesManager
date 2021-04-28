@@ -91,6 +91,7 @@ MainWindow::MainWindow() : QMainWindow(nullptr) {
 
 void MainWindow::createActions() {
 	newDocumentAction = new QAction(QPixmap(":/gui/document"), "New document", this);
+	newDocumentAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_N));
 	QObject::connect(newDocumentAction, SIGNAL(triggered()),
 					 this, SLOT(sl_NewDocumentAction_Triggered()));
 
@@ -107,6 +108,7 @@ void MainWindow::createActions() {
 
 
 	saveDocumentAsAction = new QAction(QPixmap("/gui/disk-black"), "Save As...", this);
+	saveDocumentAsAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_S));
 	QObject::connect(saveDocumentAsAction, SIGNAL(triggered()),
 					 this, SLOT(sl_SaveDocumentAsAction_Triggered()));
 	saveDocumentAsAction->setEnabled(false);

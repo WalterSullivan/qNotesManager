@@ -103,18 +103,22 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 	separatorAction->setSeparator(true);
 
 	addTopLevelNote = new QAction("Add top-level note", this);
+	addTopLevelNote->setShortcut(QKeySequence(Qt::AltModifier | Qt::ControlModifier | Qt::Key_N));
 	QObject::connect(addTopLevelNote, SIGNAL(triggered()),
 					 this, SLOT(sl_AddTopLevelNoteAction_Triggered()));
 
 	addTopLevelFolder = new QAction("Add top-level folder", this);
+	addTopLevelFolder->setShortcut(QKeySequence(Qt::AltModifier | Qt::ControlModifier | Qt::Key_F));
 	QObject::connect(addTopLevelFolder, SIGNAL(triggered()),
 					 this, SLOT(sl_AddTopLevelFolderAction_Triggered()));
 
 	addNoteAction = new QAction(QIcon(":/gui/doc-add"), "Add Note", this);
+	addNoteAction->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_N));
 	QObject::connect(addNoteAction, SIGNAL(triggered()),
 					 this, SLOT(sl_AddNoteAction_Triggered()));
 
 	addFolderAction = new QAction (QIcon(":/gui/folder-add"), "Add Folder", this);
+	addFolderAction->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_F));
 	QObject::connect(addFolderAction, SIGNAL(triggered()),
 					 this, SLOT(sl_AddFolderAction_Triggered()));
 
@@ -164,6 +168,7 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 					 this, SLOT(sl_OpenNoteAction_Triggered()));
 
 	renameItemAction = new QAction(QIcon(":/gui/rename"), "Rename", this);
+	renameItemAction->setShortcut(QKeySequence(Qt::Key_F2));
 	QObject::connect(renameItemAction, SIGNAL(triggered()),
 					 this, SLOT(sl_RenameItemAction_Triggered()));
 
