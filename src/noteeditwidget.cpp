@@ -211,7 +211,7 @@ void NoteEditWidget::updateHeight() {
 		newHeight =
 				captionEdit->height() +
 				propertiesWidget->layout()->contentsMargins().top() +
-				propertiesWidget->layout()->contentsMargins().bottom();
+				((QGridLayout*)propertiesWidget->layout())->horizontalSpacing();
 	} else {
 		newHeight = propertiesWidget->height();
 
