@@ -425,10 +425,13 @@ void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
 	if (doc->GetFilename().isEmpty()) {
 		filename = QFileDialog::getSaveFileName(this, "Select a name", QString(),
 												"qNotesManager save file (*.nms)");
-		if (filename.isNull() || filename.isEmpty()) {
+		if (filename.isEmpty()) {
 			if (actionCancelled) {*actionCancelled = true;}
 			return;
 		}
+		QFileInfo info(filename);
+		if (info.suffix().isEmpty()) { filename.append(".nms"); }
+
 		newRecentFile(filename);
 	}
 
@@ -444,7 +447,10 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 
 	QString filename = QFileDialog::getSaveFileName(this, "Select a name", QString(),
 		"qNotesManager save file (*.nms)");
-	if (filename.isNull()) {return;}
+	if (filename.isEmpty()) {return;}
+
+	QFileInfo info(filename);
+	if (info.suffix().isEmpty()) { filename.append(".nms"); }
 
 	newRecentFile(filename);
 	doc->Save(filename);
