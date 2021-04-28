@@ -396,36 +396,46 @@ bool NoteEditWidget::eventFilter (QObject* watched, QEvent* event) {
 		if (watched == captionEdit) {
 			text = captionEdit->text();
 			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-			currentNote->SetName(text);
-			captionEdit->setText(text);
-			qDebug() << "Caption changed";
+			if (currentNote->GetName() != text) {
+				currentNote->SetName(text);
+				captionEdit->setText(text);
+				qDebug() << "Caption changed";
+			}
 
 		} else if (watched == authorEdit) {
 			text = authorEdit->text();
 			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-			currentNote->SetAuthor(text);
-			authorEdit->setText(text);
-			qDebug() << "Author changed";
+			if (currentNote->GetAuthor() != text) {
+				currentNote->SetAuthor(text);
+				authorEdit->setText(text);
+				qDebug() << "Author changed";
+			}
 
 		} else if (watched == sourceEdit) {
 			text = sourceEdit->text();
 			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-			currentNote->SetSource(text);
-			sourceEdit->setText(text);
-			qDebug() << "Source changed";
+			if (currentNote->GetSource() != text) {
+				currentNote->SetSource(text);
+				sourceEdit->setText(text);
+				qDebug() << "Source changed";
+			}
 
 		} else if (watched == commentEdit) {
 			text = commentEdit->text();
 			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-			currentNote->SetComment(text);
-			commentEdit->setText(text);
-			qDebug() << "Comment changed";
+			if (currentNote->GetComment() != text) {
+				currentNote->SetComment(text);
+				commentEdit->setText(text);
+				qDebug() << "Comment changed";
+			}
 
 		} else if (watched == textCreationCheckbox ||
 				   watched == textCreationDateEdit) {
-			if (!textCreationCheckbox->isChecked()) {
-				currentNote->SetTextCreationDate(QDateTime());
-			} else {
+			QDateTime newDate = QDateTime();
+			if (textCreationCheckbox->isChecked()) {
+				newDate = textCreationDateEdit->dateTime();
+			}
+			if (currentNote->GetTextCreationDate() != newDate) {
 				currentNote->SetTextCreationDate(textCreationDateEdit->dateTime());
 			}
 			qDebug() << "Text creation date changed";
