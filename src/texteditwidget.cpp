@@ -75,20 +75,20 @@ void TextEditWidget::CreateControls() {
 
 	fontSizeComboBox = new QComboBox();
 	fontSizeComboBox->setFocusPolicy(Qt::ClickFocus);
-	fontSizeComboBox->addItem("8", 8);
-	fontSizeComboBox->addItem("9", 9);
-	fontSizeComboBox->addItem("10", 10);
-	fontSizeComboBox->addItem("11", 11);
-	fontSizeComboBox->addItem("12", 12);
-	fontSizeComboBox->addItem("13", 13);
-	fontSizeComboBox->addItem("14", 14);
-	fontSizeComboBox->addItem("15", 15);
-	fontSizeComboBox->addItem("16", 16);
-	fontSizeComboBox->addItem("17", 17);
-	fontSizeComboBox->addItem("18", 18);
-	fontSizeComboBox->addItem("19", 19);
-	fontSizeComboBox->addItem("20", 20);
-	fontSizeComboBox->addItem("22", 22);
+	fontSizeComboBox->addItem("8", 8.0);
+	fontSizeComboBox->addItem("9", 9.0);
+	fontSizeComboBox->addItem("10", 10.0);
+	fontSizeComboBox->addItem("11", 11.0);
+	fontSizeComboBox->addItem("12", 12.0);
+	fontSizeComboBox->addItem("13", 13.0);
+	fontSizeComboBox->addItem("14", 14.0);
+	fontSizeComboBox->addItem("15", 15.0);
+	fontSizeComboBox->addItem("16", 16.0);
+	fontSizeComboBox->addItem("17", 17.0);
+	fontSizeComboBox->addItem("18", 18.0);
+	fontSizeComboBox->addItem("19", 19.0);
+	fontSizeComboBox->addItem("20", 20.0);
+	fontSizeComboBox->addItem("22", 22.0);
 	QObject::connect(fontSizeComboBox, SIGNAL(currentIndexChanged(int)),
 					 this, SLOT(sl_fontSizeComboBoxCurrentIndexChanged(int)));
 	TBRMainBar->addWidget(fontSizeComboBox);
@@ -609,10 +609,31 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 	fontComboBox->blockSignals(false);
 
 	fontSizeComboBox->blockSignals(true);
-		const int size = this->textField->currentFont().pointSize();
+		while (true) {
+			// Remove non-standard font size values
+			const int index = fontSizeComboBox->findData(-1);
+			if (index != -1) {fontSizeComboBox->removeItem(index);} else {break;}
+		}
+
+		const double size = this->textField->currentFont().pointSizeF();
 		const int index = fontSizeComboBox->findData(size);
 		if (index != -1) {
 			fontSizeComboBox->setCurrentIndex(index);
+		} else {
+			// Font size is not standard, add new item to font size combobox
+			int newIndex = 0;
+			while (true) {
+				bool ok = false;
+				double tempSize = fontSizeComboBox->itemData(newIndex).toDouble(&ok);
+				if (ok) {
+					if (tempSize > size) {break;}
+				}
+
+				newIndex++;
+				if (newIndex >= fontSizeComboBox->count()) {break;}
+			}
+			fontSizeComboBox->insertItem(newIndex, QString::number(size), -1);
+			fontSizeComboBox->setCurrentIndex(newIndex);
 		}
 	fontSizeComboBox->blockSignals(false);
 
