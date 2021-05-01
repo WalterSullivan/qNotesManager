@@ -75,20 +75,10 @@ void TextEditWidget::CreateControls() {
 
 	fontSizeComboBox = new QComboBox();
 	fontSizeComboBox->setFocusPolicy(Qt::ClickFocus);
-	fontSizeComboBox->addItem("8", 8.0);
-	fontSizeComboBox->addItem("9", 9.0);
-	fontSizeComboBox->addItem("10", 10.0);
-	fontSizeComboBox->addItem("11", 11.0);
-	fontSizeComboBox->addItem("12", 12.0);
-	fontSizeComboBox->addItem("13", 13.0);
-	fontSizeComboBox->addItem("14", 14.0);
-	fontSizeComboBox->addItem("15", 15.0);
-	fontSizeComboBox->addItem("16", 16.0);
-	fontSizeComboBox->addItem("17", 17.0);
-	fontSizeComboBox->addItem("18", 18.0);
-	fontSizeComboBox->addItem("19", 19.0);
-	fontSizeComboBox->addItem("20", 20.0);
-	fontSizeComboBox->addItem("22", 22.0);
+	QFontDatabase db;
+	foreach(int size, db.standardSizes()) {
+		fontSizeComboBox->addItem(QString::number(size), double(size));
+	}
 	QObject::connect(fontSizeComboBox, SIGNAL(currentIndexChanged(int)),
 					 this, SLOT(sl_fontSizeComboBoxCurrentIndexChanged(int)));
 	TBRMainBar->addWidget(fontSizeComboBox);
