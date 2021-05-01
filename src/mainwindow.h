@@ -143,7 +143,7 @@ namespace qNotesManager {
 
 	public slots:
 	private slots:
-		void sl_NoteDoubleClicked(Note*);
+		void sl_NoteOpenRequest(Note*);
 
 		void sl_CurrentNoteChanged(Note*);
 		void sl_Note_LinkClicked(QUrl url);
@@ -175,8 +175,6 @@ namespace qNotesManager {
 
 		void sl_ShowHideMainWindowAction_Triggered();
 		void sl_QuickNoteAction_Triggered();
-
-		void sl_BookmarksMenu_NoteOpenRequest(Note*);
 
 		// Application event handlers
 		void sl_CurrentDocument_Changed();

@@ -177,7 +177,7 @@ void MainWindow::createControls() {
 
 	navigationPanel = new NavigationPanelWidget();
 	QObject::connect(navigationPanel, SIGNAL(sg_NoteDoubleClicked(Note*)),
-					 this, SLOT(sl_NoteDoubleClicked(Note*)));
+					 this, SLOT(sl_NoteOpenRequest(Note*)));
 	QObject::connect(navigationPanel, SIGNAL(sg_SelectedItemsActionsListChanged()),
 					 this, SLOT(sl_EditMenuContentChanged()));
 
@@ -272,7 +272,7 @@ void MainWindow::createControls() {
 
 	bookmarksMenu = new BookmarksMenu("Bookmarks", this);
 	QObject::connect(bookmarksMenu, SIGNAL(sg_OpenBookmark(Note*)),
-					 this, SLOT(sl_BookmarksMenu_NoteOpenRequest(Note*)));
+					 this, SLOT(sl_NoteOpenRequest(Note*)));
 	menuBar->addMenu(bookmarksMenu);
 
 	optionsMenu = new QMenu("Options", this);
@@ -332,7 +332,7 @@ void MainWindow::changeEvent (QEvent* event) {
 	}
 }
 
-void MainWindow::sl_NoteDoubleClicked(Note* note) {
+void MainWindow::sl_NoteOpenRequest(Note* note) {
 	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 		return;
@@ -525,6 +525,8 @@ void MainWindow::sl_GlobalSearchAction_Triggered() {
 						 this, SLOT(sl_SearchResults_ShowRequest()));
 		QObject::connect(searchResultsWidget, SIGNAL(sg_NoteHighlightRequest(Note*)),
 						 navigationPanel, SLOT(sl_SelectNoteInTree(Note*)));
+		QObject::connect(searchResultsWidget, SIGNAL(sg_NoteOpenRequest(Note*)),
+						 this, SLOT(sl_NoteOpenRequest(Note*)));
 		searchResultsWidget->hide();
 		rightPanelSplitter->addWidget(searchResultsWidget);
 		rightPanelSplitter->setStretchFactor(0, 3);
@@ -813,10 +815,6 @@ void MainWindow::sl_QuickNoteAction_Triggered() {
 	n->TryToExtractCaption();
 
 	doc->GetTempFolder()->Items.Add(n);
-}
-
-void MainWindow::sl_BookmarksMenu_NoteOpenRequest(Note* note) {
-	notesTabWidget->OpenNote(note);
 }
 
 void MainWindow::sl_EditMenuContentChanged() {

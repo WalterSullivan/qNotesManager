@@ -43,6 +43,7 @@ namespace qNotesManager {
 
 		QMenu* contextMenu;
 		QAction* showInTreeAction;
+		QAction* openNoteAction;
 
 	public:
 		explicit SearchResultsWidget(DocumentSearchEngine* eng, QWidget *parent = nullptr);
@@ -56,6 +57,7 @@ namespace qNotesManager {
 		void sg_CloseRequest();
 		void sg_ShowRequest();
 		void sg_NoteHighlightRequest(Note*);
+		void sg_NoteOpenRequest(Note*);
 
 	private slots:
 		void sl_ClearButton_Clicked();
@@ -72,6 +74,7 @@ namespace qNotesManager {
 		void sl_TreeView_ContextMenuRequested(const QPoint&);
 
 		void sl_ShowInTreeAction_Triggered();
+		void sl_OpenNoteAction_Triggered();
 
 	};
 }

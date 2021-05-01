@@ -117,6 +117,9 @@ SearchResultsWidget::SearchResultsWidget(DocumentSearchEngine* eng, QWidget *par
 	showInTreeAction = new QAction("Show in tree", this);
 	QObject::connect(showInTreeAction, SIGNAL(triggered()),
 					 this, SLOT(sl_ShowInTreeAction_Triggered()));
+	openNoteAction = new QAction ("Open", this);
+	QObject::connect(openNoteAction, SIGNAL(triggered()),
+					 this, SLOT(sl_OpenNoteAction_Triggered()));
 
 }
 
@@ -167,9 +170,11 @@ void SearchResultsWidget::sl_TreeView_ContextMenuRequested(const QPoint& point) 
 				static_cast<BaseModelItem*>(indexesList.at(0).internalPointer());
 		if (modelItem->DataType() == BaseModelItem::note) {
 			contextMenu->addAction(showInTreeAction);
+			contextMenu->addAction(openNoteAction);
 		}
 
 		contextMenu->exec(treeView->viewport()->mapToGlobal(point));
+
 	}
 }
 
@@ -196,6 +201,32 @@ void SearchResultsWidget::sl_ShowInTreeAction_Triggered() {
 
 		emit sg_NoteHighlightRequest(n);
 	}
+}
+
+void SearchResultsWidget::sl_OpenNoteAction_Triggered() {
+	QModelIndexList indexesList = treeView->selectionModel()->selectedIndexes();
+
+	if (indexesList.size() != 1) {
+		return;
+	}
+
+	QModelIndex itemIndex = indexesList.at(0);
+	if (!itemIndex.isValid()) {
+		return;
+	}
+
+	BaseModelItem* modelItem =
+			static_cast<BaseModelItem*>(itemIndex.internalPointer());
+
+	if (modelItem->DataType() == BaseModelItem::note) {
+		Note* note = (dynamic_cast<NoteModelItem*>(modelItem))->GetStoredData();
+		if (note == nullptr) {
+			return;
+		}
+
+		emit sg_NoteOpenRequest(note);
+	}
+
 }
 
 void SearchResultsWidget::sl_SearchStarted() {
