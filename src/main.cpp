@@ -36,7 +36,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 void myMessageOutput(QtMsgType type, const char *msg);
 #endif
 
-bool errorOutput;
+bool silent;
 
 int main(int argc, char** argv) {
 	QApplication app(argc, argv);
@@ -48,9 +48,8 @@ int main(int argc, char** argv) {
 			"-h, --help				Print this screen\n"
 			"Options:\n"
 			"-s, --silent			Do not send data to stderr\n"
-			"-fo FILE, --file-output FILE		Send debug output to file FILE\n\n"
 			"file					File to open\n");
-	errorOutput = true;
+	silent = false;
 
 	QStringList arguments = QCoreApplication::arguments();
 
@@ -66,8 +65,8 @@ int main(int argc, char** argv) {
 				fprintf(stdout, qPrintable(helpScreenText));
 				return 0;
 			}
-			if (arguments.contains("-no") || arguments.contains("--no-output")) {
-				errorOutput = false;
+			if (arguments.contains("-s") || arguments.contains("--silent")) {
+				silent = true;
 			}
 		}
 	}
@@ -96,6 +95,8 @@ int main(int argc, char** argv) {
 
 #if QT_VERSION >= 0x050000
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+	if (silent) {return;}
+
 	QByteArray localMsg = msg.toLocal8Bit();
 	switch (type) {
 	case QtDebugMsg:
@@ -123,12 +124,8 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 }
 #else
 void myMessageOutput(QtMsgType type, const char *msg) {
-	if (!errorOutput) {
-		if (type == QtFatalMsg) {
-			abort();
-		}
-		return;
-	}
+	if (silent) {return;}
+
 	switch (type) {
 	case QtDebugMsg:
 #ifdef DEBUG
