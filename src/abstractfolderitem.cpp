@@ -21,7 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-AbstractFolderItem::AbstractFolderItem(ItemType type) : QObject(nullptr), itemType(type) {
+AbstractFolderItem::AbstractFolderItem(ItemType type) : QObject(nullptr), itemType(type), uuid(QUuid::createUuid()) {
 	parent = nullptr;
 }
 
@@ -63,4 +63,8 @@ bool AbstractFolderItem::IsOffspringOf(const Folder* folder) const {
 		f = f->GetParent();
 	}
 	return false;
+}
+
+QUuid AbstractFolderItem::GetUuid() const {
+	return uuid;
 }

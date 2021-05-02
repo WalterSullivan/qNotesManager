@@ -20,6 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QHash>
 #include <QMimeData>
+#include <QUuid>
 
 #include "basemodel.h"
 
@@ -33,6 +34,7 @@ namespace qNotesManager {
 	Q_OBJECT
 	private:
 		QHash<AbstractFolderItem*, BaseModelItem*>	_bridge;
+		QHash<QUuid, AbstractFolderItem*> itemsUuids;
 
 		void RegisterItem(Folder* folder);
 		void RegisterItem(Note* note);

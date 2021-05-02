@@ -89,6 +89,7 @@ void HierarchyModel::RegisterItem(Folder* folder) { // Register folder and all i
 		parent->AddChildTo(fi, folder->GetParent()->Items.IndexOf(folder));
 	}
 	_bridge.insert(folder, fi);
+	itemsUuids.insert(folder->GetUuid(), folder);
 
 	for (int i = 0; i < folder->Items.Count(); ++i) {
 		AbstractFolderItem* item = folder->Items.ItemAt(i);
@@ -119,6 +120,7 @@ void HierarchyModel::RegisterItem(Note* note) {
 					 this, SLOT(sl_Item_DataChanged(BaseModelItem*)));
 	parentItem->AddChildTo(noteItem, note->GetParent()->Items.IndexOf(note));
 	_bridge.insert(note, noteItem);
+	itemsUuids.insert(note->GetUuid(), note);
 }
 
 void HierarchyModel::UnregisterItem(Folder* folder) {
@@ -157,6 +159,7 @@ void HierarchyModel::UnregisterItem(Folder* folder) {
 	}
 
 	_bridge.remove(folder);
+	itemsUuids.remove(folder->GetUuid());
 
 	if (GetDisplayRootItem() == childItem) {SetDisplayRootItem(GetRootItem());}
 	if (GetRootItem() == childItem) {SetRootItem(nullptr);}
@@ -191,6 +194,7 @@ void HierarchyModel::UnregisterItem(Note* note) {
 	QObject::disconnect(note, 0, this, 0);
 	parentItem->RemoveChild(childItem);
 	_bridge.remove(note);
+	itemsUuids.remove(note->GetUuid());
 	delete childItem;
 }
 
@@ -445,7 +449,7 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 	qDebug() << "Drop happened";
 
 	if (action == Qt::IgnoreAction) {return true;}
-	if (!data->hasFormat("application/ami.pointer")) {return false;}
+	if (!data->hasFormat("application/qnm-item-uuid-list")) {return false;}
 	if (column > 0) {return false;}
 
 	BaseModelItem* newParentModelItem = nullptr;
@@ -466,37 +470,51 @@ bool HierarchyModel::dropMimeData (const QMimeData* data, Qt::DropAction action,
 	}
 
 	if (newParentModelItem->DataType() != BaseModelItem::folder) {
-		WARNING("Item has wrong type");
+		qWarning() << "Item has wrong type";
 		return false;
 	}
 
-	QByteArray encodedData = data->data("application/ami.pointer");
+	QByteArray encodedData = data->data("application/qnm-item-uuid-list");
 	QDataStream stream(&encodedData, QIODevice::ReadOnly);
-	void* p = nullptr;
 
 	QList<BaseModelItem*> movedItems;
 
 	while (!stream.atEnd()) {
-		p = nullptr;
-		stream.readRawData((char*)&p, sizeof(p));
+		int idLen = 0;
+		char* c_str = nullptr;
 
-
-		qDebug() << "Dropped data pointer : " << p;
-		BaseModelItem* droppedModelItem = static_cast<BaseModelItem*>(p);
-		movedItems << droppedModelItem;
-		qDebug() << "Dropped item: " << droppedModelItem->data(Qt::DisplayRole).toString() << "'";
-		qDebug() << "\n";
-
-		Folder* newParentFolder = (dynamic_cast<FolderModelItem*>(newParentModelItem))->GetStoredData();
-		AbstractFolderItem* droppedFolderItem = nullptr;
-		if (droppedModelItem->DataType() == BaseModelItem::folder) {
-			droppedFolderItem = (dynamic_cast<FolderModelItem*>(droppedModelItem))->GetStoredData();
-		} else if (droppedModelItem->DataType() == BaseModelItem::note) {
-			droppedFolderItem = (dynamic_cast<NoteModelItem*>(droppedModelItem))->GetStoredData();
+		stream.readRawData((char*)&idLen, sizeof(idLen));
+		c_str = new char[idLen];
+		stream.readRawData(c_str, idLen);
+		QUuid id(c_str);
+		delete []c_str;
+		if (id.isNull()) {
+			qDebug() << "UUDI parsed from mime data is not valid. Skipping";
+			continue;
 		}
 
+
+		QHash<QUuid, AbstractFolderItem*>::iterator f_it = itemsUuids.find(id);
+		if (f_it == itemsUuids.end()) {
+			qWarning() << "Cannot find folder item by id";
+			continue;
+		}
+		AbstractFolderItem* droppedFolderItem = f_it.value();
+
+		QHash<AbstractFolderItem*, BaseModelItem*>::iterator m_it = _bridge.find(droppedFolderItem);
+		if (m_it == _bridge.end()) {
+			qDebug() << "Cannot find model item by its folder";
+			continue;
+		}
+		BaseModelItem* droppedModelItem = m_it.value();
+
+		movedItems << droppedModelItem;
+
+		Folder* newParentFolder = (dynamic_cast<FolderModelItem*>(newParentModelItem))->GetStoredData();
+
+
 		if (droppedFolderItem == nullptr) {
-			WARNING("Casting error");
+			qWarning() << "Casting error";
 			continue;
 		}
 
@@ -558,18 +576,33 @@ QMimeData* HierarchyModel::mimeData (const QModelIndexList& indexes) const {
 	while (iterator.hasNext()) {
 		QModelIndex index = iterator.next();
 		if (index.isValid()) {
-			void* p = index.internalPointer();
-			stream.writeRawData((char*)&p, sizeof(p)); // god forgive me
+			BaseModelItem* baseModelItem = static_cast<BaseModelItem*>(index.internalPointer());
+			if (baseModelItem == nullptr) {continue;}
+
+			AbstractFolderItem* folderItem = nullptr;
+			if (baseModelItem->DataType() == BaseModelItem::folder) {
+				folderItem = (dynamic_cast<FolderModelItem*>(baseModelItem))->GetStoredData();
+			} else if (baseModelItem->DataType() == BaseModelItem::note) {
+				folderItem = (dynamic_cast<NoteModelItem*>(baseModelItem))->GetStoredData();
+			}
+			if (folderItem == nullptr) {continue;}
+
+			QUuid id = folderItem->GetUuid();
+			QString idStr = id.toString();
+			int idLen = idStr.length();
+
+			stream.writeRawData((char*)&idLen, sizeof(idLen));
+			stream.writeRawData(idStr.toStdString().c_str(), idLen);
 		}
 	}
 
-	mimeData->setData("application/ami.pointer", encodedData);
+	mimeData->setData("application/qnm-item-uuid-list", encodedData);
 	return mimeData;
 }
 
 QStringList HierarchyModel::mimeTypes () const {
 	QStringList types;
-	types << "application/ami.pointer";
+	types << "application/qnm-item-uuid-list";
 	return types;
 }
 

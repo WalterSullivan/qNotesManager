@@ -19,6 +19,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #define ABSTRACTFOLDERITEM_H
 
 #include <QObject>
+#include <QUuid>
 
 /*
 AbstractFolderItem is an interface for items, that Folder may contain
@@ -43,10 +44,12 @@ namespace qNotesManager {
 		ItemType GetItemType() const;
 		Folder* GetParent() const;
 		bool IsOffspringOf(const Folder*) const;
+		QUuid GetUuid() const;
 
 	private:
 		Folder* parent;
 		const ItemType itemType;
+		const QUuid uuid;
 
 		void SetParent(Folder*);
 
