@@ -43,30 +43,43 @@ int main(int argc, char** argv) {
 	app.setQuitOnLastWindowClosed(false);
 
 	QString helpScreenText = QString().append("Usage: \n").append(VER_PRODUCTNAME_STR).append(
-			" [-v] [-h] [options] [file]\n"
-			"-v, --version				Print version and exit.\n"
-			"-h, --help				Print this screen\n"
+			" [OPTIONS] [FILE]\n"
 			"Options:\n"
-			"-s, --silent			Do not send data to stderr\n"
-			"file					File to open\n");
+			"-v, --version          Print version and exit\n"
+			"-h, --help             Print this screen and exit\n"
+			"-s, --silent           Do not send data to stderr\n"
+			"FILE                   File to open\n");
 	silent = false;
+	QString fileToOpen = QString("");
 
 	QStringList arguments = QCoreApplication::arguments();
 
 	if (arguments.count() > 1) {
 		arguments.removeAt(0);
 
-		if (arguments.count() == 1) {
-			QString arg = arguments.at(0);
+		for (int i = 0; i < arguments.count(); ++i) {
+			QString arg = arguments.at(i);
+			if (i == arguments.count() - 1) {
+				// Last argument, check if it is a file name
+				QFileInfo info(arg);
+				if (info.exists()) {
+					fileToOpen = arg;
+					continue;
+				}
+			}
 			if (arg == "-v" || arg == "--version") {
 				fprintf(stdout, "%s version: %s\n", VER_PRODUCTNAME_STR, V_SVERSION_STR);
+				fflush(stdout);
 				return 0;
 			} else if (arg == "-h" || arg == "--help") {
 				fprintf(stdout, qPrintable(helpScreenText));
+				fflush(stdout);
 				return 0;
-			}
-			if (arguments.contains("-s") || arguments.contains("--silent")) {
+			} else if (arg == "-s" || arg == "--silent") {
 				silent = true;
+			} else {
+				fprintf(stdout, "Unrecognized option %s\n", arg.toStdString().c_str());
+				fflush(stdout);
 			}
 		}
 	}
@@ -84,7 +97,9 @@ int main(int argc, char** argv) {
 		w.show();
 	}
 
-	if (Application::I()->Settings.GetOpenLastDocumentOnStart() &&
+	if (!fileToOpen.isEmpty()) {
+		w.OpenDocument(fileToOpen);
+	} else if (Application::I()->Settings.GetOpenLastDocumentOnStart() &&
 		!Application::I()->Settings.GetLastDocumentName().isEmpty() &&
 		QFileInfo(Application::I()->Settings.GetLastDocumentName()).exists()) {
 		w.OpenDocument(Application::I()->Settings.GetLastDocumentName());
