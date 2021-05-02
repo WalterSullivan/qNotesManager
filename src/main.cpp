@@ -101,26 +101,27 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 	switch (type) {
 	case QtDebugMsg:
 #ifdef DEBUG
-		fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+		fprintf(stderr, "%s\n", localMsg.constData());
 #endif
 		break;
 	case QtWarningMsg:
-		fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+		fprintf(stderr, "Warning: %s\nAt %s(%u)\n", localMsg.constData(), context.file, context.line);
 		break;
 	case QtCriticalMsg:
-		fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+		fprintf(stderr, "Critical: %s\nAt %s(%u)\n", localMsg.constData(), context.file, context.line);
 		break;
 	case QtFatalMsg:
-		fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+		fprintf(stderr, "Fatal: %s\nAt %s(%u)\n", localMsg.constData(), context.file, context.line);
 		abort();
 #if QT_VERSION >= 0x050500
 	case QtInfoMsg:
-		fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+		fprintf(stderr, "Info: %s\nAt %s(%u)\n", localMsg.constData(), context.file, context.line);
 		break;
 #endif
 	default:
 		break;
 	}
+	fflush(stderr);
 }
 #else
 void myMessageOutput(QtMsgType type, const char *msg) {
@@ -129,7 +130,7 @@ void myMessageOutput(QtMsgType type, const char *msg) {
 	switch (type) {
 	case QtDebugMsg:
 #ifdef DEBUG
-		fprintf(stderr, "Debug: %s\n", msg);
+		fprintf(stderr, "%s\n", msg);
 #endif
 		break;
 	case QtWarningMsg:
@@ -142,5 +143,6 @@ void myMessageOutput(QtMsgType type, const char *msg) {
 		fprintf(stderr, "Fatal: %s\n", msg);
 		abort();
 	}
+	fflush(stderr);
 }
 #endif
