@@ -21,10 +21,14 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QObject>
 #include <QSemaphore>
 
-#include "document.h"
 #include "boibuffer.h"
 
 namespace qNotesManager {
+	class Document;
+	class Note;
+	class Folder;
+	class Tag;
+
 	class Serializer : public QObject {
 	Q_OBJECT
 		enum Operation {Unknown, Loading, Saving};
