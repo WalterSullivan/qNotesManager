@@ -855,7 +855,11 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 
 	// If nothing is selected, set format for empty cursor
 	if (selectionStart == selectionEnd) {
-		cursor.mergeCharFormat(format);
+		if (mode == Merge) {
+			cursor.mergeCharFormat(format);
+		} else {
+			cursor.setCharFormat(format);
+		}
 		setTextCursor(cursor);
 		return;
 	}
