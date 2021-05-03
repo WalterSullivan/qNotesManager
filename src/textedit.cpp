@@ -718,8 +718,15 @@ QTextFragment TextEdit::findFragmentAtPos(QPoint pos) {
 }
 
 void TextEdit::ClearFormatting() {
-	QTextCharFormat f;
-	applyCharFormatting(f, Set);
+	QTextCursor cursor(textCursor());
+	cursor.beginEditBlock();
+
+	QTextCharFormat charFormat;
+	applyCharFormatting(charFormat, Set);
+
+	QTextBlockFormat blockFormat;
+	cursor.setBlockFormat(blockFormat);
+	cursor.endEditBlock();
 }
 
 void TextEdit::SetSelectionForeColor(QColor color) {
