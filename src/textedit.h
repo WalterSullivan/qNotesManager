@@ -79,6 +79,8 @@ namespace qNotesManager {
 		virtual void keyPressEvent (QKeyEvent * e);
 		virtual void keyReleaseEvent (QKeyEvent* event);
 
+		virtual void focusOutEvent(QFocusEvent* event);
+
 	private:
 
 		enum CharFormatApplyMode {

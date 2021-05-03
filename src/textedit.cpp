@@ -479,6 +479,13 @@ void TextEdit::keyReleaseEvent (QKeyEvent* event) {
 	}
 }
 
+/* virtual */
+void TextEdit::focusOutEvent(QFocusEvent* event) {
+	if (anchorTooltipTimer.isActive()) {anchorTooltipTimer.stop();}
+
+	QTextEdit::focusOutEvent(event);
+}
+
 void TextEdit::AnalyzeText(){
 	qDebug() << "\n------------------\nAnalyzing text\n";
 	qDebug() << "HTML:";
