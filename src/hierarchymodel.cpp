@@ -608,6 +608,7 @@ QStringList HierarchyModel::mimeTypes () const {
 
 void HierarchyModel::sl_RequestEmitApplySelection(AbstractFolderItem* item) {
 	if (item == nullptr) {return;}
+	if (!_bridge.contains(item)) {return;}
 
 	BaseModelItem* modelItem = _bridge.value(item);
 	BaseModelItem* parentItem = modelItem->parent();
