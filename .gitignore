@@ -4,3 +4,4 @@ Makefile*
 *.Debug
 *.Release
 Thumbs.db
+*.autosave
