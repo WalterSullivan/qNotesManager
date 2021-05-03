@@ -874,6 +874,7 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 		for(it = block.begin(); !(it.atEnd()); ++it) {
 			QTextFragment currentFragment = it.fragment();
 			if (!currentFragment.isValid()) {continue;}
+			if (currentFragment.charFormat().isImageFormat()) {continue;}
 
 			int fs = currentFragment.position();
 			int fe = currentFragment.position() + currentFragment.length();
