@@ -119,45 +119,34 @@ void DocumentSearchThread::run() {
 
 		SetCurrentNote(n);
 
-		// TODO: fix this mess
+		QString text = "";
+		NoteFragment::FragmentType fragmentType;
 
-		// Search in caption
-		currentPos = 0;
-		QString text = currentNote->GetName();
-		while (true) {
-			textMatchStart = regexp.indexIn(text, currentPos);
-			textMatchLength = regexp.matchedLength();
-			if (textMatchStart != -1 && textMatchLength != -1) {
-				const int textLength = text.length();
-				const QString capturedText = regexp.capturedTexts().at(0);
-				int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
-				if (appendSymbols < 0) {appendSymbols = 0;}
-				int sampleStart = (textMatchStart - appendSymbols) >= 0
-								  ? (textMatchStart - appendSymbols)
-								  : 0;
-				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength
-								  ? (textMatchStart + textMatchLength + appendSymbols - 1)
-								  : textLength;
-				const QString sample = text.mid(sampleStart, sampleLength);
-				const int sampleMatchStart = textMatchStart - sampleStart;
+		for (int i = 0; i < 4; ++i) {
+			if (i == 0) { // Search in caption
+				text = currentNote->GetName();
+				fragmentType = NoteFragment::CaptionFragment;
+			} else if (i == 1) { // Search in author field
+				text = currentNote->GetAuthor();
+				fragmentType = NoteFragment::AuthorFragment;
+			} else if (i == 2) { // Search in source field
+				text = currentNote->GetSource();
+				fragmentType = NoteFragment::SourceFragment;
+			} else if (i == 3) { // Search in comment field
+				text = currentNote->GetComment();
+				fragmentType = NoteFragment::CommentFragment;
+			} else {
+				break;
+			}
 
+			currentPos = 0;
+			while (true) {
+				textMatchStart = regexp.indexIn(text, currentPos);
+				textMatchLength = regexp.matchedLength();
+				if (textMatchStart == -1 || textMatchLength == -1) {
+					break;
+				}
 
-
-				NoteFragment f(currentNote, NoteFragment::CaptionFragment, textMatchStart,
-							   textMatchLength, sample, sampleMatchStart, capturedText.length());
-				emit sg_SearchResult(f);
-			} else {break;}
-
-			currentPos = textMatchStart + 1;
-		}
-
-		// Search in author field
-		currentPos = 0;
-		text = currentNote->GetAuthor();
-		while (true) {
-			textMatchStart = regexp.indexIn(text, currentPos);
-			textMatchLength = regexp.matchedLength();
-			if (textMatchStart != -1 && textMatchLength != -1) {
 				const int textLength = text.length();
 				const QString capturedText = regexp.capturedTexts().at(0);
 				int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
@@ -168,68 +157,12 @@ void DocumentSearchThread::run() {
 				const QString sample = text.mid(sampleStart, sampleLength);
 				const int sampleMatchStart = textMatchStart - sampleStart;
 
-
-
-				NoteFragment f(currentNote, NoteFragment::AuthorFragment, textMatchStart,
+				NoteFragment f(currentNote, fragmentType, textMatchStart,
 							   textMatchLength, sample, sampleMatchStart, capturedText.length());
 				emit sg_SearchResult(f);
-			} else {break;}
 
-			currentPos = textMatchStart + 1;
-		}
-
-		// Search in source field
-		currentPos = 0;
-		text = currentNote->GetSource();
-		while (true) {
-			textMatchStart = regexp.indexIn(text, currentPos);
-			textMatchLength = regexp.matchedLength();
-			if (textMatchStart != -1 && textMatchLength != -1) {
-				const int textLength = text.length();
-				const QString capturedText = regexp.capturedTexts().at(0);
-				int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
-				if (appendSymbols < 0) {appendSymbols = 0;}
-				int sampleStart = (textMatchStart - appendSymbols) >= 0 ? (textMatchStart - appendSymbols) : 0;
-				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength ?
-								   (textMatchStart + textMatchLength + appendSymbols - 1) : textLength;
-				const QString sample = text.mid(sampleStart, sampleLength);
-				const int sampleMatchStart = textMatchStart - sampleStart;
-
-
-
-				NoteFragment f(currentNote, NoteFragment::SourceFragment, textMatchStart,
-							   textMatchLength, sample, sampleMatchStart, capturedText.length());
-				emit sg_SearchResult(f);
-			} else {break;}
-
-			currentPos = textMatchStart + 1;
-		}
-
-		// Search in comment field
-		currentPos = 0;
-		text = currentNote->GetComment();
-		while (true) {
-			textMatchStart = regexp.indexIn(text, currentPos);
-			textMatchLength = regexp.matchedLength();
-			if (textMatchStart != -1 && textMatchLength != -1) {
-				const int textLength = text.length();
-				const QString capturedText = regexp.capturedTexts().at(0);
-				int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
-				if (appendSymbols < 0) {appendSymbols = 0;}
-				int sampleStart = (textMatchStart - appendSymbols) >= 0 ? (textMatchStart - appendSymbols) : 0;
-				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength ?
-								   (textMatchStart + textMatchLength + appendSymbols - 1) : textLength;
-				const QString sample = text.mid(sampleStart, sampleLength);
-				const int sampleMatchStart = textMatchStart - sampleStart;
-
-
-
-				NoteFragment f(currentNote, NoteFragment::CommentFragment, textMatchStart,
-							   textMatchLength, sample, sampleMatchStart, capturedText.length());
-				emit sg_SearchResult(f);
-			} else {break;}
-
-			currentPos = textMatchStart + 1;
+				currentPos = textMatchStart + 1;
+			}
 		}
 
 		// Search in text
@@ -243,8 +176,7 @@ void DocumentSearchThread::run() {
 
 				const int textLength = text.length();
 				const QString capturedText = regexp.capturedTexts().at(0);
-				int appendSymbols = (symbolsForSample - capturedText.length() -
-										   (elide.length()*2)) / 2;
+				int appendSymbols = (symbolsForSample - capturedText.length() - (elide.length()*2)) / 2;
 				if (appendSymbols < 0) {appendSymbols = 0;}
 				int sampleStart = (textMatchStart - appendSymbols) >= 0 ? (textMatchStart - appendSymbols) : 0;
 				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength ?
