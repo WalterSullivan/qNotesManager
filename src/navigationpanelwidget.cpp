@@ -51,7 +51,7 @@ NavigationPanelWidget::NavigationPanelWidget(QWidget *parent) : QWidget(parent) 
 					 this, SIGNAL(sg_NoteClicked(Note*)));
 	QObject::connect(tagsWidget, SIGNAL(sg_NoteDoubleClicked(Note*)),
 					 this, SIGNAL(sg_NoteDoubleClicked(Note*)));
-	tabWidget->addTab(tagsWidget, QIcon(":/gui/tag"), "Tags"); // TODO: make icon and title widget's properties
+	tabWidget->addTab(tagsWidget, QIcon(":/gui/tag"), "Tags");
 
 	datesWidget = new DateNavigationWidget();
 	datesWidget->SetModelItemDelegate(delegate);

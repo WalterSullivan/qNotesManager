@@ -26,8 +26,6 @@ namespace qNotesManager {
 	class Tag;
 	class Note;
 
-	// TODO: rename to TagsCollection
-
 	class NoteTagsCollection : public QObject {
 	Q_OBJECT
 

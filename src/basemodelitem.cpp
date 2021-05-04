@@ -181,8 +181,7 @@ bool BaseModelItem::LessThan(const BaseModelItem*) const {
 
 // Returns index for a new item when list is sorted
 int BaseModelItem::findInsertIndex_Sorted(const BaseModelItem* item) const {
-	// TODO: add anchors handling
-	// TODO: handle Qt::DescendingOrder
+	// NOTE: does not work with Qt::DescendingOrder
 	if (item == nullptr) {
 		WARNING("Null pointer recieved");
 		return -1;
@@ -225,7 +224,6 @@ int BaseModelItem::findInsertIndex_Sorted(const BaseModelItem* item) const {
 // Returns index for a new item when list is not sorted
 int BaseModelItem::findInsertIndex_Simple(const BaseModelItem* item) const {
 	(void)item;
-	// TODO: add anchors handling
 	return ChildrenCount();
 }
 
