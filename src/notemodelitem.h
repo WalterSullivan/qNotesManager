@@ -20,14 +20,18 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "basemodelitem.h"
 
+#include <QPixmap>
+
 namespace qNotesManager {
 	class Note;
 
 	class NoteModelItem : public BaseModelItem {
 	Q_OBJECT
 	private:
-		Note*		_storedData;
-		void drawLock(QPixmap&) const;
+		Note* note;
+		void drawLockedIcon() const;
+		mutable qint64 cachedItemPixmapKey;
+		mutable QPixmap cachedLockedItemPixmap;
 
 	public:
 		explicit NoteModelItem(Note*);

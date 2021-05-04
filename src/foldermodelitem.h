@@ -20,6 +20,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include "basemodelitem.h"
 
+#include <QPixmap>
+
 namespace qNotesManager {
 	class Folder;
 
@@ -27,7 +29,9 @@ namespace qNotesManager {
 	Q_OBJECT
 	private:
 		Folder* folder;
-		void drawLockedIcon (QPixmap&) const;
+		void drawLockedIcon() const;
+		mutable qint64 cachedItemPixmapKey;
+		mutable QPixmap cachedLockedItemPixmap;
 
 	public:
 		explicit FolderModelItem(Folder*);

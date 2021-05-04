@@ -28,7 +28,8 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-NoteModelItem::NoteModelItem(Note* note) : BaseModelItem(BaseModelItem::note), _storedData(note) {
+NoteModelItem::NoteModelItem(Note* _note) : BaseModelItem(BaseModelItem::note), note(_note) {
+	cachedItemPixmapKey = 0;
 	if (note == nullptr) {
 		WARNING("Null pointer recieved");
 	} else {
@@ -39,36 +40,36 @@ NoteModelItem::NoteModelItem(Note* note) : BaseModelItem(BaseModelItem::note), _
 }
 
 QVariant NoteModelItem::data(int role) const {
-	if (_storedData == nullptr) {
+	if (note == nullptr) {
 		return QVariant();
 	}
 
 	if (role == Qt::DecorationRole) {
-		if (_storedData->IsLocked()) {
-			QPixmap shadedIcon = QIcon(_storedData->GetIcon()).pixmap(_storedData->GetIcon().size(),
-													   QIcon::Disabled, QIcon::On);
-			drawLock(shadedIcon);
-			return shadedIcon;
+		if (cachedItemPixmapKey != note->GetIcon().cacheKey()) {
+			drawLockedIcon();
+		}
+		if (note->IsLocked()) {
+			return cachedLockedItemPixmap;
 		} else {
-			return _storedData->GetIcon();
+			return note->GetIcon();
 		}
 	} else if (role == Qt::DisplayRole) {
-		return _storedData->GetName();
+		return note->GetName();
 	} else if (role == Qt::ToolTipRole) {
-		return _storedData->GetName();
+		return note->GetName();
 	} else if (role == Qt::EditRole) {
-		return _storedData->GetName();
+		return note->GetName();
 	} else if (role == Qt::BackgroundRole) {
-		if (_storedData->IsLocked()) {
+		if (note->IsLocked()) {
 			return QBrush();
 		} else {
-			return QBrush(_storedData->GetNameBackColor());
+			return QBrush(note->GetNameBackColor());
 		}
 	} else if (role == Qt::ForegroundRole) {
-		if (_storedData->IsLocked()) {
+		if (note->IsLocked()) {
 			return QBrush(QApplication::palette().color(QPalette::Disabled, QPalette::WindowText));
 		} else {
-			return QBrush(_storedData->GetNameForeColor());
+			return QBrush(note->GetNameForeColor());
 		}
 	} else {
 		return QVariant();
@@ -81,7 +82,7 @@ bool NoteModelItem::setData(const QVariant& value, int role) {
 	if (role == Qt::EditRole) {
 		QString newName = value.toString();
 		newName.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-		_storedData->SetName(newName);
+		note->SetName(newName);
 		return true;
 	}
 	return false;
@@ -91,7 +92,7 @@ bool NoteModelItem::setData(const QVariant& value, int role) {
 Qt::ItemFlags NoteModelItem::flags () const {
 	Qt::ItemFlags flags = BaseModelItem::flags();
 
-	if ((!_storedData->IsLocked()) && (IsEditable)) {
+	if ((!note->IsLocked()) && (IsEditable)) {
 		return flags | Qt::ItemIsEditable;
 	}
 
@@ -99,10 +100,13 @@ Qt::ItemFlags NoteModelItem::flags () const {
 }
 
 Note* NoteModelItem::GetStoredData() const {
-	return _storedData;
+	return note;
 }
 
 void NoteModelItem::sl_Note_PropertiesChanged() {
+	if (cachedItemPixmapKey != note->GetIcon().cacheKey()) {
+		drawLockedIcon();
+	}
 	emit sg_DataChanged(this);
 }
 
@@ -112,14 +116,19 @@ bool NoteModelItem::LessThan(const BaseModelItem* item) const {
 		return BaseModelItem::LessThan(item);
 	}
 	const NoteModelItem* noteItem = dynamic_cast<const NoteModelItem*>(item);
-	return _storedData->GetName().toUpper() < noteItem->_storedData->GetName().toUpper();
+	return note->GetName().toUpper() < noteItem->note->GetName().toUpper();
 }
 
-void NoteModelItem::drawLock(QPixmap& pixmap) const {
+void NoteModelItem::drawLockedIcon() const {
+	cachedItemPixmapKey = note->GetIcon().cacheKey();
+	cachedLockedItemPixmap = QIcon(note->GetIcon()).pixmap(note->GetIcon().size(),
+											   QIcon::Disabled, QIcon::On);
+	if (cachedLockedItemPixmap.isNull()) {return;}
+
 	QPixmap lock = QPixmap(":/gui/lock-small");
 
 	QPainter painter;
-	painter.begin(&pixmap);
+	painter.begin(&cachedLockedItemPixmap);
 		painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 		painter.drawPixmap(QRect(0, 0, 16, 16), lock);
 	painter.end();

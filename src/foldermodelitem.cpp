@@ -31,13 +31,13 @@ using namespace qNotesManager;
 FolderModelItem::FolderModelItem(Folder* _folder) :
 		BaseModelItem(BaseModelItem::folder),
 		folder(_folder) {
+	cachedItemPixmapKey = 0;
 	if (folder == nullptr) {
 		CRITICAL("Null pointer recieved");
 	} else {
 		QObject::connect(folder, SIGNAL(sg_VisualPropertiesChanged()),
 					 this, SLOT(sl_Folder_PropertiesChanged()));
 	}
-
 }
 
 QVariant FolderModelItem::data(int role) const {
@@ -45,12 +45,11 @@ QVariant FolderModelItem::data(int role) const {
 		return QVariant();
 	}
 	if (role == Qt::DecorationRole) {
+		if (cachedItemPixmapKey != folder->GetIcon().cacheKey()) {
+			drawLockedIcon();
+		}
 		if (folder->IsLocked()) {
-			QPixmap shadedIcon = QIcon(folder->GetIcon()).pixmap(folder->GetIcon().size(),
-													   QIcon::Disabled, QIcon::On);
-			drawLockedIcon(shadedIcon); // TODO: cache 'locked' icon
-			return shadedIcon;
-
+			return cachedLockedItemPixmap;
 		} else {
 			return folder->GetIcon();
 		}
@@ -115,6 +114,9 @@ Folder* FolderModelItem::GetStoredData() const {
 }
 
 void FolderModelItem::sl_Folder_PropertiesChanged() {
+	if (cachedItemPixmapKey != folder->GetIcon().cacheKey()) {
+		drawLockedIcon();
+	}
 	emit sg_DataChanged(this);
 }
 
@@ -127,11 +129,16 @@ bool FolderModelItem::LessThan(const BaseModelItem* item) const {
 	return folder->GetName().toUpper() < folderItem->folder->GetName().toUpper();
 }
 
-void FolderModelItem::drawLockedIcon(QPixmap& pixmap) const {
+void FolderModelItem::drawLockedIcon() const {
+	cachedItemPixmapKey = folder->GetIcon().cacheKey();
+	cachedLockedItemPixmap = QIcon(folder->GetIcon()).pixmap(folder->GetIcon().size(),
+											   QIcon::Disabled, QIcon::On);
+	if (cachedLockedItemPixmap.isNull()) {return;}
+
 	QPixmap lock = QPixmap(":/gui/lock-small");
 
 	QPainter painter;
-	painter.begin(&pixmap);
+	painter.begin(&cachedLockedItemPixmap);
 		painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 		painter.drawPixmap(QRect(0, 0, 16, 16), lock);
 	painter.end();
