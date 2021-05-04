@@ -5,7 +5,6 @@ QT += network
 QMAKE_CXXFLAGS += -Wall
 QMAKE_CXXFLAGS += -isystem \
 	$(QTDIR)/include
-DEFINES += ENABLE_LOG_TRACE
 BUILD_PATH = ./build
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 # With C++11 support
@@ -89,7 +88,6 @@ HEADERS += src/tag.h \
 	src/searchresultsmodel.h \
 	src/searchresultitemdelegate.h \
 	src/basemodelitem.h \
-	src/tracelogger.h \
 	src/customiconslistwidget.h \
 	src/separatormodelitem.h \
 	src/searchresultswidget.h \
@@ -160,7 +158,6 @@ SOURCES += src/tagownerscollection.cpp \
 	src/searchresultsmodel.cpp \
 	src/searchresultitemdelegate.cpp \
 	src/basemodelitem.cpp \
-	src/tracelogger.cpp \
 	src/customiconslistwidget.cpp \
 	src/separatormodelitem.cpp \
 	src/searchresultswidget.cpp \
