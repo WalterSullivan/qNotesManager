@@ -79,16 +79,11 @@ void TagsLineEdit::sl_Completer_Activated (const QString& selectedText) {
 	int end = current;
 	int start = current == 0 ? 0 : current - 1;
 
-	// TODO change to text().indexOf(QRegExp) and text().lastIndexOf(QRegExp)
-	while(true) {
-		if ((start == 0) || text.mid(start - 1, 1 ) == ";" || text.mid(start - 1, 1) == " ") {break;}
-		start--;
-	}
-	while(true) {
-		if (end == (text.length()) || text.mid(end + 1, 1) == " " || text.mid(end + 1, 1) == ";") {break;}
-		end++;
-	}
+	start = text.lastIndexOf(QRegExp("[ ;]"), start);
+	if (start == -1) {start = 0;} else {start++;}
 
+	end = text.indexOf(QRegExp("[ ;]"), end);
+	if (end == -1) {end = text.length();} else {end--;}
 
 	setSelection(start, end - start);
 	insert(selectedText + "; ");
@@ -96,8 +91,6 @@ void TagsLineEdit::sl_Completer_Activated (const QString& selectedText) {
 
 void TagsLineEdit::sl_textEdited (const QString&) {
 	// Do not show completer when editing characters in the middle of a word
-	qDebug() << "\nTagsLineEdit::sl_textEdited";
-
 	if (cursorPosition() < (text().length() - 1) && (
 			text().mid(cursorPosition(), 1) != " "
 			||
@@ -108,17 +101,11 @@ void TagsLineEdit::sl_textEdited (const QString&) {
 	int end = current;
 	int start = current == 0 ? 0 : current - 1;
 
-	// TODO change to text().indexOf(QRegExp) and text().lastIndexOf(QRegExp)
-	while(true) {
-		if ((start == 0) || text.mid(start - 1, 1) == ";") {break;}
-		start--;
-	}
-	while(true) {
-		if (end == (text.length()) || text.mid(end + 1, 1) == ";") {break;}
-		end++;
-	}
+	start = text.lastIndexOf(QRegExp("[ ;]"), start);
+	if (start == -1) {start = 0;} else {start++;}
 
-	qDebug() << "Text edited. Start index: " << start << ", end index: " << end;
+	end = text.indexOf(QRegExp("[ ;]"), end);
+	if (end == -1) {end = text.length();} else {end--;}
 
 	if (start == end) {return;}
 
@@ -126,18 +113,13 @@ void TagsLineEdit::sl_textEdited (const QString&) {
 	QString prefix = text.mid(start, end - start).trimmed();
 	if (!prefix.isEmpty()) {
 		completer->setCompletionPrefix(prefix);
-		qDebug() << "Prefix set: " << prefix;
 		completer->complete();
 	}
-
 }
 
 /* virtual */
 void TagsLineEdit::focusOutEvent (QFocusEvent * event) {
 	QLineEdit::focusOutEvent(event);
-
-	qDebug() << event->reason();
-	qDebug() << event->type();
 
 	editingFinished();
 }
