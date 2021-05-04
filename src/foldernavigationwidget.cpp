@@ -837,7 +837,7 @@ bool FolderNavigationWidget::eventFilter (QObject* watched, QEvent* event) {
 void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool permanently) {
 	QString details;
 	if (indexesList.size() == 0) {
-		WARNING("List is empty");
+		qWarning() << "List is empty";
 		return;
 	}
 
@@ -862,12 +862,11 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 		}
 	}
 
-	// FIXME: fix situation when parent folder was deleted and we try to delete child item
 	deleteChildIndexes(indexesList);
 
 	foreach (QModelIndex index, indexesList) {
 		if (!index.isValid()) {
-			WARNING("Invalid index in list");
+			qWarning() << "Invalid index in list";
 			continue;
 		}
 
@@ -888,13 +887,13 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 			itemToDelete = fmi->GetStoredData();
 		}
 		if (itemToDelete == nullptr) {
-			WARNING("Could not find an item for deletion");
+			qWarning() << "Could not find an item for deletion";
 			continue;
 		}
 
 		Folder* parentFolder = itemToDelete->GetParent();
 		if (parentFolder == nullptr) {
-			WARNING("Cannot delete item without parent");
+			qWarning() << "Cannot delete item without parent";
 			continue;
 		}
 
@@ -907,6 +906,7 @@ void FolderNavigationWidget::deleteItems(QModelIndexList& indexesList, bool perm
 	}
 }
 
+// Remove index from deletion list if index's parent index is already in this list
 void FolderNavigationWidget::deleteChildIndexes(QModelIndexList& list) const {
 	QMutableListIterator<QModelIndex> iterator(list);
 
