@@ -65,11 +65,11 @@ const Note* DocumentSearchThread::CurrentNote() const {
 
 void DocumentSearchThread::run() {
 	if (!regexp.isValid()) {
-		WARNING("DocumentSearchThread::run: regexp is invalid");
+		qWarning() << "DocumentSearchThread::run: regexp is invalid";
 		return;
 	}
 	if (regexp == QRegExp()) {
-		WARNING("DocumentSearchThread::run: regexp is empty");
+		qWarning() << "DocumentSearchThread::run: regexp is empty";
 		return;
 	}
 
@@ -122,7 +122,6 @@ void DocumentSearchThread::run() {
 		// TODO: fix this mess
 
 		// Search in caption
-		// FIXME: fix situation when capturedText.length() > symbolsForSample
 		currentPos = 0;
 		QString text = currentNote->GetName();
 		while (true) {
@@ -131,7 +130,8 @@ void DocumentSearchThread::run() {
 			if (textMatchStart != -1 && textMatchLength != -1) {
 				const int textLength = text.length();
 				const QString capturedText = regexp.capturedTexts().at(0);
-				const int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
+				int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
+				if (appendSymbols < 0) {appendSymbols = 0;}
 				int sampleStart = (textMatchStart - appendSymbols) >= 0
 								  ? (textMatchStart - appendSymbols)
 								  : 0;
@@ -139,7 +139,7 @@ void DocumentSearchThread::run() {
 								  ? (textMatchStart + textMatchLength + appendSymbols - 1)
 								  : textLength;
 				const QString sample = text.mid(sampleStart, sampleLength);
-				const int sampleMatchStart = textMatchStart - sampleStart;//sample.indexOf(capturedText);
+				const int sampleMatchStart = textMatchStart - sampleStart;
 
 
 
@@ -160,12 +160,13 @@ void DocumentSearchThread::run() {
 			if (textMatchStart != -1 && textMatchLength != -1) {
 				const int textLength = text.length();
 				const QString capturedText = regexp.capturedTexts().at(0);
-				const int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
+				int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
+				if (appendSymbols < 0) {appendSymbols = 0;}
 				int sampleStart = (textMatchStart - appendSymbols) >= 0 ? (textMatchStart - appendSymbols) : 0;
 				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength ?
 								   (textMatchStart + textMatchLength + appendSymbols - 1) : textLength;
 				const QString sample = text.mid(sampleStart, sampleLength);
-				const int sampleMatchStart = textMatchStart - sampleStart;//sample.indexOf(capturedText);
+				const int sampleMatchStart = textMatchStart - sampleStart;
 
 
 
@@ -186,12 +187,13 @@ void DocumentSearchThread::run() {
 			if (textMatchStart != -1 && textMatchLength != -1) {
 				const int textLength = text.length();
 				const QString capturedText = regexp.capturedTexts().at(0);
-				const int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
+				int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
+				if (appendSymbols < 0) {appendSymbols = 0;}
 				int sampleStart = (textMatchStart - appendSymbols) >= 0 ? (textMatchStart - appendSymbols) : 0;
 				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength ?
 								   (textMatchStart + textMatchLength + appendSymbols - 1) : textLength;
 				const QString sample = text.mid(sampleStart, sampleLength);
-				const int sampleMatchStart = textMatchStart - sampleStart;//sample.indexOf(capturedText);
+				const int sampleMatchStart = textMatchStart - sampleStart;
 
 
 
@@ -212,12 +214,13 @@ void DocumentSearchThread::run() {
 			if (textMatchStart != -1 && textMatchLength != -1) {
 				const int textLength = text.length();
 				const QString capturedText = regexp.capturedTexts().at(0);
-				const int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
+				int appendSymbols = (symbolsForSample - capturedText.length()) / 2;
+				if (appendSymbols < 0) {appendSymbols = 0;}
 				int sampleStart = (textMatchStart - appendSymbols) >= 0 ? (textMatchStart - appendSymbols) : 0;
 				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength ?
 								   (textMatchStart + textMatchLength + appendSymbols - 1) : textLength;
 				const QString sample = text.mid(sampleStart, sampleLength);
-				const int sampleMatchStart = textMatchStart - sampleStart;//sample.indexOf(capturedText);
+				const int sampleMatchStart = textMatchStart - sampleStart;
 
 
 
@@ -234,15 +237,15 @@ void DocumentSearchThread::run() {
 		const QString elide = "...";
 		text = currentNote->GetText();
 		while (true) {
-			// FIXME: fix situation when capturedText.length() > symbolsForSample
 			textMatchStart = regexp.indexIn(text, currentPos);
 			textMatchLength = regexp.matchedLength();
 			if (textMatchStart != -1 && textMatchLength != -1) {
 
 				const int textLength = text.length();
 				const QString capturedText = regexp.capturedTexts().at(0);
-				const int appendSymbols = (symbolsForSample - capturedText.length() -
+				int appendSymbols = (symbolsForSample - capturedText.length() -
 										   (elide.length()*2)) / 2;
+				if (appendSymbols < 0) {appendSymbols = 0;}
 				int sampleStart = (textMatchStart - appendSymbols) >= 0 ? (textMatchStart - appendSymbols) : 0;
 				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength ?
 								   (appendSymbols + textMatchLength + appendSymbols) : textLength;
