@@ -250,10 +250,12 @@ void DocumentSearchThread::run() {
 				int sampleLength = (textMatchStart + textMatchLength + appendSymbols - 1) < textLength ?
 								   (appendSymbols + textMatchLength + appendSymbols) : textLength;
 
-				QString sample =
-						text.mid(sampleStart, sampleLength).append(elide).prepend(elide);
+				QString sample = text.mid(sampleStart, sampleLength);
+				if (sampleStart > 0) {sample = sample.prepend(elide);}
+				if ((sampleStart + sampleLength) < text.length()) {sample = sample.append(elide);}
 				sample.replace(QRegExp("\n"), " ");
-				const int sampleMatchStart = textMatchStart - sampleStart + elide.length();
+				int sampleMatchStart = textMatchStart - sampleStart;
+				if (sampleStart > 0) { sampleMatchStart += elide.length();}
 
 
 				NoteFragment f(currentNote, NoteFragment::TextFragment, textMatchStart, textMatchLength, sample,
