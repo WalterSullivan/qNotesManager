@@ -915,25 +915,24 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 	}
 
 	QPair<int, int> pair;
-	QTextCursor temp(document());
 	QTextCharFormat hyperlinkFormat;
-	temp.beginEditBlock();
+	cursor.beginEditBlock();
 	foreach (pair, fragments) {
-		temp.setPosition(pair.first);
-		temp.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
+		cursor.setPosition(pair.first);
+		cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
 		if (mode == Merge) {
-			temp.mergeCharFormat(format);
+			cursor.mergeCharFormat(format);
 		} else {
-			temp.setCharFormat(format);
+			cursor.setCharFormat(format);
 		}
 	}
 	// Change format for hyperlinks
 	QTextCharFormat newHyperlinkFormat = format;
 	foreach (pair, hyperLinkFragments) {
-		temp.setPosition(pair.first);
-		temp.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
+		cursor.setPosition(pair.first);
+		cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
 
-		hyperlinkFormat = temp.charFormat();
+		hyperlinkFormat = cursor.charFormat();
 		newHyperlinkFormat.setAnchor(hyperlinkFormat.isAnchor());
 		newHyperlinkFormat.setAnchorHref(hyperlinkFormat.anchorHref());
 		newHyperlinkFormat.setAnchorName(hyperlinkFormat.anchorName());
@@ -943,12 +942,12 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 		newHyperlinkFormat.setForeground(hyperlinkFormat.foreground());
 
 		if (mode == Merge) {
-			temp.mergeCharFormat(newHyperlinkFormat);
+			cursor.mergeCharFormat(newHyperlinkFormat);
 		} else {
-			temp.setCharFormat(newHyperlinkFormat);
+			cursor.setCharFormat(newHyperlinkFormat);
 		}
 	}
-	temp.endEditBlock();
+	cursor.endEditBlock();
 }
 
 void TextEdit::sl_AnchorTooltipTimer_Timeout() {
