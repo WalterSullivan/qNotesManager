@@ -840,7 +840,7 @@ Qt::Alignment TextEdit::GetAlignment() const {
 	return textCursor().blockFormat().alignment();
 }
 
-void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharFormatApplyMode mode) {
+void TextEdit::applyCharFormatting(const QTextCharFormat &newFormat, const CharFormatApplyMode mode) {
 	qDebug() << "applyCharFormatting";
 	QTextCursor cursor = this->textCursor();
 	int selectionStart = cursor.selectionStart();
@@ -855,17 +855,22 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 	// If document is empty change default font
 	if (this->document()->isEmpty()) {
 		QFont font = cursor.charFormat().font();
-		if (format.hasProperty(QTextFormat::FontPointSize)) {font.setPointSize(format.fontPointSize());}
-		if (format.hasProperty(QTextFormat::FontFamily)) {font.setFamily(format.fontFamily());}
+		if (newFormat.hasProperty(QTextFormat::FontPointSize)) {font.setPointSize(newFormat.fontPointSize());}
+		if (newFormat.hasProperty(QTextFormat::FontFamily)) {font.setFamily(newFormat.fontFamily());}
 		this->document()->setDefaultFont(font);
 	}
 
 	// If nothing is selected, set format for empty cursor
 	if (selectionStart == selectionEnd) {
 		if (mode == Merge) {
-			cursor.mergeCharFormat(format);
+			if (cursor.charFormat().hasProperty(QTextFormat::FontPixelSize) && newFormat.hasProperty(QTextFormat::FontPointSize)) {
+				QTextCharFormat oldFormat = cursor.charFormat();
+				oldFormat.clearProperty(QTextFormat::FontPixelSize);
+				cursor.setCharFormat(oldFormat);
+			}
+			cursor.mergeCharFormat(newFormat);
 		} else {
-			cursor.setCharFormat(format);
+			cursor.setCharFormat(newFormat);
 		}
 		setTextCursor(cursor);
 		return;
@@ -920,14 +925,22 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 	foreach (pair, fragments) {
 		cursor.setPosition(pair.first);
 		cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
+
 		if (mode == Merge) {
-			cursor.mergeCharFormat(format);
+			// If user wants to set font point size, but text has pixel size set, first remove pixel size property
+			// As fas as i understand it, pixel size has priority over point size
+			if (cursor.charFormat().hasProperty(QTextFormat::FontPixelSize) && newFormat.hasProperty(QTextFormat::FontPointSize)) {
+				QTextCharFormat oldFormat = cursor.charFormat();
+				oldFormat.clearProperty(QTextFormat::FontPixelSize);
+				cursor.setCharFormat(oldFormat);
+			}
+			cursor.mergeCharFormat(newFormat);
 		} else {
-			cursor.setCharFormat(format);
+			cursor.setCharFormat(newFormat);
 		}
 	}
 	// Change format for hyperlinks
-	QTextCharFormat newHyperlinkFormat = format;
+	QTextCharFormat newHyperlinkFormat = newFormat;
 	foreach (pair, hyperLinkFragments) {
 		cursor.setPosition(pair.first);
 		cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, pair.second);
@@ -942,6 +955,12 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &format, const CharForm
 		newHyperlinkFormat.setForeground(hyperlinkFormat.foreground());
 
 		if (mode == Merge) {
+			// If user wants to set font point size, but text has pixel size set, first remove pixel size property
+			if (cursor.charFormat().hasProperty(QTextFormat::FontPixelSize) && newHyperlinkFormat.hasProperty(QTextFormat::FontPointSize)) {
+				QTextCharFormat oldFormat = cursor.charFormat();
+				oldFormat.clearProperty(QTextFormat::FontPixelSize);
+				cursor.setCharFormat(oldFormat);
+			}
 			cursor.mergeCharFormat(newHyperlinkFormat);
 		} else {
 			cursor.setCharFormat(newHyperlinkFormat);

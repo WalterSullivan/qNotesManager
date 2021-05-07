@@ -109,7 +109,7 @@ namespace qNotesManager {
 		QTextFormat formatToCopy;
 
 		QTextFragment findFragmentAtPos(QPoint pos);
-		void applyCharFormatting(const QTextCharFormat& format, const CharFormatApplyMode = Merge);
+		void applyCharFormatting(const QTextCharFormat& newFormat, const CharFormatApplyMode = Merge);
 		void insertImageFromFile(QString fileName);
 
 		void setDocument(QTextDocument*) {} // hide inherited function
