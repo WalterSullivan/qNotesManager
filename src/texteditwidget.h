@@ -72,6 +72,8 @@ namespace qNotesManager {
 		ColorPickerButton*	backgroundTextColorButton;
 		ColorPickerButton*	textUnderlineColorButton;
 
+		QAction*			showSpaceCharacters;
+
 		QFontComboBox*		fontComboBox;
 		QComboBox*			fontSizeComboBox;
 
@@ -158,6 +160,8 @@ namespace qNotesManager {
 		void sl_ForegroundTextColorButton_Clicked();
 		void sl_BackgroundTextColorButton_Clicked();
 		void sl_TextUnderlineColorButton_Clicked();
+
+		void sl_ShowSpaceCharacters_Triggered(bool);
 
 		void sl_TextEdit_CursorPositionChanged();
 		void sl_TextEdit_SelectionChanged();

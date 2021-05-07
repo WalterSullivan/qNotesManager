@@ -245,6 +245,17 @@ void TextEditWidget::CreateControls() {
 	textUnderlineColorButton->setIcon(QIcon(":/gui/underline-color"));
 	TBRMainBar->addWidget(textUnderlineColorButton);
 
+	TBRMainBar->addSeparator();
+
+	showSpaceCharacters = TBRMainBar->addAction(QIcon(":/gui/edit-pilcrow"), "");
+#if QT_VERSION >= 0x050000
+	showSpaceCharacters->setText("Show special characters");
+#else
+	showSpaceCharacters->setText("Show space characters");
+#endif
+	showSpaceCharacters ->setCheckable(true);
+	QObject::connect(showSpaceCharacters, SIGNAL(triggered(bool)), this, SLOT(sl_ShowSpaceCharacters_Triggered(bool)));
+
 	undoAction = new QAction(QIcon(":/gui/undo"), "Undo", this);
 	undoAction->setShortcut(QKeySequence::Undo);
 	undoAction->setEnabled(false);
@@ -363,6 +374,25 @@ void TextEditWidget::sl_BackgroundTextColorButton_Clicked() {
 void TextEditWidget::sl_TextUnderlineColorButton_Clicked() {
 	textField->SetSelectionUnderlineColor(textUnderlineColorButton->GetCurrentColor());
 }
+
+
+void TextEditWidget::sl_ShowSpaceCharacters_Triggered(bool toggle) {
+	QTextOption option = textField->document()->defaultTextOption();
+	QTextOption::Flags flags = option.flags();
+
+	if (toggle) {
+		flags = flags | QTextOption::ShowTabsAndSpaces;
+#if QT_VERSION >= 0x050000
+		// Pilcrow character (paragraph separator) shows incorrectly in qt4
+		flags = flags | QTextOption::ShowLineAndParagraphSeparators | QTextOption::AddSpaceForLineAndParagraphSeparators;
+#endif
+	} else {
+		flags = flags & ~QTextOption::ShowTabsAndSpaces & ~QTextOption::ShowLineAndParagraphSeparators & ~QTextOption::AddSpaceForLineAndParagraphSeparators;
+	}
+	option.setFlags(flags);
+	textField->document()->setDefaultTextOption(option);
+}
+
 
 void TextEditWidget::sl_BoldAction_Triggered(bool toggle) {
 	textField->SetSelectionBold(toggle);
