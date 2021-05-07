@@ -23,6 +23,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QLabel>
 #include <QPushButton>
 #include <QGroupBox>
+#include <QDialogButtonBox>
 
 namespace qNotesManager {
 	class AbstractFolderItem;
@@ -48,8 +49,7 @@ namespace qNotesManager {
 		QPushButton*	resetIconToDefaultButton;
 		QPushButton*	setDefaultIconButton;
 
-		QPushButton*	okButton;
-		QPushButton*	cancelButton;
+		QDialogButtonBox* buttonBox;
 
 		CustomIconsListWidget* customIconsWidget;
 
@@ -64,10 +64,10 @@ namespace qNotesManager {
 
 	public slots:
 		virtual void accept();
+		virtual void reject();
 
 	private slots:
-		void sl_Accepted();
-		void sl_Rejected();
+		void sl_ButtonBox_Clicked(QAbstractButton* button);
 		void sl_ChooseIconButton_Clicked();
 		void sl_ResetIconToDefaultButton_Clicked();
 		void sl_SetDefaultIconButton_Clicked();

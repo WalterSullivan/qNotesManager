@@ -21,6 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QPushButton>
 
 using namespace qNotesManager;
 
@@ -44,16 +45,11 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	showWindowOnStartCheckbox = new QCheckBox("Show main window on start", this);
 	openLastDocumentOnStartCheckbox = new QCheckBox("Open last document on start", this);
 
-	okButton = new QPushButton("OK", this);
-	okButton->setDefault(true);
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-	cancelButton = new QPushButton("Cancel", this);
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-
-	QHBoxLayout* buttonsLayout = new QHBoxLayout();
-	buttonsLayout->addWidget(okButton);
-	buttonsLayout->addWidget(cancelButton);
-	buttonsLayout->setAlignment(Qt::AlignRight);
+	// Buttons
+	buttonBox = new QDialogButtonBox(this);
+	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(sl_ButtonBox_Clicked(QAbstractButton*)));
+	buttonBox->addButton(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->addButton(QDialogButtonBox::Cancel)->setAutoDefault(false);
 
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addWidget(showNumberOfItemsCheckbox);
@@ -70,7 +66,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	mainLayout->addWidget(showWindowOnStartCheckbox);
 	mainLayout->addWidget(openLastDocumentOnStartCheckbox);
 	mainLayout->addStretch();
-	mainLayout->addLayout(buttonsLayout);
+	mainLayout->addWidget(buttonBox);
 
 	showAsterixInTitleCheckbox->setVisible(false);
 	createBackupsCheckbox->setVisible(false);
@@ -111,6 +107,21 @@ void ApplicationSettingsWidget::accept() {
 	Application::I()->Settings.SetOpenLastDocumentOnStart(openLastDocumentOnStartCheckbox->isChecked());
 
 	QDialog::accept();
+}
+
+void ApplicationSettingsWidget::sl_ButtonBox_Clicked(QAbstractButton* button) {
+	QDialogButtonBox::ButtonRole role = buttonBox->buttonRole(button);
+
+	switch(role) {
+		case QDialogButtonBox::AcceptRole:
+			accept();
+			break;
+		case QDialogButtonBox::RejectRole:
+			reject();
+			break;
+		default:
+			reject();
+	}
 }
 
 void ApplicationSettingsWidget::sl_ShowSystemTrayCheckbox_StateChanged(int) {

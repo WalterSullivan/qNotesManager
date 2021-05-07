@@ -20,7 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDialog>
 #include <QCheckBox>
-#include <QPushButton>
+#include <QDialogButtonBox>
 
 namespace qNotesManager {
 	class ApplicationSettingsWidget : public QDialog {
@@ -40,8 +40,7 @@ namespace qNotesManager {
 		QCheckBox* showWindowOnStartCheckbox;
 		QCheckBox* openLastDocumentOnStartCheckbox;
 
-		QPushButton* okButton;
-		QPushButton* cancelButton;
+		QDialogButtonBox* buttonBox;
 
 	public:
 		explicit ApplicationSettingsWidget(QWidget *parent = nullptr);
@@ -51,6 +50,7 @@ namespace qNotesManager {
 
 	private slots:
 		void sl_ShowSystemTrayCheckbox_StateChanged(int);
+		void sl_ButtonBox_Clicked(QAbstractButton* button);
 	};
 }
 

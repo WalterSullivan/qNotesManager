@@ -23,6 +23,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "cachedimagefile.h"
 #include "iconitemdelegate.h"
 
+#include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>
@@ -86,21 +87,12 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 	QObject::connect(listView, SIGNAL(doubleClicked(QModelIndex)),
 					 this, SLOT(sl_ListView_DoubleClicked(QModelIndex)));
 
-	okButton = new QPushButton("Select");
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-
-	cancelButton = new QPushButton("Cancel");
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-	QObject::connect(this, SIGNAL(rejected()), this, SLOT(sl_Rejected()));
-
-	addIconButton = new QPushButton("Add custom icon");
-	QObject::connect(addIconButton, SIGNAL(clicked()), this, SLOT(sl_AddIconButton_Clicked()));
-
-	QHBoxLayout* hl = new QHBoxLayout();
-	hl->addWidget(addIconButton);
-	hl->addStretch();
-	hl->addWidget(okButton);
-	hl->addWidget(cancelButton);
+	// Buttons
+	buttonBox = new QDialogButtonBox(this);
+	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(sl_ButtonBox_Clicked(QAbstractButton*)));
+	buttonBox->addButton(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->addButton(QDialogButtonBox::Cancel)->setAutoDefault(false);
+	buttonBox->addButton("Add custom icon", QDialogButtonBox::ActionRole)->setAutoDefault(false);
 
 	QHBoxLayout* hl2 = new QHBoxLayout();
 	hl2->addLayout(buttonsLayout);
@@ -108,7 +100,7 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 
 	QVBoxLayout* vl = new QVBoxLayout();
 	vl->addLayout(hl2);
-	vl->addLayout(hl);
+	vl->addWidget(buttonBox);
 
 	setLayout(vl);
 
@@ -131,11 +123,31 @@ void CustomIconsListWidget::accept() {
 	QDialog::accept();
 }
 
-void CustomIconsListWidget::sl_Rejected() {
+void CustomIconsListWidget::reject() {
 	SelectedIconKey = "";
+
+	QDialog::reject();
 }
 
-void CustomIconsListWidget::sl_AddIconButton_Clicked() {
+void CustomIconsListWidget::sl_ButtonBox_Clicked(QAbstractButton* button) {
+	QDialogButtonBox::ButtonRole role = buttonBox->buttonRole(button);
+
+	switch(role) {
+		case QDialogButtonBox::AcceptRole:
+			accept();
+			break;
+		case QDialogButtonBox::RejectRole:
+			reject();
+			break;
+		case QDialogButtonBox::ActionRole:
+			addCustomIcon();
+			break;
+		default:
+			reject();
+	}
+}
+
+void CustomIconsListWidget::addCustomIcon() {
 	QString filter = "Images (*.png)";
 	QStringList list = QFileDialog::getOpenFileNames (this, "Select icons to add", QString(),
 													  filter);

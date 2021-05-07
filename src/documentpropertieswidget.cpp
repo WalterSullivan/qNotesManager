@@ -25,6 +25,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QToolTip>
+#include <QPushButton>
 
 using namespace qNotesManager;
 
@@ -59,14 +60,11 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 		encryptionAlg->addItem(name, id);
 	}
 
-	okButton = new QPushButton("OK", this);
-	okButton->setDefault(true);
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-	cancelButton = new QPushButton("Cancel", this);
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-
-	QObject::connect(this, SIGNAL(accepted()), this, SLOT(sl_Accepted()));
-	QObject::connect(this, SIGNAL(rejected()), this, SLOT(sl_Rejected()));
+	// Buttons
+	buttonBox = new QDialogButtonBox(this);
+	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(sl_ButtonBox_Clicked(QAbstractButton*)));
+	buttonBox->addButton(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->addButton(QDialogButtonBox::Cancel)->setAutoDefault(false);
 
 	QGridLayout* encryptionLayout = new QGridLayout();
 	encryptionLayout->addWidget(passwordLabel, 0, 0);
@@ -85,15 +83,10 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 	gridLayout->addWidget(useEncryptionCheckbox, 3, 0);
 	gridLayout->addWidget(encryptionGroupBox, 3, 1, 2, 1);
 
-	QHBoxLayout* buttonsLayout = new QHBoxLayout();
-	buttonsLayout->addStretch();
-	buttonsLayout->addWidget(okButton);
-	buttonsLayout->addWidget(cancelButton);
-
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(gridLayout);
 	mainLayout->addStretch();
-	mainLayout->addLayout(buttonsLayout);
+	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
 	setWindowIcon(QIcon(":/gui/property"));
@@ -156,10 +149,6 @@ void DocumentPropertiesWidget::accept() {
 		}
 	}
 
-	QDialog::accept();
-}
-
-void DocumentPropertiesWidget::sl_Accepted() {
 	quint8 cipherID = 0;
 	if (useEncryptionCheckbox->isChecked()) {
 		QVariant data = encryptionAlg->itemData(encryptionAlg->currentIndex(), Qt::UserRole);
@@ -173,8 +162,27 @@ void DocumentPropertiesWidget::sl_Accepted() {
 		currentDocument->GetPassword() != passwordLineEdit->text()) {
 		currentDocument->SetCipherData(cipherID, passwordLineEdit->text());
 	}
+
+	QDialog::accept();
 }
 
-void DocumentPropertiesWidget::sl_Rejected() {
+void DocumentPropertiesWidget::reject() {
 	currentDocument = nullptr;
+
+	QDialog::reject();
+}
+
+void DocumentPropertiesWidget::sl_ButtonBox_Clicked(QAbstractButton* button) {
+	QDialogButtonBox::ButtonRole role = buttonBox->buttonRole(button);
+
+	switch(role) {
+		case QDialogButtonBox::AcceptRole:
+			accept();
+			break;
+		case QDialogButtonBox::RejectRole:
+			reject();
+			break;
+		default:
+			reject();
+	}
 }

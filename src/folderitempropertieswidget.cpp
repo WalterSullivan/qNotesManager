@@ -68,17 +68,11 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 
 	iconGroupBox->setLayout(iconLayout);
 
-	okButton = new QPushButton("OK", this);
-	okButton->setDefault(true);
-	QObject::connect(okButton, SIGNAL(clicked()),
-					 this, SLOT(accept()));
-
-	cancelButton = new QPushButton("Cancel", this);
-	QObject::connect(cancelButton, SIGNAL(clicked()),
-					 this, SLOT(reject()));
-
-	QObject::connect(this, SIGNAL(accepted()), this, SLOT(sl_Accepted()));
-	QObject::connect(this, SIGNAL(rejected()), this, SLOT(sl_Rejected()));
+	// Buttons
+	buttonBox = new QDialogButtonBox(this);
+	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(sl_ButtonBox_Clicked(QAbstractButton*)));
+	buttonBox->addButton(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->addButton(QDialogButtonBox::Cancel)->setAutoDefault(false);
 
 	QGridLayout* controlsLayout = new QGridLayout();
 	controlsLayout->addWidget(creationDateLabel, 0, 0);
@@ -92,15 +86,10 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 
 	controlsLayout->addWidget(iconGroupBox, 3, 0, 1, 2);
 
-	QHBoxLayout* buttonsLayout = new QHBoxLayout();
-	buttonsLayout->addStretch();
-	buttonsLayout->addWidget(okButton);
-	buttonsLayout->addWidget(cancelButton);
-
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(controlsLayout);
 	mainLayout->addStretch();
-	mainLayout->addLayout(buttonsLayout);
+	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
 	setWindowTitle("Edit properties");
@@ -151,13 +140,9 @@ void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
 void FolderItemPropertiesWidget::accept() {
 	if (itemToEdit == nullptr) {
 		WARNING("Null pointer recieved");
-		reject();
+		QDialog::reject();
 	}
 
-	QDialog::accept();
-}
-
-void FolderItemPropertiesWidget::sl_Accepted() {
 	if (nameLineEdit->text().isEmpty()) {nameLineEdit->setText("Noname");} // ?
 
 	if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Folder) {
@@ -171,10 +156,29 @@ void FolderItemPropertiesWidget::sl_Accepted() {
 	}
 
 	itemToEdit = nullptr;
+
+	QDialog::accept();
 }
 
-void FolderItemPropertiesWidget::sl_Rejected() {
+void FolderItemPropertiesWidget::reject() {
 	itemToEdit = nullptr;
+
+	QDialog::reject();
+}
+
+void FolderItemPropertiesWidget::sl_ButtonBox_Clicked(QAbstractButton* button) {
+	QDialogButtonBox::ButtonRole role = buttonBox->buttonRole(button);
+
+	switch(role) {
+		case QDialogButtonBox::AcceptRole:
+			accept();
+			break;
+		case QDialogButtonBox::RejectRole:
+			reject();
+			break;
+		default:
+			reject();
+	}
 }
 
 void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {

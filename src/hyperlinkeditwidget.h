@@ -21,7 +21,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
-#include <QPushButton>
+#include <QDialogButtonBox>
 
 namespace qNotesManager {
 	class HyperlinkEditWidget : public QDialog {
@@ -31,8 +31,8 @@ namespace qNotesManager {
 		QLineEdit*		linkNameEdit;
 		QLabel*			linkUrlLabel;
 		QLineEdit*		linkUrlEdit;
-		QPushButton*	okButton;
-		QPushButton*	cancelButton;
+
+		QDialogButtonBox* buttonBox;
 
 	public:
 		explicit HyperlinkEditWidget(QWidget *parent = nullptr);
@@ -44,7 +44,8 @@ namespace qNotesManager {
 	protected:
 		virtual void showEvent(QShowEvent* event);
 
-	signals:
+	private slots:
+		void sl_ButtonBox_Clicked(QAbstractButton* button);
 
 	public slots:
 		virtual void accept();

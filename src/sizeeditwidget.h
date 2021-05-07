@@ -24,14 +24,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QSpinBox>
 #include <QSlider>
 #include <QToolButton>
+#include <QDialogButtonBox>
 
 namespace qNotesManager {
 	class SizeEditWidget : public QDialog {
 		Q_OBJECT
 	private:
-		QPushButton* restoreSizeButton;
-		QPushButton* okButton;
-		QPushButton* cancelButton;
+		QDialogButtonBox* buttonBox;
 
 		QLabel* widthLabel;
 		QSlider* widthSlider;
@@ -56,9 +55,10 @@ namespace qNotesManager {
 
 		QSize NewSize;
 
+		virtual void accept();
+
 	private slots:
-		void sl_RestoreSizeButton_Pressed();
-		void sl_Accepted();
+		void sl_ButtonBox_Clicked(QAbstractButton* button);
 
 		void sl_WidthSlider_ValueChanged(int);
 		void sl_HeightSlider_ValueChanged(int);

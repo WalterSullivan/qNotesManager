@@ -19,6 +19,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QGridLayout>
 #include <QToolTip>
+#include <QPushButton>
 #include <QDebug>
 
 using namespace qNotesManager;
@@ -29,11 +30,11 @@ HyperlinkEditWidget::HyperlinkEditWidget(QWidget *parent) : QDialog(parent) {
 	linkUrlLabel= new QLabel("Url:");
 	linkUrlEdit = new QLineEdit();
 
-	okButton = new QPushButton("OK");
-	okButton->setDefault(true);
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-	cancelButton = new QPushButton("Cancel");
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	// Buttons
+	buttonBox = new QDialogButtonBox(this);
+	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(sl_ButtonBox_Clicked(QAbstractButton*)));
+	buttonBox->addButton(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->addButton(QDialogButtonBox::Cancel)->setAutoDefault(false);
 
 	QGridLayout* gridLayout = new QGridLayout();
 	gridLayout->addWidget(linkNameLabel, 0, 0);
@@ -41,15 +42,10 @@ HyperlinkEditWidget::HyperlinkEditWidget(QWidget *parent) : QDialog(parent) {
 	gridLayout->addWidget(linkUrlLabel, 1, 0);
 	gridLayout->addWidget(linkUrlEdit, 1, 1);
 
-	QHBoxLayout* buttonsLayout = new QHBoxLayout();
-	buttonsLayout->addStretch();
-	buttonsLayout->addWidget(okButton);
-	buttonsLayout->addWidget(cancelButton);
-
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(gridLayout);
 	mainLayout->addStretch();
-	mainLayout->addLayout(buttonsLayout);
+	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
 	setWindowTitle("Edit hyperlink");
@@ -79,6 +75,21 @@ void HyperlinkEditWidget::accept() {
 		QToolTip::showText(linkUrlEdit->mapToGlobal(linkUrlEdit->pos()), "Enter link url", linkUrlEdit);
 	} else {
 		QDialog::accept();
+	}
+}
+
+void HyperlinkEditWidget::sl_ButtonBox_Clicked(QAbstractButton* button) {
+	QDialogButtonBox::ButtonRole role = buttonBox->buttonRole(button);
+
+	switch(role) {
+		case QDialogButtonBox::AcceptRole:
+			accept();
+			break;
+		case QDialogButtonBox::RejectRole:
+			reject();
+			break;
+		default:
+			reject();
 	}
 }
 

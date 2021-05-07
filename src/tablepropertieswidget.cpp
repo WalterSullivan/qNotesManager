@@ -66,6 +66,7 @@ TablePropertiesWidget::TablePropertiesWidget(QTextTable* t, QWidget* parent) : Q
 	borderColorDisplayLabel->setPixmap(borderColorPixmap);
 
 	selectBorderColorButton = new QPushButton("Change", this);
+	selectBorderColorButton->setAutoDefault(false);
 	QObject::connect(selectBorderColorButton, SIGNAL(pressed()),
 					 this, SLOT(sl_SelectBorderColorButton_Pressed()));
 
@@ -112,9 +113,11 @@ TablePropertiesWidget::TablePropertiesWidget(QTextTable* t, QWidget* parent) : Q
 	tableBGColorDisplayLabel->setPixmap(tableBGColorPixmap);
 
 	selectTableBGColorButton = new QPushButton("Change", this);
+	selectTableBGColorButton->setAutoDefault(false);
 	QObject::connect(selectTableBGColorButton, SIGNAL(pressed()), this, SLOT(sl_SelectTableBGColorButton_Pressed()));
 
 	resetTableBGColorButton = new QPushButton("Reset", this);
+	resetTableBGColorButton->setAutoDefault(false);
 	QObject::connect(resetTableBGColorButton, SIGNAL(pressed()), this, SLOT(sl_ResetTableBGColorButton_Pressed()));
 
 	QHBoxLayout* BGColorLayout = new QHBoxLayout();
@@ -197,24 +200,17 @@ TablePropertiesWidget::TablePropertiesWidget(QTextTable* t, QWidget* parent) : Q
 	tabWidget->addTab(sizesWidget, QIcon(":gui/resize"), "Width");
 
 	// Buttons
-	okButton = new QPushButton("OK");
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-	cancelButton = new QPushButton("Cancel");
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-	applyButton = new QPushButton("Apply");
-	QObject::connect(applyButton, SIGNAL(clicked()), this, SLOT(sl_ApplyButton_Clicked()));
-
-	QHBoxLayout* buttonsLayout = new QHBoxLayout();
-	buttonsLayout->addWidget(applyButton);
-	buttonsLayout->addStretch();
-	buttonsLayout->addWidget(okButton);
-	buttonsLayout->addWidget(cancelButton);
+	buttonBox = new QDialogButtonBox(this);
+	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(sl_ButtonBox_Clicked(QAbstractButton*)));
+	buttonBox->addButton(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->addButton(QDialogButtonBox::Apply)->setAutoDefault(false);
+	buttonBox->addButton(QDialogButtonBox::Cancel)->setAutoDefault(false);
 
 	// Main layout
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addWidget(tabWidget);
 	mainLayout->addStretch();
-	mainLayout->addLayout(buttonsLayout);
+	mainLayout->addWidget(buttonBox);
 	mainLayout->setContentsMargins(5, 5, 5, 5);
 
 	setLayout(mainLayout);
@@ -402,13 +398,27 @@ void TablePropertiesWidget::applyFormat() {
 	table->setFormat(TableFormat);
 }
 
+void TablePropertiesWidget::sl_ButtonBox_Clicked(QAbstractButton* button) {
+	QDialogButtonBox::ButtonRole role = buttonBox->buttonRole(button);
+
+	switch(role) {
+		case QDialogButtonBox::AcceptRole:
+			accept();
+			break;
+		case QDialogButtonBox::RejectRole:
+			reject();
+			break;
+		case QDialogButtonBox::ApplyRole:
+			applyFormat();
+			break;
+		default:
+			reject();
+	}
+}
+
 void TablePropertiesWidget::accept() {
 	applyFormat();
 	QDialog::accept();
-}
-
-void TablePropertiesWidget::sl_ApplyButton_Clicked() {
-	applyFormat();
 }
 
 void TablePropertiesWidget::sl_MinimalSizeRadioButton_Toggled() {

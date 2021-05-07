@@ -20,7 +20,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDialog>
 #include <QLabel>
-#include <QPushButton>
+#include <QDialogButtonBox>
 
 namespace qNotesManager {
 	class AboutProgramWidget : public QDialog {
@@ -29,10 +29,14 @@ namespace qNotesManager {
 		QLabel* logoLabel;
 		QLabel* descriptionLabel;
 		QLabel* versionLabel;
-		QPushButton* okButton;
+
+		QDialogButtonBox* buttonBox;
 
 	public:
 		explicit AboutProgramWidget(QWidget *parent = nullptr);
+
+	private slots:
+		void sl_ButtonBox_Clicked(QAbstractButton* button);
 
 	};
 }

@@ -24,7 +24,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QGroupBox>
-#include <QPushButton>
+#include <QDialogButtonBox>
 
 namespace qNotesManager {
 	class Document;
@@ -45,8 +45,7 @@ namespace qNotesManager {
 		QLabel* encryptionAlgLabel;
 		QComboBox* encryptionAlg;
 
-		QPushButton* okButton;
-		QPushButton* cancelButton;
+		QDialogButtonBox* buttonBox;
 
 		Document* currentDocument;
 
@@ -56,11 +55,11 @@ namespace qNotesManager {
 
 	public slots:
 		virtual void accept();
+		virtual void reject();
 
 	private slots:
 		void sl_UseEncryptionCB_StateChanged(int = 0);
-		void sl_Accepted();
-		void sl_Rejected();
+		void sl_ButtonBox_Clicked(QAbstractButton* button);
 	};
 }
 

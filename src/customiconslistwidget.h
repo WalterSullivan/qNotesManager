@@ -20,9 +20,9 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDialog>
 #include <QListView>
-#include <QPushButton>
 #include <QSortFilterProxyModel>
 #include <QButtonGroup>
+#include <QDialogButtonBox>
 
 namespace qNotesManager {
 	class Document;
@@ -32,9 +32,7 @@ namespace qNotesManager {
 	private:
 		QButtonGroup*	buttonGroup;
 		QListView*		listView;
-		QPushButton*	okButton;
-		QPushButton*	cancelButton;
-		QPushButton*	addIconButton;
+		QDialogButtonBox* buttonBox;
 
 		QAbstractItemModel* iconsModel;
 		QSortFilterProxyModel* filterModel;
@@ -43,6 +41,7 @@ namespace qNotesManager {
 		const int IconGroupRole = Qt::UserRole + 2;
 
 		int FindButtonIndexByName(const QString& name) const;
+		void addCustomIcon();
 
 	public:
 		explicit CustomIconsListWidget(QWidget *parent = nullptr);
@@ -54,12 +53,12 @@ namespace qNotesManager {
 
 	public slots:
 		virtual void accept();
+		virtual void reject();
 
 	private slots:
-		void sl_Rejected();
-		void sl_AddIconButton_Clicked();
 		void sl_ListView_DoubleClicked (const QModelIndex& index);
 		void sl_ButtonGroup_ButtonClicked(QAbstractButton* button);
+		void sl_ButtonBox_Clicked(QAbstractButton* button);
 	};
 }
 

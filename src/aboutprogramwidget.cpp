@@ -19,6 +19,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "appinfo.h"
 
 #include <QGridLayout>
+#include <QPushButton>
 
 using namespace qNotesManager;
 
@@ -46,12 +47,10 @@ AboutProgramWidget::AboutProgramWidget(QWidget *parent) : QDialog(parent) {
 	versionLabel = new QLabel();
 	versionLabel->setText(QString("Current version: %1").arg(V_SVERSION_STR));
 
-	okButton = new QPushButton("OK");
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(close()));
-
-	QHBoxLayout* buttonLayout = new QHBoxLayout();
-	buttonLayout->addStretch();
-	buttonLayout->addWidget(okButton);
+	// Buttons
+	buttonBox = new QDialogButtonBox(this);
+	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(sl_ButtonBox_Clicked(QAbstractButton*)));
+	buttonBox->addButton(QDialogButtonBox::Close)->setDefault(true);
 
 	QGridLayout* gridLayout = new QGridLayout();
 	gridLayout->addWidget(logoLabel, 0, 0, 1, 1, Qt::AlignCenter);
@@ -61,10 +60,14 @@ AboutProgramWidget::AboutProgramWidget(QWidget *parent) : QDialog(parent) {
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(gridLayout);
 	mainLayout->addStretch();
-	mainLayout->addLayout(buttonLayout);
+	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
 	setWindowTitle("About qNotesManager");
+}
+
+void AboutProgramWidget::sl_ButtonBox_Clicked(QAbstractButton*) {
+	accept();
 }
 
 

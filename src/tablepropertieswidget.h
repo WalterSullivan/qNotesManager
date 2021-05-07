@@ -32,14 +32,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QComboBox>
 #include <QTextTable>
 #include <QTextTableFormat>
+#include <QDialogButtonBox>
 
 namespace qNotesManager {
 	class TablePropertiesWidget : public QDialog {
 		Q_OBJECT
 	private:
-		QPushButton* okButton;
-		QPushButton* cancelButton;
-		QPushButton* applyButton;
+		QDialogButtonBox* buttonBox;
 
 		QTabWidget* tabWidget;
 
@@ -105,7 +104,7 @@ namespace qNotesManager {
 		virtual void accept();
 
 	private slots:
-		void sl_ApplyButton_Clicked();
+		void sl_ButtonBox_Clicked(QAbstractButton* button);
 
 		void sl_MinimalSizeRadioButton_Toggled();
 		void sl_FixedSizeRadioButton_Toggled();

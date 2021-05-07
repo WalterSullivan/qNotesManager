@@ -24,22 +24,13 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 SizeEditWidget::SizeEditWidget(QWidget *parent) : QDialog(parent), NewSize(QSize()) {
-	restoreSizeButton = new QPushButton("Original size");
-	QObject::connect(restoreSizeButton, SIGNAL(released()),
-					 this, SLOT(sl_RestoreSizeButton_Pressed()));
-	okButton = new QPushButton("OK");
-	okButton->setDefault(true);
-	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-	cancelButton = new QPushButton("Cancel");
-	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	// Buttons
+	buttonBox = new QDialogButtonBox(this);
+	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(sl_ButtonBox_Clicked(QAbstractButton*)));
+	buttonBox->addButton(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->addButton(QDialogButtonBox::Cancel)->setAutoDefault(false);
+	buttonBox->addButton(QDialogButtonBox::Reset)->setAutoDefault(false);
 
-	QObject::connect(this, SIGNAL(accepted()), this, SLOT(sl_Accepted()));
-
-	QHBoxLayout* buttonsLayout = new QHBoxLayout();
-	buttonsLayout->addWidget(restoreSizeButton);
-	buttonsLayout->addStretch();
-	buttonsLayout->addWidget(okButton);
-	buttonsLayout->addWidget(cancelButton);
 
 	widthLabel = new QLabel("Width:", this);
 
@@ -98,7 +89,7 @@ SizeEditWidget::SizeEditWidget(QWidget *parent) : QDialog(parent), NewSize(QSize
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(gridLayout);
 	mainLayout->addStretch();
-	mainLayout->addLayout(buttonsLayout);
+	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
 	setWindowTitle("Resize image");
@@ -146,12 +137,27 @@ void SizeEditWidget::SetData(const QSize& currentSize, const QSize& originalSize
 	}
 }
 
-void SizeEditWidget::sl_RestoreSizeButton_Pressed() {
-	SetData(imageOriginalSize, imageOriginalSize);
+void SizeEditWidget::sl_ButtonBox_Clicked(QAbstractButton* button) {
+	QDialogButtonBox::ButtonRole role = buttonBox->buttonRole(button);
+
+	switch(role) {
+		case QDialogButtonBox::AcceptRole:
+			accept();
+			break;
+		case QDialogButtonBox::RejectRole:
+			reject();
+			break;
+		case QDialogButtonBox::ResetRole:
+			SetData(imageOriginalSize, imageOriginalSize);
+			break;
+		default:
+			reject();
+	}
 }
 
-void SizeEditWidget::sl_Accepted() {
+void SizeEditWidget::accept() {
 	NewSize = QSize(widthSlider->value(), heightSlider->value());
+	QDialog::accept();
 }
 
 void SizeEditWidget::sl_WidthSlider_ValueChanged(int value) {
