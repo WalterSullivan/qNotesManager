@@ -191,13 +191,7 @@ void FolderItemPropertiesWidget::sl_ChooseIconButton_Clicked() {
 		customIconsWidget = new CustomIconsListWidget(this);
 	}
 
-	if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Folder) {
-		Folder* f = dynamic_cast<Folder*>(itemToEdit);
-		customIconsWidget->SelectIcon(f->GetIconID());
-	} else if (itemToEdit->GetItemType() == AbstractFolderItem::Type_Note) {
-		Note* n = dynamic_cast<Note*>(itemToEdit);
-		customIconsWidget->SelectIcon(n->GetIconID());
-	}
+	customIconsWidget->SelectIcon(selectedIconKey);
 
 	if (customIconsWidget->exec() != QDialog::Accepted) {return;}
 
