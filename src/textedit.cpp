@@ -48,12 +48,12 @@ using namespace qNotesManager;
 
 TextEdit::TextEdit(QWidget *parent) :
 	QTextEdit(parent),
-	InsertHyperlinkAction(new QAction("Insert hyperlink", this)),
-	InsertImageFromUrlAction(new QAction("Insert image from URL", this)),
-	InsertImageFromFileAction(new QAction("Insert image from file", this)),
-	InsertPlainTextAction(new QAction("Insert plain text", this)),
+	InsertHyperlinkAction(new QAction(QIcon(":/gui/globe-network"), "Insert hyperlink", this)),
+	InsertImageFromUrlAction(new QAction(QIcon(":/gui/image"), "Insert image from URL", this)),
+	InsertImageFromFileAction(new QAction(QIcon(":/gui/image"), "Insert image from file", this)),
+	InsertPlainTextAction(new QAction(QIcon(":/gui/edit"), "Insert plain text", this)),
 	InsertLineAction(new QAction("Insert line", this)),
-	InsertDateTimeAction(new QAction("Insert date and time", this))
+	InsertDateTimeAction(new QAction(QIcon(":/gui/date"), "Insert date and time", this))
 {
 	followLinkAction = new QAction(tr("Follow Link"),this);
 	QObject::connect(followLinkAction, SIGNAL(triggered()),
