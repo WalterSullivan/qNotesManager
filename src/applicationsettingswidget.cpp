@@ -69,6 +69,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget *parent) : QDialog(
 	mainLayout->addWidget(createBackupsCheckbox);
 	mainLayout->addWidget(showWindowOnStartCheckbox);
 	mainLayout->addWidget(openLastDocumentOnStartCheckbox);
+	mainLayout->addStretch();
 	mainLayout->addLayout(buttonsLayout);
 
 	showAsterixInTitleCheckbox->setVisible(false);

@@ -92,11 +92,13 @@ DocumentPropertiesWidget::DocumentPropertiesWidget(QWidget *parent) : QDialog(pa
 
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(gridLayout);
+	mainLayout->addStretch();
 	mainLayout->addLayout(buttonsLayout);
 
 	setLayout(mainLayout);
 	setWindowIcon(QIcon(":/gui/property"));
 	setWindowTitle("Document properties");
+	resize(400, height());
 }
 
 void DocumentPropertiesWidget::SetDocument(Document* d) {

@@ -49,13 +49,21 @@ AboutProgramWidget::AboutProgramWidget(QWidget *parent) : QDialog(parent) {
 	okButton = new QPushButton("OK");
 	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(close()));
 
-	QGridLayout* layout = new QGridLayout();
-	layout->addWidget(logoLabel, 0, 0);
-	layout->addWidget(descriptionLabel, 0, 1);
-	layout->addWidget(versionLabel, 1, 1);
-	layout->addWidget(okButton, 2, 1, 1, 1, Qt::AlignRight);
+	QHBoxLayout* buttonLayout = new QHBoxLayout();
+	buttonLayout->addStretch();
+	buttonLayout->addWidget(okButton);
 
-	setLayout(layout);
+	QGridLayout* gridLayout = new QGridLayout();
+	gridLayout->addWidget(logoLabel, 0, 0, 1, 1, Qt::AlignCenter);
+	gridLayout->addWidget(descriptionLabel, 0, 1);
+	gridLayout->addWidget(versionLabel, 1, 1);
+
+	QVBoxLayout* mainLayout = new QVBoxLayout();
+	mainLayout->addLayout(gridLayout);
+	mainLayout->addStretch();
+	mainLayout->addLayout(buttonLayout);
+
+	setLayout(mainLayout);
 	setWindowTitle("About qNotesManager");
 }
 

@@ -97,11 +97,13 @@ SizeEditWidget::SizeEditWidget(QWidget *parent) : QDialog(parent), NewSize(QSize
 
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(gridLayout);
+	mainLayout->addStretch();
 	mainLayout->addLayout(buttonsLayout);
 
 	setLayout(mainLayout);
 	setWindowTitle("Resize image");
 	setWindowIcon(QIcon(":/gui/image-resize"));
+	resize(400, height());
 }
 
 void SizeEditWidget::SetData(const QSize& currentSize, const QSize& originalSize) {

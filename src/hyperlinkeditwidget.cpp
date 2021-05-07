@@ -48,11 +48,13 @@ HyperlinkEditWidget::HyperlinkEditWidget(QWidget *parent) : QDialog(parent) {
 
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(gridLayout);
+	mainLayout->addStretch();
 	mainLayout->addLayout(buttonsLayout);
 
 	setLayout(mainLayout);
 	setWindowTitle("Edit hyperlink");
 	setWindowIcon(QIcon(":/gui/globe-network"));
+	resize(400, height());
 }
 
 void HyperlinkEditWidget::Set(const QString& name, const QString& url) {

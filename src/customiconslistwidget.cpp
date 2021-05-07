@@ -113,6 +113,7 @@ CustomIconsListWidget::CustomIconsListWidget(QWidget *parent) : QDialog(parent) 
 	setLayout(vl);
 
 	setWindowTitle("Pick icon");
+	resize(500, 500);
 
 	SelectedIconKey = "";
 }

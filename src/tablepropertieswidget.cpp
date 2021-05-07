@@ -213,11 +213,13 @@ TablePropertiesWidget::TablePropertiesWidget(QTextTable* t, QWidget* parent) : Q
 	// Main layout
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addWidget(tabWidget);
+	mainLayout->addStretch();
 	mainLayout->addLayout(buttonsLayout);
 	mainLayout->setContentsMargins(5, 5, 5, 5);
 
 	setLayout(mainLayout);
 	setWindowTitle("Table properties");
+	resize(500, height());
 
 	loadData();
 }

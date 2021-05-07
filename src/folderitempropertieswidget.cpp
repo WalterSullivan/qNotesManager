@@ -61,7 +61,7 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 	iconGroupBox = new QGroupBox(this);
 	iconGroupBox->setTitle("Icon");
 	QGridLayout* iconLayout = new QGridLayout();
-	iconLayout->addWidget(iconLabel, 0, 0, 3, 1);
+	iconLayout->addWidget(iconLabel, 0, 0, 3, 1, Qt::AlignCenter);
 	iconLayout->addWidget(chooseIconButton, 0, 1);
 	iconLayout->addWidget(resetIconToDefaultButton, 1, 1);
 	iconLayout->addWidget(setDefaultIconButton, 2, 1);
@@ -99,13 +99,14 @@ FolderItemPropertiesWidget::FolderItemPropertiesWidget(QWidget *parent) : QDialo
 
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 	mainLayout->addLayout(controlsLayout);
+	mainLayout->addStretch();
 	mainLayout->addLayout(buttonsLayout);
 
 	setLayout(mainLayout);
-
 	setWindowTitle("Edit properties");
 	setWindowIcon(QIcon(":/gui/property"));
 	selectedIconKey = "";
+	resize(400, height());
 }
 
 void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
