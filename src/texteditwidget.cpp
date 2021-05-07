@@ -77,7 +77,7 @@ void TextEditWidget::CreateControls() {
 	fontSizeComboBox->setFocusPolicy(Qt::ClickFocus);
 	QFontDatabase db;
 	foreach(int size, db.standardSizes()) {
-		fontSizeComboBox->addItem(QString::number(size), double(size));
+		fontSizeComboBox->addItem(QString::number(size), size);
 	}
 	QObject::connect(fontSizeComboBox, SIGNAL(currentIndexChanged(int)),
 					 this, SLOT(sl_fontSizeComboBoxCurrentIndexChanged(int)));
@@ -622,10 +622,13 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 		decreaseListIndentAction->setVisible(textList != 0);
 	listButton->blockSignals(false);
 
+	QFont originalFont = this->textField->textCursor().charFormat().font();
+	QFontInfo info(originalFont);
+	QFont resolvedFont(info.family());
+	resolvedFont.setPointSize(info.pointSize());
 
 	fontComboBox->blockSignals(true);
-		const QFont temp = textField->currentFont();
-		fontComboBox->setCurrentFont(temp);
+		fontComboBox->setCurrentFont(resolvedFont);
 	fontComboBox->blockSignals(false);
 
 	fontSizeComboBox->blockSignals(true);
@@ -635,7 +638,7 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 			if (index != -1) {fontSizeComboBox->removeItem(index);} else {break;}
 		}
 
-		const double size = this->textField->currentFont().pointSizeF();
+		const int size = resolvedFont.pointSize();
 		const int index = fontSizeComboBox->findData(size);
 		if (index != -1) {
 			fontSizeComboBox->setCurrentIndex(index);
@@ -644,7 +647,7 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 			int newIndex = 0;
 			while (true) {
 				bool ok = false;
-				double tempSize = fontSizeComboBox->itemData(newIndex).toDouble(&ok);
+				int tempSize = fontSizeComboBox->itemData(newIndex).toInt(&ok);
 				if (ok) {
 					if (tempSize > size) {break;}
 				}

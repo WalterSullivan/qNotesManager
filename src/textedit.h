@@ -51,7 +51,7 @@ namespace qNotesManager {
 		void SetSelectionStrikeOut(bool);
 		void SetAlignment(Qt::Alignment);
 		void SetFontFamily(QString);
-		void SetFontSize(qreal);
+		void SetFontSize(int);
 
 		QColor GetForeColor() const;
 		QColor GetBackColor() const;

@@ -803,7 +803,7 @@ void TextEdit::SetFontFamily(QString family) {
 	applyCharFormatting(f);
 }
 
-void TextEdit::SetFontSize(qreal size) {
+void TextEdit::SetFontSize(int size) {
 	QTextCharFormat f;
 	f.setFontPointSize(size);
 	applyCharFormatting(f);
