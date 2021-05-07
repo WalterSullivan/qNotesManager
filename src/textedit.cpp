@@ -858,6 +858,20 @@ void TextEdit::applyCharFormatting(const QTextCharFormat &newFormat, const CharF
 		if (newFormat.hasProperty(QTextFormat::FontPointSize)) {font.setPointSize(newFormat.fontPointSize());}
 		if (newFormat.hasProperty(QTextFormat::FontFamily)) {font.setFamily(newFormat.fontFamily());}
 		this->document()->setDefaultFont(font);
+
+		// Update format for default block in empty document.
+		// Sometimes first block in empty text document, even though it is empty, keeps text formatting and can have
+		// font settings different from document's default font. This code removes font information from such block.
+		if (block.isValid()) {
+			QTextCursor blockCursor(block);
+			QTextCharFormat oldFormat = blockCursor.blockCharFormat();
+			oldFormat.clearProperty(QTextFormat::FontPointSize);
+			oldFormat.clearProperty(QTextFormat::FontFamily);
+			blockCursor.setBlockCharFormat(oldFormat);
+
+			blockCursor.mergeBlockCharFormat(newFormat);
+			blockCursor.mergeBlockFormat(QTextBlockFormat(block.blockFormat()));
+		}
 	}
 
 	// If nothing is selected, set format for empty cursor
