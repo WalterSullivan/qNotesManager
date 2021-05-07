@@ -28,11 +28,12 @@ SizeEditWidget::SizeEditWidget(QWidget *parent) : QDialog(parent), NewSize(QSize
 	QObject::connect(restoreSizeButton, SIGNAL(released()),
 					 this, SLOT(sl_RestoreSizeButton_Pressed()));
 	okButton = new QPushButton("OK");
-	QObject::connect(okButton, SIGNAL(pressed()),
-					 this, SLOT(sl_OKButton_Pressed()));
+	okButton->setDefault(true);
+	QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	cancelButton = new QPushButton("Cancel");
-	QObject::connect(cancelButton, SIGNAL(pressed()),
-					 this, SLOT(sl_CancelButton_Pressed()));
+	QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+
+	QObject::connect(this, SIGNAL(accepted()), this, SLOT(sl_Accepted()));
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout();
 	buttonsLayout->addWidget(restoreSizeButton);
@@ -147,13 +148,8 @@ void SizeEditWidget::sl_RestoreSizeButton_Pressed() {
 	SetData(imageOriginalSize, imageOriginalSize);
 }
 
-void SizeEditWidget::sl_OKButton_Pressed() {
+void SizeEditWidget::sl_Accepted() {
 	NewSize = QSize(widthSlider->value(), heightSlider->value());
-	accept();
-}
-
-void SizeEditWidget::sl_CancelButton_Pressed() {
-	reject();
 }
 
 void SizeEditWidget::sl_WidthSlider_ValueChanged(int value) {

@@ -58,8 +58,7 @@ namespace qNotesManager {
 
 	private slots:
 		void sl_RestoreSizeButton_Pressed();
-		void sl_OKButton_Pressed();
-		void sl_CancelButton_Pressed();
+		void sl_Accepted();
 
 		void sl_WidthSlider_ValueChanged(int);
 		void sl_HeightSlider_ValueChanged(int);
