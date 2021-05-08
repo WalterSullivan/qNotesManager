@@ -125,7 +125,8 @@ HEADERS += src/tag.h \
 	src/attachedfileswidget.h \
 	src/custommessagebox.h \
 	src/searchpanelwidget.h \
-	src/sizeeditwidget.h
+	src/sizeeditwidget.h \
+	src/paragraphpropertieswidget.h
 
 SOURCES += src/tagownerscollection.cpp \
 	src/tag.cpp \
@@ -192,6 +193,7 @@ SOURCES += src/tagownerscollection.cpp \
 	src/attachedfileswidget.cpp \
 	src/custommessagebox.cpp \
 	src/searchpanelwidget.cpp \
-	src/sizeeditwidget.cpp
+	src/sizeeditwidget.cpp \
+	src/paragraphpropertieswidget.cpp
 
 RESOURCES += icons.qrc

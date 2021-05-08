@@ -23,6 +23,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include "global.h"
 #include "searchpanelwidget.h"
 #include "tablepropertieswidget.h"
+#include "paragraphpropertieswidget.h"
 
 #include <QVBoxLayout>
 #include <QAction>
@@ -247,6 +248,11 @@ void TextEditWidget::CreateControls() {
 
 	TBRMainBar->addSeparator();
 
+	blockFormatPropertiesAction = TBRMainBar->addAction(QIcon(":/gui/paragraph"), "Paragraph properties");
+	QObject::connect(blockFormatPropertiesAction, SIGNAL(triggered()), this, SLOT(sl_BlockFormatPropertiesAction_Triggered()));
+
+	TBRMainBar->addSeparator();
+
 	showSpaceCharacters = TBRMainBar->addAction(QIcon(":/gui/edit-pilcrow"), "");
 #if QT_VERSION >= 0x050000
 	showSpaceCharacters->setText("Show special characters");
@@ -281,6 +287,7 @@ void TextEditWidget::CreateControls() {
 	publicActionsList.append(ACTItalic);
 	publicActionsList.append(ACTUnderline);
 	publicActionsList.append(strikeOutAction);
+	publicActionsList.append(blockFormatPropertiesAction);
 
 	QActionGroup* group = new QActionGroup(this);
 	group->addAction(ACTAlignLeft);
@@ -590,6 +597,12 @@ void TextEditWidget::sl_MergeCellsAction_Triggered() {
 	}
 
 	table->mergeCells(textField->textCursor());
+}
+
+void TextEditWidget::sl_BlockFormatPropertiesAction_Triggered() {
+	ParagraphPropertiesWidget widget;
+	widget.SetCursor(textField->textCursor());
+	widget.exec();
 }
 
 void TextEditWidget::sl_fontComboBoxCurrentFontChanged (const QFont& font) {

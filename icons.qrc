@@ -930,5 +930,6 @@
         <file alias="book-brown">icons/gui/book-brown.png</file>
         <file alias="edit-pilcrow">icons/gui/edit-pilcrow.png</file>
         <file alias="image">icons/gui/image.png</file>
+        <file alias="paragraph">icons/gui/edit-drop-cap.png</file>
     </qresource>
 </RCC>
