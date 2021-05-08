@@ -113,7 +113,7 @@ void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
 		nameLineEdit->setText(f->GetName());
 		iconLabel->setPixmap(f->GetIcon());
 		selectedIconKey = f->GetIconID();
-		setWindowTitle(QString("Edit properties for \"%1\"").arg(f->GetName()));
+		setWindowTitle(QString("Edit properties of \"%1\"").arg(f->GetName()));
 
 		nameLineEdit->setEnabled(!f->IsLocked());
 		chooseIconButton->setEnabled(!f->IsLocked());
@@ -126,7 +126,7 @@ void FolderItemPropertiesWidget::SetFolderItem(AbstractFolderItem* item) {
 		nameLineEdit->setText(n->GetName());
 		iconLabel->setPixmap(n->GetIcon());
 		selectedIconKey = n->GetIconID();
-		setWindowTitle(QString("Edit properties for \"%1\"").arg(n->GetName()));
+		setWindowTitle(QString("Edit properties of \"%1\"").arg(n->GetName()));
 
 		nameLineEdit->setEnabled(!n->IsLocked());
 		chooseIconButton->setEnabled(!n->IsLocked());
