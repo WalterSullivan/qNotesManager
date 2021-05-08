@@ -93,6 +93,7 @@ void TextEditWidget::CreateControls() {
 	TBRMainBar->addSeparator();
 
 	copyFormatAction = TBRMainBar->addAction(QIcon(":/gui/broom"), "Copy format");
+	copyFormatAction->setToolTip("Copy format\n(Hold Control to copy paragraph format)");
 	copyFormatAction->setCheckable(true);
 	QObject::connect(copyFormatAction, SIGNAL(triggered(bool)),
 					 textField, SLOT(sl_CopyCurrentFormat(bool)));

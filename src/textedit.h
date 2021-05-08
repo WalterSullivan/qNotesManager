@@ -106,7 +106,8 @@ namespace qNotesManager {
 		QAction* saveImageAction;
 		QAction* resizeImageAction;
 
-		QTextFormat formatToCopy;
+		QTextFormat charFormatToCopy;
+		QTextFormat blockFormatToCopy;
 
 		QTextFragment findFragmentAtPos(QPoint pos);
 		void applyCharFormatting(const QTextCharFormat& newFormat, const CharFormatApplyMode = Merge);

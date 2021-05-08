@@ -582,13 +582,18 @@ void TextEdit::mousePressEvent (QMouseEvent* event) {
 void TextEdit::mouseReleaseEvent (QMouseEvent* event) {
 	QTextEdit::mouseReleaseEvent(event);
 
-	if (formatToCopy.isValid()) {
-		QTextCharFormat format = formatToCopy.toCharFormat();
+	if (charFormatToCopy.isValid()) {
+		QTextCharFormat format = charFormatToCopy.toCharFormat();
 		applyCharFormatting(format, Set);
-		formatToCopy = QTextFormat(QTextFormat::InvalidFormat);
+		charFormatToCopy = QTextFormat(QTextFormat::InvalidFormat);
 		emit sg_CopyFormatCleared(false);
 	}
-
+	if (blockFormatToCopy.isValid()) {
+		QTextBlockFormat format = blockFormatToCopy.toBlockFormat();
+		textCursor().setBlockFormat(format);
+		blockFormatToCopy = QTextFormat(QTextFormat::InvalidFormat);
+		emit sg_CopyFormatCleared(false);
+	}
 }
 
 void TextEdit::sl_currentCharFormatChanged (const QTextCharFormat&) {
@@ -991,10 +996,17 @@ void TextEdit::sl_AnchorTooltipTimer_Timeout() {
 }
 
 void TextEdit::sl_CopyCurrentFormat(bool copy) {
+	if ((QApplication::keyboardModifiers() & Qt::ControlModifier) == Qt::ControlModifier) {
+		if (copy) {
+			blockFormatToCopy = textCursor().blockFormat();
+		} else {
+			blockFormatToCopy = QTextFormat(QTextFormat::InvalidFormat);
+		}
+	}
 	if (copy) {
-		formatToCopy = textCursor().charFormat();
+		charFormatToCopy = textCursor().charFormat();
 	} else {
-		formatToCopy = QTextFormat(QTextFormat::InvalidFormat);
+		charFormatToCopy = QTextFormat(QTextFormat::InvalidFormat);
 	}
 }
 
