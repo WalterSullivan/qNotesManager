@@ -608,10 +608,10 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 	ACTItalic->setChecked(textField->fontItalic());
 	ACTUnderline->setChecked(textField->fontUnderline());
 	strikeOutAction->setChecked(textField->StrikedOut());
-	ACTAlignLeft->setChecked(textField->GetAlignment() == Qt::AlignLeft);
-	ACTAlignCenter->setChecked(textField->GetAlignment() == Qt::AlignHCenter);
-	ACTAlignRight->setChecked(textField->GetAlignment() == Qt::AlignRight);
-	alignJustifyAction->setChecked(textField->GetAlignment() == Qt::AlignJustify);
+	ACTAlignLeft->setChecked((textField->GetAlignment() & Qt::AlignLeft) == Qt::AlignLeft);
+	ACTAlignCenter->setChecked((textField->GetAlignment() & Qt::AlignHCenter) == Qt::AlignHCenter);
+	ACTAlignRight->setChecked((textField->GetAlignment() & Qt::AlignRight) == Qt::AlignRight);
+	alignJustifyAction->setChecked((textField->GetAlignment() & Qt::AlignJustify) == Qt::AlignJustify);
 
 
 	listButton->blockSignals(true);
