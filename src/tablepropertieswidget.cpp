@@ -215,6 +215,7 @@ TablePropertiesWidget::TablePropertiesWidget(QTextTable* t, QWidget* parent) : Q
 
 	setLayout(mainLayout);
 	setWindowTitle("Table properties");
+	setWindowIcon(QIcon(":/gui/table-edit"));
 	resize(500, height());
 
 	loadData();
