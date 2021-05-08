@@ -27,7 +27,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QSpinBox>
-#include <QDoubleSpinBox>
 #include <QTabWidget>
 #include <QComboBox>
 #include <QTextTable>
@@ -48,13 +47,13 @@ namespace qNotesManager {
 		QRadioButton* centerAlignmentRadioButton;
 		QRadioButton* rightAlignmentRadioButton;
 		QLabel* cellPaddingLabel;
-		QDoubleSpinBox* cellPaddingSpinBox;
+		QSpinBox* cellPaddingSpinBox;
 		QLabel* cellSpacingLabel;
-		QDoubleSpinBox* cellSpacingSpinBox;
+		QSpinBox* cellSpacingSpinBox;
 
 		QGroupBox* borderGroupBox;
 		QLabel* borderWidthLabel;
-		QDoubleSpinBox* borderWidthSpinBox;
+		QSpinBox* borderWidthSpinBox;
 
 		QLabel* borderColorLabel;
 		QLabel* borderColorDisplayLabel;
@@ -67,7 +66,7 @@ namespace qNotesManager {
 		QComboBox* borderStyleComboBox;
 
 		QLabel* paddingLabel;
-		QDoubleSpinBox* paddingSpinBox;
+		QSpinBox* paddingSpinBox;
 
 		QLabel* tableBGColorLabel;
 		QLabel* tableBGColorDisplayLabel;

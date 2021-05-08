@@ -43,21 +43,21 @@ TablePropertiesWidget::TablePropertiesWidget(QTextTable* t, QWidget* parent) : Q
 	alignmentGroupBox->setLayout(alignmentLayout);
 
 	cellPaddingLabel = new QLabel("Cell padding");
-	cellPaddingSpinBox = new QDoubleSpinBox();
+	cellPaddingSpinBox = new QSpinBox();
 	cellPaddingSpinBox->setSuffix("px");
 
 	cellSpacingLabel = new QLabel("Cell spacing");
-	cellSpacingSpinBox = new QDoubleSpinBox();
+	cellSpacingSpinBox = new QSpinBox();
 	cellSpacingSpinBox->setSuffix("px");
 
 	// Border
 	borderGroupBox = new QGroupBox("Border", this);
 	borderWidthLabel = new QLabel("Width:", this);
-	borderWidthSpinBox = new QDoubleSpinBox(this);
+	borderWidthSpinBox = new QSpinBox(this);
 	borderWidthSpinBox->setSuffix("px");
-	borderWidthSpinBox->setMinimum(0.5);
+	borderWidthSpinBox->setMinimum(1);
 	borderWidthSpinBox->setMaximum(50);
-	borderWidthSpinBox->setSingleStep(0.1);
+	borderWidthSpinBox->setSingleStep(1);
 
 	borderColorLabel = new QLabel("Color:", this);
 
@@ -96,7 +96,7 @@ TablePropertiesWidget::TablePropertiesWidget(QTextTable* t, QWidget* parent) : Q
 
 	// Padding
 	paddingLabel = new QLabel("Padding:", this);
-	paddingSpinBox = new QDoubleSpinBox(this);
+	paddingSpinBox = new QSpinBox(this);
 	paddingSpinBox->setSuffix("px");
 	paddingSpinBox->setMinimum(0);
 	paddingSpinBox->setMaximum(500);
