@@ -69,10 +69,10 @@ QString HyperlinkEditWidget::GetUrl() const {
 void HyperlinkEditWidget::accept() {
 	if (linkNameEdit->text().isEmpty()) {
 		linkNameEdit->setFocus(Qt::OtherFocusReason);
-		QToolTip::showText(linkNameEdit->mapToGlobal(linkNameEdit->pos()), "Enter link name", linkNameEdit);
+		QToolTip::showText(this->mapToGlobal(linkNameEdit->pos()), "Enter link name", linkNameEdit);
 	} else if (linkUrlEdit->text().isEmpty()) {
 		linkUrlEdit->setFocus(Qt::OtherFocusReason);
-		QToolTip::showText(linkUrlEdit->mapToGlobal(linkUrlEdit->pos()), "Enter link url", linkUrlEdit);
+		QToolTip::showText(this->mapToGlobal(linkUrlEdit->pos()), "Enter link url", linkUrlEdit);
 	} else {
 		QDialog::accept();
 	}
