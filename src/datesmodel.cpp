@@ -91,12 +91,10 @@ void DatesModel::sl_Note_DateChanged() {
 	if (notesBridge.contains(note)) {
 		noteItem = notesBridge.value(note);
 		removeNoteFromTree(dynamic_cast<NoteModelItem*>(noteItem));
-		qDebug() << "note item removed from tree";
 
 		if (!noteDate.isValid()) {
 			notesBridge.remove(note);
 			delete noteItem;
-			qDebug() << "new date is invalid, note item deleted";
 			return;
 		}
 	}
@@ -107,12 +105,9 @@ void DatesModel::sl_Note_DateChanged() {
 			QObject::connect(noteItem, SIGNAL(sg_DataChanged(BaseModelItem*)),
 							 this, SLOT(sl_Item_DataChanged(BaseModelItem*)));
 			notesBridge.insert(note, noteItem);
-			qDebug() << "new note item created";
 		}
 
-		qDebug() << "trying to add item to tree";
 		addNoteToTree(dynamic_cast<NoteModelItem*>(noteItem));
-		qDebug() << "note item added to tree";
 	}
 }
 
