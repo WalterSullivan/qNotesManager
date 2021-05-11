@@ -135,6 +135,8 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(nullptr) {
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	scrollArea->setFrameStyle(QFrame::Box);
 	scrollArea->setMinimumWidth(propertiesWidget->sizeHint().width());
+	scrollArea->viewport()->installEventFilter(this);
+	scrollArea->installEventFilter(this);
 
 
 	// Setting up main layout
@@ -391,6 +393,16 @@ void NoteEditWidget::sl_Note_PropertyChanged() {
 
 // virtual
 bool NoteEditWidget::eventFilter (QObject* watched, QEvent* event) {
+	if ((scrollArea != nullptr) && (watched == scrollArea->viewport())) {
+		if ((event->type() == QEvent::Wheel)) {
+			return true;
+		}
+	}
+	if ((scrollArea != nullptr) && (watched == scrollArea)) {
+		if ((event->type() == QEvent::KeyPress) || (event->type() == QEvent::KeyRelease)) {
+			return true;
+		}
+	}
 	if (event->type() == QEvent::FocusOut) {
 		QString text;
 		if (watched == captionEdit) {
