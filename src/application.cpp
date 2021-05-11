@@ -92,14 +92,14 @@ QPixmap Application::createImage(const QSize& size, const QString& text, bool lo
 	QPixmap image {size};
 	const bool smallImage {((size.width() < 100) || (size.height() < 20))};
 
+	painter.begin(&image);
+	painter.setBrush(backgroundBrush);
+	painter.setPen(Qt::NoPen);
+	painter.drawRect(back);
+
 	if (loading) {
 		const int smallestSide {qMin(size.width(), size.height())};
 		const int wheelSize {(int)(smallestSide * 0.6)};
-
-		painter.begin(&image);
-		painter.setBrush(backgroundBrush);
-		painter.setPen(Qt::NoPen);
-		painter.drawRect(back);
 
 		// Draw loading icon
 		if (wheelSize > 6) {
