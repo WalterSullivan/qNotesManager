@@ -128,10 +128,4 @@ void DateNavigationWidget::sl_updateTreeModel(bool) {
 	} else if (textDateButton->isChecked()) {
 		treeView->setModel(textDateModel);
 	}
-
-	if (treeView->model() != nullptr) {
-		for (int i = 0; i < treeView->model()->columnCount(); i++) {
-			treeView->resizeColumnToContents(i);
-		}
-	}
 }

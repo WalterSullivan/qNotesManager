@@ -1097,9 +1097,6 @@ void FolderNavigationWidget::SetModel(HierarchyModel* _model) {
 
 	treeView->setModel(model);
 	if (treeView->model() != nullptr) {
-		for (int i = 0; i < treeView->model()->columnCount(); i++) {
-			treeView->resizeColumnToContents(i);
-		}
 		QObject::connect(treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
 						 this, SLOT(sl_View_SelectionChanged(QItemSelection,QItemSelection)));
 		restoreExpandedIndexes();

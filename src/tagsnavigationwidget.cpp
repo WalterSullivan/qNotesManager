@@ -51,12 +51,6 @@ TagsNavigationWidget::TagsNavigationWidget(QWidget *parent) : QWidget(parent) {
 void TagsNavigationWidget::SetModel(TagsModel* _model) {
 	model = _model;
 	treeView->setModel(model);
-
-	if (treeView->model() != nullptr) {
-		for (int i = 0; i < treeView->model()->columnCount(); i++) {
-			treeView->resizeColumnToContents(i);
-		}
-	}
 }
 
 void TagsNavigationWidget::SetModelItemDelegate(QAbstractItemDelegate* delegate) {
