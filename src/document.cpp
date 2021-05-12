@@ -351,8 +351,7 @@ void Document::UnregisterTag(Tag* tag) {
 	tag->setParent(nullptr);
 	tagsByName.remove(tag->GetName());
 	QList<QStandardItem*> itemsList = tagsListModel->findItems(tag->GetName(), Qt::MatchExactly, 0);
-	QStandardItem* item = tagsListModel->takeItem(itemsList.at(0)->row());
-	delete item;
+	tagsListModel->removeRow(itemsList.at(0)->row());
 
 	emit sg_ItemUnregistered(tag);
 	delete tag;
