@@ -49,7 +49,7 @@ FolderNavigationWidget::FolderNavigationWidget(QWidget *parent) : QWidget(parent
 	treeView->setDragDropMode(QAbstractItemView::InternalMove);
 	treeView->viewport()->setAcceptDrops(true);
 	treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
+	treeView->setEditTriggers(QAbstractItemView::EditKeyPressed);
 
 	QObject::connect(treeView, SIGNAL(customContextMenuRequested(QPoint)),
 					 this, SLOT(sl_TreeView_ContextMenuRequested(QPoint)));
