@@ -94,6 +94,7 @@ namespace qNotesManager {
 		void sl_TagsEdit_CollectionChanged(QStringList);
 
 		void sl_Note_PropertyChanged();
+		void sl_PropertyEdited(const QString&);
 
 		void sl_AttachFilesPanel_OnResize();
 

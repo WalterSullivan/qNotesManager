@@ -56,11 +56,11 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(nullptr) {
 
 	captionLabel = new QLabel("Caption:");
 	captionEdit = new QLineEdit();
-	captionEdit->installEventFilter(this);
+	QObject::connect(captionEdit, SIGNAL(textEdited(QString)), this, SLOT(sl_PropertyEdited(QString)));
 
 	authorLabel = new QLabel("Author:");
 	authorEdit = new QLineEdit();
-	authorEdit->installEventFilter(this);
+	QObject::connect(authorEdit, SIGNAL(textEdited(QString)), this, SLOT(sl_PropertyEdited(QString)));
 
 	textCreationDateLabel = new QLabel("Text was created at:");
 	textCreationCheckbox = new QCheckBox();
@@ -78,7 +78,7 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(nullptr) {
 
 	sourceLabel = new QLabel("Text source:");
 	sourceEdit = new QLineEdit();
-	sourceEdit->installEventFilter(this);
+	QObject::connect(sourceEdit, SIGNAL(textEdited(QString)), this, SLOT(sl_PropertyEdited(QString)));
 
 	tagsLabel = new QLabel("Tags (divided by semicolon):");
 	tagsEdit = new TagsLineEdit();
@@ -88,7 +88,7 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(nullptr) {
 
 	commentLabel = new QLabel("Comment:");
 	commentEdit = new QLineEdit();
-	commentEdit->installEventFilter(this);
+	QObject::connect(commentEdit, SIGNAL(textEdited(QString)), this, SLOT(sl_PropertyEdited(QString)));
 
 	attachedFilesWidget = new AttachedFilesWidget(n);
 	QObject::connect(attachedFilesWidget, SIGNAL(sg_OnResize()),
@@ -360,10 +360,27 @@ void NoteEditWidget::fillControlsWithData() {
 
 void NoteEditWidget::sl_TextCreationCheckbox_Toggled(bool toggle) {
 	textCreationDateEdit->setEnabled(toggle);
+
+	QDateTime newDate = QDateTime();
+	if (textCreationCheckbox->isChecked()) {
+		newDate = textCreationDateEdit->dateTime();
+	} else {
+		newDate = QDateTime();
+	}
+	currentNote->SetTextCreationDate(newDate);
 }
 
 void NoteEditWidget::sl_TextCreationDateTime_Changed(const QDateTime& newDateTime) {
 	(void)newDateTime;
+
+	QDateTime newDate = QDateTime();
+	if (textCreationCheckbox->isChecked()) {
+		newDate = textCreationDateEdit->dateTime();
+	} else {
+		// leave newDate invalid
+	}
+
+	currentNote->SetTextCreationDate(newDate);
 }
 
 void NoteEditWidget::sl_TagsEdit_CollectionChanged(QStringList newTags) {
@@ -404,59 +421,39 @@ bool NoteEditWidget::eventFilter (QObject* watched, QEvent* event) {
 			return true;
 		}
 	}
-	if (event->type() == QEvent::FocusOut) {
-		QString text;
-		if (watched == captionEdit) {
-			text = captionEdit->text();
-			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-			if (currentNote->GetName() != text) {
-				currentNote->SetName(text);
-				captionEdit->setText(text);
-				qDebug() << "Caption changed";
-			}
-
-		} else if (watched == authorEdit) {
-			text = authorEdit->text();
-			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-			if (currentNote->GetAuthor() != text) {
-				currentNote->SetAuthor(text);
-				authorEdit->setText(text);
-				qDebug() << "Author changed";
-			}
-
-		} else if (watched == sourceEdit) {
-			text = sourceEdit->text();
-			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-			if (currentNote->GetSource() != text) {
-				currentNote->SetSource(text);
-				sourceEdit->setText(text);
-				qDebug() << "Source changed";
-			}
-
-		} else if (watched == commentEdit) {
-			text = commentEdit->text();
-			text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
-			if (currentNote->GetComment() != text) {
-				currentNote->SetComment(text);
-				commentEdit->setText(text);
-				qDebug() << "Comment changed";
-			}
-
-		} else if (watched == textCreationCheckbox ||
-				   watched == textCreationDateEdit) {
-			QDateTime newDate = QDateTime();
-			if (textCreationCheckbox->isChecked()) {
-				newDate = textCreationDateEdit->dateTime();
-			}
-			if (currentNote->GetTextCreationDate() != newDate) {
-				currentNote->SetTextCreationDate(textCreationDateEdit->dateTime());
-			}
-			qDebug() << "Text creation date changed";
-		} else {
-			qDebug() << "Unhandled widget focus out event";
-		}
-	}
 	return false;
+}
+
+void NoteEditWidget::sl_PropertyEdited(const QString& t) {
+	QLineEdit* sender = nullptr;
+	sender = qobject_cast<QLineEdit*>(QObject::sender());
+	if (sender == nullptr) {
+		qWarning() << "Conversion error";
+		return;
+	}
+
+	QString text = t;
+
+	if (sender == captionEdit) {
+		text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+		currentNote->SetName(text);
+		captionEdit->setText(text);
+
+	} else if (sender == authorEdit) {
+		text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+		currentNote->SetAuthor(text);
+		authorEdit->setText(text);
+
+	} else if (sender == sourceEdit) {
+		text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+		currentNote->SetSource(text);
+		sourceEdit->setText(text);
+
+	} else if (sender == commentEdit) {
+		text.replace(QRegExp("[\a\e\f\n\r\t\v]"), " ");
+		currentNote->SetComment(text);
+		commentEdit->setText(text);
+	}
 }
 
 QList<QAction*> NoteEditWidget::EditActionsList() const {
