@@ -33,6 +33,7 @@ namespace qNotesManager {
 	public:
 		explicit TagsLineEdit(QWidget *parent = nullptr);
 		void SetTagsModel(QAbstractItemModel*);
+		QStringList ParseTags();
 
 	protected:
 		virtual void focusOutEvent (QFocusEvent* event);

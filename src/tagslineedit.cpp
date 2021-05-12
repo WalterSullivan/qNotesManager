@@ -43,7 +43,7 @@ void TagsLineEdit::SetTagsModel(QAbstractItemModel* model) {
 	completer->setModel(model);
 }
 
-void TagsLineEdit::editingFinished() {
+QStringList TagsLineEdit::ParseTags() {
 	QStringList tags;
 
 	QString text = this->text();
@@ -69,6 +69,11 @@ void TagsLineEdit::editingFinished() {
 			tags.append(temp);
 		}
 	}
+	return tags;
+}
+
+void TagsLineEdit::editingFinished() {
+	QStringList tags = ParseTags();
 
 	emit sg_TagsCollectionChanged(tags);
 }
