@@ -211,10 +211,8 @@ void NoteEditWidget::sl_AttachFilesPanel_OnResize() {
 void NoteEditWidget::updateHeight() {
 	int newHeight = 0;
 	if (propertiesPanelCollapsed) {
-		newHeight =
-				captionEdit->height() +
-				propertiesWidget->layout()->contentsMargins().top() +
-				((QGridLayout*)propertiesWidget->layout())->verticalSpacing();
+		newHeight = ((QGridLayout*)propertiesWidget->layout())->cellRect(1, 0).top() +
+				scrollArea->frameWidth() * 2 /* QFrame height includes border width */;
 	} else {
 		newHeight = propertiesWidget->height();
 
