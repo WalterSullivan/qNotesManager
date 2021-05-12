@@ -47,7 +47,7 @@ namespace qNotesManager {
 		QUuid GetUuid() const;
 
 	private:
-		Folder* parent;
+		Folder* parentFolder;
 		const ItemType itemType;
 		const QUuid uuid;
 

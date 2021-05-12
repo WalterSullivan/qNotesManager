@@ -22,7 +22,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 using namespace qNotesManager;
 
 AbstractFolderItem::AbstractFolderItem(ItemType type) : QObject(nullptr), itemType(type), uuid(QUuid::createUuid()) {
-	parent = nullptr;
+	parentFolder = nullptr;
 }
 
 AbstractFolderItem::~AbstractFolderItem() {
@@ -34,9 +34,9 @@ void AbstractFolderItem::SetParent(Folder* newParent) {
 		return;
 	}
 
-	if (newParent == parent) {return;}
+	if (newParent == parentFolder) {return;}
 
-	parent = newParent;
+	parentFolder = newParent;
 	setParent(newParent);  // QObject's parentship
 	emit sg_ParentChanged(newParent);
 }
@@ -46,7 +46,7 @@ AbstractFolderItem::ItemType AbstractFolderItem::GetItemType() const {
 }
 
 Folder* AbstractFolderItem::GetParent() const {
-	return parent;
+	return parentFolder;
 }
 
 bool AbstractFolderItem::IsOffspringOf(const Folder* folder) const {
@@ -57,7 +57,7 @@ bool AbstractFolderItem::IsOffspringOf(const Folder* folder) const {
 
 	if (folder == this) {return false;}
 
-	Folder* f = parent;
+	Folder* f = parentFolder;
 	while (f != nullptr) {
 		if (f == folder) {return true;}
 		f = f->GetParent();
