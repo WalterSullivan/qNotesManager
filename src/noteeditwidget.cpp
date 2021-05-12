@@ -94,6 +94,7 @@ NoteEditWidget::NoteEditWidget(Note* n) : QWidget(nullptr) {
 	QObject::connect(attachedFilesWidget, SIGNAL(sg_OnResize()),
 					 this, SLOT(sl_AttachFilesPanel_OnResize()));
 
+	scrollArea = nullptr;
 
 	// Setting up properties widget's layout
 	QGridLayout* gridLayout = new QGridLayout();
