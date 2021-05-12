@@ -103,7 +103,7 @@ void Serializer::loadDocument() {
 	const QFileInfo fileInfo(filename);
 	doc->fileTimeStamp = fileInfo.lastModified();
 
-	qint64 readResult = 0;
+	qint64 readResult __attribute__((unused)) = 0;
 
 	QByteArray fileDataArray(file.size(), 0x0);
 	readResult = file.read(fileDataArray.data(), fileDataArray.size());
@@ -225,7 +225,7 @@ void Serializer::sendProgressSignal(BOIBuffer* buffer) {
 
 // Save file ver. 1
 void Serializer::loadDocument_v1(BOIBuffer& buffer) {
-	qint64 readResult = 0;
+	qint64 readResult __attribute__((unused)) = 0;
 
 	quint8 r_compressionLevel = 0;
 	buffer.read(r_compressionLevel);
@@ -828,7 +828,7 @@ void Serializer::saveDocument_v1() {
 }
 
 Note* Serializer::loadNote_v1(BOIBuffer& buffer) {
-	qint64 bytesRead = 0;
+	qint64 bytesRead __attribute__((unused)) = 0;
 
 	quint32 r_itemSize = 0;
 	bytesRead = buffer.read(r_itemSize);
@@ -1043,7 +1043,7 @@ void Serializer::saveNote_v1(const Note* note, BOIBuffer& buffer) {
 								sizeof(w_locked) +
 								sizeof(w_imagesArraySize) +
 								w_imagesArraySize;
-	qint64 result = 0;
+	qint64 result __attribute__((unused)) = 0;
 	result = buffer.write(w_itemSize);
 	result = buffer.write(w_captionSize);
 	result = buffer.write(w_captionArray.constData(),	w_captionSize);
@@ -1068,7 +1068,7 @@ void Serializer::saveNote_v1(const Note* note, BOIBuffer& buffer) {
 }
 
 Folder* Serializer::loadFolder_v1(BOIBuffer& buffer) {
-	qint64 bytesRead = 0;
+	qint64 bytesRead __attribute__((unused)) = 0;
 
 	quint32 r_itemSize = 0;
 	bytesRead = buffer.read(r_itemSize);
@@ -1146,7 +1146,7 @@ void Serializer::saveFolder_v1(const Folder* folder, BOIBuffer& buffer) {
 }
 
 Tag* Serializer::loadTag_v1(BOIBuffer& buffer) {
-	qint64 result = 0;
+	qint64 result __attribute__((unused)) = 0;
 
 	quint32 r_itemSize = 0;
 	result = buffer.read(r_itemSize);
@@ -1173,7 +1173,7 @@ void Serializer::saveTag_v1(const Tag* tag, BOIBuffer& buffer) {
 	const quint32 w_nameSize = w_nameArray.size();
 	const quint32 w_itemSize = w_nameSize + sizeof(w_nameSize);
 
-	qint64 result = 0;
+	qint64 result __attribute__((unused)) = 0 ;
 	result = buffer.write(w_itemSize);
 	result = buffer.write(w_nameSize);
 	result = buffer.write(w_nameArray.constData(), w_nameSize);
@@ -1181,7 +1181,7 @@ void Serializer::saveTag_v1(const Tag* tag, BOIBuffer& buffer) {
 
 // Save file ver. 2
 void Serializer::loadDocument_v2(BOIBuffer& buffer) {
-	qint64 readResult = 0;
+	qint64 readResult __attribute__((unused)) = 0;
 
 	quint8 r_compressionLevel = 0;
 	buffer.read(r_compressionLevel);
@@ -1806,7 +1806,7 @@ void Serializer::saveDocument_v2() {
 }
 
 Note* Serializer::loadNote_v2(BOIBuffer& buffer) {
-	qint64 bytesRead = 0;
+	qint64 bytesRead __attribute__((unused)) = 0;
 
 	quint32 r_itemSize = 0;
 	bytesRead = buffer.read(r_itemSize);
@@ -2048,7 +2048,7 @@ void Serializer::saveNote_v2(const Note* note, BOIBuffer& buffer) {
 								w_imagesArraySize +
 								sizeof(w_fileaArraySize) +
 								w_fileaArraySize;
-	qint64 result = 0;
+	qint64 result __attribute__((unused)) = 0;
 	result = buffer.write(w_itemSize);
 	result = buffer.write(w_captionSize);
 	result = buffer.write(w_captionArray.constData(),	w_captionSize);
