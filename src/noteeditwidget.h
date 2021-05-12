@@ -79,6 +79,7 @@ namespace qNotesManager {
 		int CurrentPosition() const;
 		QList<QAction*> EditActionsList() const;
 		void FocusTextEdit();
+		void ForceWriteTags();
 
 	protected:
 		// virtual

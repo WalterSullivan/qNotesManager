@@ -461,3 +461,12 @@ QList<QAction*> NoteEditWidget::EditActionsList() const {
 void NoteEditWidget::FocusTextEdit() {
 	textEditWidget->FocusTextEdit();
 }
+
+void NoteEditWidget::ForceWriteTags() {
+	/*
+	TagsLineEdit sends information about new tags after losing focus. When user presses Ctrl+S or 'Save document',
+	'MainWindow::sl_SaveDocumentAction_Triggered' slot activates BEFORE TagsLineEdit losing focus which causes all changes
+	made in TagsLineEdit to get lost. This method forcedly writes new tags data ignoring signal-slot mechanism.
+	*/
+	sl_TagsEdit_CollectionChanged(tagsEdit->ParseTags());
+}

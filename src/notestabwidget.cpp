@@ -213,6 +213,12 @@ QList< QPair<Note*, int> > NotesTabWidget::GetState() const {
 	return list;
 }
 
+void NotesTabWidget::ForceWriteTags() {
+	if (tabWidget->count() == 0) {return;}
+	NoteEditWidget* noteWidget = dynamic_cast<NoteEditWidget*>(tabWidget->currentWidget());
+	noteWidget->ForceWriteTags();
+}
+
 void NotesTabWidget::sl_TabWidget_CurrentChanged(int index) {
 	if (index == -1) {
 		emit sg_CurrentNoteChanged(nullptr);

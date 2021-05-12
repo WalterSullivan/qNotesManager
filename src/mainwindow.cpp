@@ -417,6 +417,8 @@ void MainWindow::OpenDocument(QString fileName) {
 }
 
 void MainWindow::sl_SaveDocumentAction_Triggered(bool* actionCancelled) {
+	notesTabWidget->ForceWriteTags();
+
 	Document* doc = Application::I()->CurrentDocument();
 	if (doc == nullptr) {
 		WARNING("No current document set");
@@ -459,6 +461,8 @@ void MainWindow::sl_SaveDocumentAsAction_Triggered() {
 }
 
 void MainWindow::sl_CloseDocumentAction_Triggered(bool* actionCancelled, bool* actionDelayed, bool suppressSaving) {
+	notesTabWidget->ForceWriteTags();
+
 	Document* oldDoc = Application::I()->CurrentDocument();
 	if (oldDoc == nullptr) {
 		WARNING("No current document set");

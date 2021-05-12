@@ -67,6 +67,8 @@ namespace qNotesManager {
 		void SetCurrentNote(const Note*);
 		QList< QPair<Note*, int> > GetState() const;
 
+		void ForceWriteTags();
+
 	signals:
 		void sg_CurrentNoteChanged(Note*);
 		void sg_LinkClicked(QUrl url);
