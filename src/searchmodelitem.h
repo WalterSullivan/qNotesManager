@@ -34,8 +34,8 @@ namespace qNotesManager {
 		/*virtual*/ Qt::ItemFlags flags () const;
 		NoteFragment Fragment() const;
 
-		static const int HighlightStartRole = 50;
-		static const int HightlightLengthRole = 51;
+		static const int HighlightStartRole = Qt::UserRole + 1;
+		static const int HightlightLengthRole = Qt::UserRole + 2;
 
 	private slots:
 		void sl_Note_TextChanged();
