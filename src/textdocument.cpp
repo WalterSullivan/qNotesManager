@@ -40,11 +40,11 @@ TextDocument::TextDocument(QObject *parent) : QTextDocument(parent), restartDown
 	loader = new ImageLoader(this);
 
 	QObject::connect(loader, SIGNAL(sg_DownloadError(QUrl,QString)),
-					 this, SLOT(sl_Downloader_DownloadError(QUrl,QString)), Qt::DirectConnection);
+					 this, SLOT(sl_Downloader_DownloadError(QUrl,QString)));
 	QObject::connect(loader, SIGNAL(sg_DownloadFinished(QUrl,CachedImageFile*)),
-					 this, SLOT(sl_Downloader_DownloadFinished(QUrl,CachedImageFile*)), Qt::DirectConnection);
+					 this, SLOT(sl_Downloader_DownloadFinished(QUrl,CachedImageFile*)));
 	QObject::connect(loader, SIGNAL(sg_Progress(QUrl,int)),
-					 this, SLOT(sl_Downloader_Progress(QUrl,int)), Qt::DirectConnection);
+					 this, SLOT(sl_Downloader_Progress(QUrl,int)));
 
 
 	restartDownloadsTimer.setInterval(60000); // restart in 1 minute

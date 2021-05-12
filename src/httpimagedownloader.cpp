@@ -35,13 +35,13 @@ HttpImageDownloader::HttpImageDownloader(QObject *parent) :
 	manager = new QNetworkAccessManager(this);
 
 	connect(manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-			this, SLOT(sl_netManager_authenticationRequired(QNetworkReply*,QAuthenticator*)), Qt::DirectConnection);
+			this, SLOT(sl_netManager_authenticationRequired(QNetworkReply*,QAuthenticator*)));
 	connect(manager, SIGNAL(finished(QNetworkReply*)),
-			this, SLOT(sl_netManager_finished(QNetworkReply*)), Qt::DirectConnection);
+			this, SLOT(sl_netManager_finished(QNetworkReply*)));
 	connect(manager, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)),
-			this, SLOT(sl_netManager_proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)), Qt::DirectConnection);
+			this, SLOT(sl_netManager_proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)));
 	connect(manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
-			this, SLOT(sl_netManager_sslErrors(QNetworkReply*,QList<QSslError>)), Qt::DirectConnection);
+			this, SLOT(sl_netManager_sslErrors(QNetworkReply*,QList<QSslError>)));
 
 	networkErrorMessages.insert(0,		"QNetworkReply::NoError");
 	networkErrorMessages.insert(1,		"QNetworkReply::ConnectionRefusedError");
