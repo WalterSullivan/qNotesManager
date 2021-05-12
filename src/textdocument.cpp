@@ -36,7 +36,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-TextDocument::TextDocument(QObject *parent) : QTextDocument(parent) {
+TextDocument::TextDocument(QObject *parent) : QTextDocument(parent), restartDownloadsTimer(this) {
 	loader = new ImageLoader(this);
 
 	QObject::connect(loader, SIGNAL(sg_DownloadError(QUrl,QString)),
