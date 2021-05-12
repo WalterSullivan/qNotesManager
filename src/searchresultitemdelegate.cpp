@@ -56,14 +56,14 @@ void SearchResultItemDelegate::paint (QPainter* painter, const QStyleOptionViewI
 	QVariant tempVariant = index.model()->data(index, SearchModelItem::HighlightStartRole);
 	if (tempVariant.isNull()) {
 		WARNING("Could not retrieve data from item");
-		return;
+		tempVariant = QVariant(0);
 	}
 	const int matchStart = tempVariant.toInt();
 
 	tempVariant = index.model()->data(index, SearchModelItem::HightlightLengthRole);
 	if (tempVariant.isNull()) {
 		WARNING("Could not retrieve data from item");
-		return;
+		tempVariant = QVariant(0);
 	}
 	const int matchLength = tempVariant.toInt();
 
