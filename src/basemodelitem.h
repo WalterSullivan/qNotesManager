@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ABSTRACTMODELITEM_H
-#define ABSTRACTMODELITEM_H
+#ifndef BASEMODELITEM_H
+#define BASEMODELITEM_H
 
 #include <QList>
 #include <QVariant>
@@ -95,4 +95,4 @@ namespace qNotesManager {
 	};
 }
 
-#endif // ABSTRACTMODELITEM_H
+#endif // BASEMODELITEM_H

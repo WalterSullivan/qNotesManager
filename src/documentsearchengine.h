@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ABSTRACTSEARCHENGINE_H
-#define ABSTRACTSEARCHENGINE_H
+#ifndef DOCUMENTSEARCHENGINE_H
+#define DOCUMENTSEARCHENGINE_H
 
 #include <QObject>
 
@@ -59,4 +59,4 @@ namespace qNotesManager {
 	};
 }
 
-#endif // ABSTRACTSEARCHENGINE_H
+#endif // DOCUMENTSEARCHENGINE_H
