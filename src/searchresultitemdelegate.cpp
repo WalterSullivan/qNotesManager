@@ -26,7 +26,7 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace qNotesManager;
 
-SearchResultItemDelegate::SearchResultItemDelegate(QObject *parent) : QStyledItemDelegate (parent) {
+SearchResultItemDelegate::SearchResultItemDelegate(QObject *parent) : QItemDelegate (parent) {
 }
 
 /* virtual */
@@ -38,7 +38,7 @@ void SearchResultItemDelegate::paint (QPainter* painter, const QStyleOptionViewI
 		return;
 	}
 	if (item->DataType() != BaseModelItem::SearchResult) {
-		QStyledItemDelegate::paint(painter, option, index);
+		QItemDelegate::paint(painter, option, index);
 		return;
 	}
 
@@ -67,37 +67,26 @@ void SearchResultItemDelegate::paint (QPainter* painter, const QStyleOptionViewI
 	}
 	const int matchLength = tempVariant.toInt();
 
-	QStyleOptionViewItem opt(option);
-	initStyleOption(&opt, index);
+	tempVariant = index.model()->data(index, SearchModelItem::ExpiredRole);
+	if (tempVariant.isNull()) {
+		WARNING("Could not retrieve data from item");
+		tempVariant = QVariant(false);
+	}
+	const int expired = tempVariant.toBool();
+
 	painter->save();
 
-	QStyle *style = QApplication::style();
-	style->drawControl(QStyle::CE_ItemViewItem, &option, painter, 0);
-
-	QPalette::ColorGroup cg = (option.state & QStyle::State_Enabled) ? QPalette::Normal : QPalette::Disabled;
-	if (cg == QPalette::Normal && !(option.state & QStyle::State_Active)) {
-		cg = QPalette::Inactive;
+	QPalette::ColorGroup colorGroup = option.palette.currentColorGroup();
+	if (expired) {
+		colorGroup = QPalette::Disabled;
 	}
 
-	QPen normalPen;
+	// Draw selected background
 	if (option.state & QStyle::State_Selected) {
-		normalPen = QPen(option.palette.color(cg, QPalette::HighlightedText));
-	} else {
-		normalPen = QPen(option.palette.color(cg, QPalette::Text));
+		painter->fillRect(option.rect, option.palette.brush(colorGroup, QPalette::Highlight));
 	}
 
-	const QBrush highlightBrush(QColor(255, 255, 0), Qt::SolidPattern);
-	const QBrush selectedHighlightBrush(QColor(130, 130, 0), Qt::SolidPattern);
-
-	const QStringList strings = splitStrings(text, matchStart, matchLength);
-	const QPoint textOffset = drawIcon ? QPoint(option.rect.topLeft().x() + iconOffset + icon.width()
-										  + iconTextInterval, option.rect.topLeft().y())
-										: option.rect.topLeft();
-	const QList<QRect> rects = calculateRects(strings, textOffset,
-											  option.rect.height(), painter->fontMetrics());
-
-	painter->setPen(normalPen);
-
+	// Draw icon
 	const QRect iconRect(option.rect.topLeft().x() + iconOffset,
 						 option.rect.topLeft().y() + iconOffset,
 						 icon.width(),
@@ -106,16 +95,40 @@ void SearchResultItemDelegate::paint (QPainter* painter, const QStyleOptionViewI
 		painter->drawPixmap(iconRect, icon);
 	}
 
-	painter->drawText(rects.value(0), Qt::AlignLeft | Qt::AlignVCenter, strings.value(0));
-	painter->save();
-	painter->setBackgroundMode(Qt::OpaqueMode);
-	if (!(option.state & QStyle::State_Selected)) {
-		painter->setBackground(highlightBrush);
+	QFont highlightFont = option.font;
+	highlightFont.setBold(true);
+
+	// Draw text
+	const QStringList strings = splitStrings(text, matchStart, matchLength);
+	const QPoint textOffset = drawIcon ? QPoint(option.rect.topLeft().x() + iconOffset + icon.width()
+										  + iconTextInterval, option.rect.topLeft().y())
+										: option.rect.topLeft();
+	const QList<QRect> rects = calculateRects(strings, textOffset,
+											  option.rect.height(), painter->fontMetrics(),
+											  highlightFont);
+
+	QPen normalPen;
+	if (option.state & QStyle::State_Selected) {
+		normalPen = QPen(option.palette.color(colorGroup, QPalette::HighlightedText));
 	} else {
-		painter->setBackground(selectedHighlightBrush);
+		normalPen = QPen(option.palette.color(colorGroup, QPalette::Text));
+	}
+
+	painter->setPen(normalPen);
+	painter->drawText(rects.value(0), Qt::AlignLeft | Qt::AlignVCenter, strings.value(0));
+
+	painter->save();
+	painter->setFont(highlightFont);
+	if (!(option.state & QStyle::State_Selected)) {
+		const QPen highlightPen = QPen(QColor(255, 0, 0));
+		const QBrush highlightBrush(QColor(255, 255, 191), Qt::SolidPattern);
+		painter->setBackgroundMode(Qt::OpaqueMode);
+		painter->setBackground(highlightBrush);
+		painter->setPen(highlightPen);
 	}
 	painter->drawText(rects.value(1), Qt::AlignLeft | Qt::AlignVCenter, strings.value(1));
 	painter->restore();
+
 	painter->drawText(rects.value(2), Qt::AlignLeft | Qt::AlignVCenter, strings.value(2));
 
 	painter->restore();
@@ -133,10 +146,10 @@ QStringList SearchResultItemDelegate::splitStrings(const QString& text, const in
 QList<QRect> SearchResultItemDelegate::calculateRects(const QStringList& list,
 													  const QPoint& offset,
 													  int height,
-													  const QFontMetrics& metrics) const {
+													  const QFontMetrics& metrics, const QFont& hightlightFont) const {
 	int actualHeight = qMax(height, metrics.height());
 	const QRect firstStringRect = QRect(0, 0, metrics.width(list.value(0)), actualHeight);
-	const QRect secondStringRect = QRect(0, 0, metrics.width(list.value(1)), actualHeight);
+	const QRect secondStringRect = QRect(0, 0, QFontMetrics(hightlightFont).width(list.value(1)), actualHeight);
 	const QRect thirdStringRect = QRect(0, 0, metrics.width(list.value(2)), actualHeight);
 
 	const QRect firstStringFinalRect(offset, firstStringRect.size());

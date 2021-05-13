@@ -36,6 +36,7 @@ namespace qNotesManager {
 
 		static const int HighlightStartRole = Qt::UserRole + 1;
 		static const int HightlightLengthRole = Qt::UserRole + 2;
+		static const int ExpiredRole = Qt::UserRole + 3;
 
 	private slots:
 		void sl_Note_TextChanged();

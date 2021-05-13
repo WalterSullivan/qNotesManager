@@ -18,11 +18,11 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #ifndef SEARCHRESULTITEMDELEGATE_H
 #define SEARCHRESULTITEMDELEGATE_H
 
-#include <QStyledItemDelegate>
+#include <QItemDelegate>
 #include <QStringList>
 
 namespace qNotesManager {
-	class SearchResultItemDelegate : public QStyledItemDelegate {
+	class SearchResultItemDelegate : public QItemDelegate {
 	Q_OBJECT
 	public:
 		explicit SearchResultItemDelegate(QObject *parent = nullptr);
@@ -32,7 +32,7 @@ namespace qNotesManager {
 	private:
 		QStringList splitStrings(const QString& text, const int start, const int length) const;
 		QList<QRect> calculateRects(const QStringList& list, const QPoint& offset, int height,
-									const QFontMetrics& metrics) const;
+									const QFontMetrics& metrics, const QFont& hightlightFont) const;
 	};
 }
 

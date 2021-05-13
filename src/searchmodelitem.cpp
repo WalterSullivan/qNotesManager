@@ -66,18 +66,15 @@ QVariant SearchModelItem::data(int role) const {
 				return QVariant();
 				break;
 		}
+	} else if (role == ExpiredRole) {
+		return expired;
 	}
 	return QVariant();
 }
 
 /* virtual */
 Qt::ItemFlags SearchModelItem::flags () const {
-	Qt::ItemFlags f = BaseModelItem::flags();
-	if (expired && (f & Qt::ItemIsEnabled)) {
-		f ^= Qt::ItemIsEnabled;
-	}
-
-	return f;
+	return BaseModelItem::flags();
 }
 
 NoteFragment SearchModelItem::Fragment() const {
