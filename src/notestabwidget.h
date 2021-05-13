@@ -21,7 +21,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QWidget>
 #include <QTabWidget>
 #include <QHash>
-#include <QLayout>
 #include <QMenu>
 #include <QUrl>
 
@@ -42,7 +41,6 @@ namespace qNotesManager {
 	private:
 		QHash<const Note*, QWidget*> hash;
 		QTabWidget*		tabWidget;
-		QLayout*		layout;
 
 	#if QT_VERSION < 0x040500
 		QPushButton* closeTabButton;

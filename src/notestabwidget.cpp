@@ -46,7 +46,7 @@ NotesTabWidget::NotesTabWidget(QWidget *parent) : QWidget(parent) {
 #endif
 
 
-	layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QBoxLayout* layout = new QBoxLayout(QBoxLayout::LeftToRight);
 #if QT_VERSION < 0x040300
 	layout->setMargin(0);
 #else

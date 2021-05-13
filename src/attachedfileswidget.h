@@ -21,7 +21,6 @@ along with qNotesManager. If not, see <http://www.gnu.org/licenses/>.
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
-#include <QVBoxLayout>
 #include <QListWidget>
 
 namespace qNotesManager {
@@ -35,8 +34,6 @@ namespace qNotesManager {
 		QPushButton* saveButton;
 		QPushButton* deleteButton;
 		QListWidget* listWidget;
-
-		QVBoxLayout* layout;
 
 		Note* currentNote;
 
