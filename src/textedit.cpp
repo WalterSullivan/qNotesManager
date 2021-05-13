@@ -727,9 +727,10 @@ void TextEdit::ClearFormatting() {
 	cursor.beginEditBlock();
 
 	QTextCharFormat charFormat;
-	applyCharFormatting(charFormat, Set);
-
 	QTextBlockFormat blockFormat;
+
+	cursor.setCharFormat(charFormat);
+	cursor.setBlockCharFormat(charFormat);
 	cursor.setBlockFormat(blockFormat);
 	cursor.endEditBlock();
 }
