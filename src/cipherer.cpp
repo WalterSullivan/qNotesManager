@@ -161,19 +161,22 @@ QString Cipherer::GetCipherName(int cipherID) {
 }
 
 QByteArray Cipherer::GetHash(const QByteArray& str, quint8 hashID) {
-	(void)hashID;
-	const int iterations {1000};
+	QByteArray finalHash;
 
-	unsigned char hash[SHA256_DIGEST_LENGTH];
-	SHA256_CTX sha256;
-	SHA256_Init(&sha256);
+	if (hashID == 0) {
+		const int iterations {1000};
 
-	for (int i = 0; i < iterations; i++) {
-		SHA256_Update(&sha256, str.data(), str.size());
+		unsigned char hash[SHA256_DIGEST_LENGTH];
+		SHA256_CTX sha256;
+		SHA256_Init(&sha256);
+
+		for (int i = 0; i < iterations; i++) {
+			SHA256_Update(&sha256, str.data(), str.size());
+		}
+		SHA256_Final(hash, &sha256);
+
+		finalHash = QByteArray((char*)hash, SHA256_DIGEST_LENGTH);
 	}
-	SHA256_Final(hash, &sha256);
-
-	QByteArray finalHash {(char*)hash};
 
 	return finalHash;
 }
@@ -183,25 +186,40 @@ bool Cipherer::IsHashSupported(quint8 i) {
 }
 
 QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
-	(void)hashID;
-	const int iterations {1000};
+	QByteArray finalHash;
 
-	unsigned int len {SHA256_DIGEST_LENGTH};
-	unsigned char hash[SHA256_DIGEST_LENGTH];
+	if (hashID == 0) {
+		const int iterations {1000};
 
-	HMAC_CTX ctx;
-	HMAC_CTX_init(&ctx);
+		unsigned int len {SHA256_DIGEST_LENGTH};
+		unsigned char hash[SHA256_DIGEST_LENGTH];
+
+	#if OPENSSL_VERSION_NUMBER >= 0x010100000
+		HMAC_CTX *ctx;
+
+		ctx = HMAC_CTX_new();
+		HMAC_CTX_reset(ctx);
+		HMAC_Init_ex(ctx, data.data(), data.size(), EVP_sha256(), NULL);
+		for (int i = 0; i < iterations; i++) {
+				HMAC_Update(ctx, (const uchar*)data.data(), data.size());
+		}
+		HMAC_Final(ctx, hash, &len);
+		HMAC_CTX_free(ctx);
+	#elif
+		HMAC_CTX ctx;
+		HMAC_CTX_init(&ctx);
 
 
-	HMAC_Init_ex(&ctx, data.data(), data.size(), EVP_sha256(), NULL);
-	for (int i = 0; i < iterations; i++) {
-		HMAC_Update(&ctx, (const uchar*)data.data(), data.size());
+		HMAC_Init_ex(&ctx, data.data(), data.size(), EVP_sha256(), NULL);
+		for (int i = 0; i < iterations; i++) {
+			HMAC_Update(&ctx, (const uchar*)data.data(), data.size());
+		}
+		HMAC_Final(&ctx, hash, &len);
+		HMAC_CTX_cleanup(&ctx);
+	#endif
+
+		finalHash = QByteArray((char*)hash, len);
 	}
-	HMAC_Final(&ctx, hash, &len);
-	HMAC_CTX_cleanup(&ctx);
-
-
-	QByteArray finalHash {(char*)hash};
 
 	return finalHash;
 }
