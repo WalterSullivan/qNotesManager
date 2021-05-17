@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 			"-v, --version          Print version and exit\n"
 			"-h, --help             Print this screen and exit\n"
 			"-s, --silent           Do not send data to stderr\n"
-			"FILE                   File to open\n");
+			"FILE                   File to open");
 	silent = false;
 	QString fileToOpen = QString("");
 
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 				fflush(stdout);
 				return 0;
 			} else if (arg == "-h" || arg == "--help") {
-				fprintf(stdout, qPrintable(helpScreenText));
+				fprintf(stdout, "%s\n", qPrintable(helpScreenText));
 				fflush(stdout);
 				return 0;
 			} else if (arg == "-s" || arg == "--silent") {
