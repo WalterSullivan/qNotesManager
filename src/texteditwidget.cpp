@@ -471,9 +471,43 @@ void TextEditWidget::sl_ListButton_Toggled(bool toggle) {
 			WARNING("Wrong button state");
 			return;
 		}
+		QTextList *textList = nullptr;
+
+		// Try to find existing list before current block
+		QTextCursor tempCursor(cursor);
+		tempCursor.setPosition(cursor.selectionStart());
+		if (tempCursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor, 1)) {
+			if (tempCursor.currentList()) {
+				textList = tempCursor.currentList();
+			}
+		}
+
+		// Try to find existing list after current block
+		if (textList == nullptr) {
+			tempCursor.setPosition(cursor.selectionEnd());
+			if (tempCursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, 1)) {
+				if (tempCursor.currentList()) {
+					textList = tempCursor.currentList();
+				}
+			}
+		}
+
 		QTextListFormat format;
-		format.setStyle(QTextListFormat::ListDisc);
-		cursor.createList(format);
+		if (textList != nullptr) {
+			format = textList->format();
+			tempCursor.setPosition(cursor.selectionStart());
+			tempCursor.beginEditBlock();
+			while(tempCursor.position() <= cursor.selectionEnd()) {
+				textList->add(tempCursor.block());
+				if (!tempCursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, 1)) {
+					break;
+				}
+			}
+			tempCursor.endEditBlock();
+		} else {
+			format.setStyle(QTextListFormat::ListDisc);
+			cursor.createList(format);
+		}
 	} else {
 		QTextList *textList = cursor.currentList();
 		if (!cursor.currentList()) {
