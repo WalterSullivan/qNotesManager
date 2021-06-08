@@ -527,6 +527,12 @@ void TextEditWidget::sl_ListButton_Triggered(QAction* action) {
 		WARNING("Null pointer recieved");
 		return;
 	}
+	if (!action->data().isValid()) {
+		if (action->isCheckable() && action->isChecked()) {
+			action->setChecked(false);
+		}
+		return;
+	}
 	QTextListFormat::Style style = (QTextListFormat::Style)action->data().toInt();
 
 	QTextCursor cursor = this->textField->textCursor();
