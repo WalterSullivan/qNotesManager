@@ -155,20 +155,28 @@ void TextEditWidget::CreateControls() {
 	QMenu *listMenu = new QMenu(this);
 	{
 		QAction* a = listMenu->addAction(QIcon(":/gui/list-point"), "Circle");
+		a->setCheckable(true);
 		a->setData(QTextListFormat::ListDisc);
 		a = listMenu->addAction(QIcon(":/gui/list-point-hollow"), "Hollow circle");
+		a->setCheckable(true);
 		a->setData(QTextListFormat::ListCircle);
 		a = listMenu->addAction(QIcon(":/gui/list-square"), "Square");
+		a->setCheckable(true);
 		a->setData(QTextListFormat::ListSquare);
 		a = listMenu->addAction(QIcon(":/gui/list-number"), "Number");
+		a->setCheckable(true);
 		a->setData(QTextListFormat::ListDecimal);
 		a = listMenu->addAction(QIcon(":/gui/list-letter-lower"), "Letter (lower)");
+		a->setCheckable(true);
 		a->setData(QTextListFormat::ListLowerAlpha);
 		a = listMenu->addAction(QIcon(":/gui/list-letter-upper"), "Letter (upper)");
+		a->setCheckable(true);
 		a->setData(QTextListFormat::ListUpperAlpha);
 		a = listMenu->addAction(QIcon(":/gui/list-roman-lower"), "Roman (lower)");
+		a->setCheckable(true);
 		a->setData(QTextListFormat::ListLowerRoman);
 		a = listMenu->addAction(QIcon(":/gui/list-roman-upper"), "Roman (upper)");
+		a->setCheckable(true);
 		a->setData(QTextListFormat::ListUpperRoman);
 		listButton->setMenu(listMenu);
 	}
@@ -641,9 +649,19 @@ void TextEditWidget::sl_TextEdit_CursorPositionChanged() {
 	listButton->blockSignals(true);
 		const QTextCursor cursor = textField->textCursor();
 		const QTextList *textList = cursor.currentList();
-		listButton->setChecked(textList != 0);
-		increaseListIndentAction->setVisible(textList != 0);
-		decreaseListIndentAction->setVisible(textList != 0);
+		listButton->setChecked(textList != nullptr);
+		increaseListIndentAction->setVisible(textList != nullptr);
+		decreaseListIndentAction->setVisible(textList != nullptr);
+
+		foreach (QAction* listAction, listButton->menu()->actions()) {
+			listAction->setChecked(false);
+		}
+		if (textList != nullptr) {
+			QTextListFormat::Style currentListStyle = textList->format().style();
+			foreach (QAction* listAction, listButton->menu()->actions()) {
+				listAction->setChecked( (QTextListFormat::Style)listAction->data().toInt() == currentListStyle);
+			}
+		}
 	listButton->blockSignals(false);
 
 	QFont originalFont = this->textField->textCursor().charFormat().font();
