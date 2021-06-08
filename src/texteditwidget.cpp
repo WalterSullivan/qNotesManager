@@ -154,12 +154,22 @@ void TextEditWidget::CreateControls() {
 	listButton->setIcon(QIcon(":/gui/edit-list"));
 	QMenu *listMenu = new QMenu(this);
 	{
-		QAction* a = listMenu->addAction("Filled circle");
+		QAction* a = listMenu->addAction(QIcon(":/gui/list-point"), "Circle");
 		a->setData(QTextListFormat::ListDisc);
-		a = listMenu->addAction("Empty circle");
+		a = listMenu->addAction(QIcon(":/gui/list-point-hollow"), "Hollow circle");
 		a->setData(QTextListFormat::ListCircle);
-		a = listMenu->addAction("Filled square");
+		a = listMenu->addAction(QIcon(":/gui/list-square"), "Square");
 		a->setData(QTextListFormat::ListSquare);
+		a = listMenu->addAction(QIcon(":/gui/list-number"), "Number");
+		a->setData(QTextListFormat::ListDecimal);
+		a = listMenu->addAction(QIcon(":/gui/list-letter-lower"), "Letter (lower)");
+		a->setData(QTextListFormat::ListLowerAlpha);
+		a = listMenu->addAction(QIcon(":/gui/list-letter-upper"), "Letter (upper)");
+		a->setData(QTextListFormat::ListUpperAlpha);
+		a = listMenu->addAction(QIcon(":/gui/list-roman-lower"), "Roman (lower)");
+		a->setData(QTextListFormat::ListLowerRoman);
+		a = listMenu->addAction(QIcon(":/gui/list-roman-upper"), "Roman (upper)");
+		a->setData(QTextListFormat::ListUpperRoman);
 		listButton->setMenu(listMenu);
 	}
 	QObject::connect(listButton, SIGNAL(triggered(QAction*)),

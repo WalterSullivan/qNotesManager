@@ -931,5 +931,13 @@
         <file alias="edit-pilcrow">icons/gui/edit-pilcrow.png</file>
         <file alias="image">icons/gui/image.png</file>
         <file alias="paragraph">icons/gui/edit-drop-cap.png</file>
+        <file alias="list-point">icons/gui/list-point.png</file>
+        <file alias="list-point-hollow">icons/gui/list-point-hollow.png</file>
+        <file alias="list-square">icons/gui/list-square.png</file>
+        <file alias="list-number">icons/gui/list-number.png</file>
+        <file alias="list-letter-lower">icons/gui/list-letter-lower.png</file>
+        <file alias="list-letter-upper">icons/gui/list-letter-upper.png</file>
+        <file alias="list-roman-lower">icons/gui/list-roman-lower.png</file>
+        <file alias="list-roman-upper">icons/gui/list-roman-upper.png</file>
     </qresource>
 </RCC>
