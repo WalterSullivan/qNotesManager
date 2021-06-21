@@ -205,7 +205,7 @@ QByteArray Cipherer::GetSecureHash(const QByteArray& data, quint8 hashID) {
 		}
 		HMAC_Final(ctx, hash, &len);
 		HMAC_CTX_free(ctx);
-	#elif
+	#else
 		HMAC_CTX ctx;
 		HMAC_CTX_init(&ctx);
 
