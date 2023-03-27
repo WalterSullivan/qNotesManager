@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of qNotesManager.
 
 qNotesManager is free software: you can redistribute it and/or modify
@@ -430,6 +430,8 @@ void NoteEditWidget::sl_PropertyEdited(const QString& t) {
 		return;
 	}
 
+	int pos = sender->cursorPosition();
+
 	QString text = t;
 
 	if (sender == captionEdit) {
@@ -452,6 +454,8 @@ void NoteEditWidget::sl_PropertyEdited(const QString& t) {
 		currentNote->SetComment(text);
 		commentEdit->setText(text);
 	}
+
+	sender->setCursorPosition(pos);
 }
 
 QList<QAction*> NoteEditWidget::EditActionsList() const {
